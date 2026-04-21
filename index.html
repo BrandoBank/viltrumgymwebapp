@@ -2422,7 +2422,7 @@ const EXERCISE_LIBRARY={
   "Mountain Climbers":{cues:["Strong plank position","Drive knees to chest","Keep hips level","Fast tempo"],mistakes:["Hips too high","Touching foot down","Holding breath"],target:"Core, conditioning",muscles:["core"]},
   "Back Extensions":{cues:["Hinge at hips","Squeeze glutes at top","Don't hyperextend","Controlled tempo"],mistakes:["Rounding back","Using momentum","Hyperextending at top"],target:"Lower back, glutes",muscles:["back","glutes"]},
   "Chest Supported Rear Delt Flyes":{cues:["Chest flat on incline bench","Slight elbow bend","Lead with pinkies","Squeeze rear delts"],mistakes:["Using lats","Going too heavy","Swinging"],target:"Rear delts",muscles:["shoulders"]},
-  "🏃 Treadmill Run":{cues:["Refer to Run Plan tab for pace","Arms drive back at 90° elbows","Nasal breathing if possible"],mistakes:["Too fast early","Gripping handrails"],target:"Cardiovascular, fat loss",muscles:["quads","hamstrings","calves"]},
+  "Treadmill Run":{cues:["Refer to Run Plan tab for pace","Arms drive back at 90° elbows","Nasal breathing if possible"],mistakes:["Too fast early","Gripping handrails"],target:"Cardiovascular, fat loss",muscles:["quads","hamstrings","calves"]},
   "Rower":{cues:["Legs drive first, then back, then arms","Reverse order on return","Keep core braced","Steady pace"],mistakes:["Pulling with arms first","Leaning back too far"],target:"Full-body conditioning",muscles:["back","quads","core"]},
   "Elliptical or Stairmaster":{cues:["Steady rhythm","Full range on the stride","Don't lean on handles","Progressive intensity"],mistakes:["Leaning on handles","Slumped posture"],target:"Cardiovascular warm-up",muscles:["quads","calves"]},
   "Cycle":{cues:["Adjust seat height correctly","Steady pace for warm-up","Keep core engaged","Consistent RPM"],mistakes:["Seat too low","Rocking side to side"],target:"Cardiovascular warm-up",muscles:["quads","calves"]},
@@ -2603,7 +2603,7 @@ const WORKOUTS={
     {name:"B-Stance DB RDLs",sets:"1/3",reps:"10/10 then 8/8",weight:"20s / 25s",note:"Heel to toe, back heel elevated, focus on front hamstring"},
     {name:"Lying Hamstring Curl",sets:"4",reps:"8",weight:"Moderate",note:"5-second eccentric (lowering) each rep"},
     {name:"Calf Raises",sets:"3",reps:"15",weight:"Moderate",note:"Full stretch, full squeeze"},
-    {name:"🏃 Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"Follow weekly phase"},
+    {name:"Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"Follow weekly phase"},
   ]},
   Tuesday:{label:"TUE — Upper Push + Back",muscleGroups:["chest","shoulders","triceps","back","core"],exercises:[
     {name:"Elliptical or Stairmaster",sets:"1",reps:"10 min",weight:"—",note:"Warm-up"},
@@ -2615,7 +2615,7 @@ const WORKOUTS={
     {name:"DB Incline Flyes",sets:"3",reps:"12",weight:"25-30s",note:""},
     {name:"Overhead Tricep Extension",sets:"4",reps:"10",weight:"50-60lb EZ curl",note:"Full stretch in tricep at bottom"},
     {name:"Tricep Pushdowns",sets:"3",reps:"20",weight:"Drop set",note:"Drop weight as needed"},
-    {name:"🏃 Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"Flat — follow weekly phase"},
+    {name:"Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"Flat — follow weekly phase"},
   ]},
   Wednesday:{label:"WED — Pull + Biceps + Power",muscleGroups:["back","biceps","shoulders","core"],exercises:[
     {name:"Cycle",sets:"1",reps:"10 min",weight:"—",note:"Warm-up"},
@@ -2629,7 +2629,7 @@ const WORKOUTS={
     {name:"EZ Curls — Inner Grip",sets:"3",reps:"10",weight:"Moderate",note:"Close handles"},
     {name:"Alternating Hammer Curls",sets:"4",reps:"10/10",weight:"25-30s",note:""},
     {name:"Rear Delt Cable Crossover",sets:"4",reps:"15",weight:"Light",note:"Slow + controlled"},
-    {name:"🏃 Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"1% incline"},
+    {name:"Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"1% incline"},
   ]},
   Thursday:{label:"THU — Hinge + Trap Bar Deadlift",muscleGroups:["hamstrings","glutes","back","traps","core","quads"],exercises:[
     {name:"Jump Rope",sets:"4",reps:"30",weight:"—",note:""},
@@ -2641,7 +2641,7 @@ const WORKOUTS={
     {name:"Hip Adductor Machine",sets:"3",reps:"12",weight:"Moderate",note:""},
     {name:"Hip Abductor Machine",sets:"3",reps:"12",weight:"Moderate",note:""},
     {name:"Stairs",sets:"1",reps:"10 min",weight:"—",note:"Steady pace finisher"},
-    {name:"🏃 Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"After foam roll"},
+    {name:"Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"After foam roll"},
   ]},
   Friday:{label:"FRI — Shoulders + Arms",muscleGroups:["shoulders","triceps","biceps","chest","core"],exercises:[
     {name:"Spin Bike",sets:"1",reps:"10 min",weight:"—",note:"Warm-up"},
@@ -2653,7 +2653,7 @@ const WORKOUTS={
     {name:"Skull Crushers",sets:"3",reps:"12-15",weight:"60-70lb",note:""},
     {name:"Cable Curls",sets:"3",reps:"15",weight:"Straight or EZ curl",note:""},
     {name:"Concentration Curls",sets:"4",reps:"10/10",weight:"20-30lb DB",note:""},
-    {name:"🏃 Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"End strong"},
+    {name:"Treadmill Run",sets:"1",reps:"20 min",weight:"See run plan",note:"End strong"},
   ]}
 };
 
@@ -4473,7 +4473,7 @@ CRITICAL RULES:
 - For "weight": preserve format from PDF — "115/135/155/185/205lb" for ramps, "60-70lb" for ranges, "20s" for dumbbell pairs, "BW" for bodyweight, "—" if not specified, "5s eccentrics" for tempo notes that aren't weights.
 - "note" should be concise form cue or relevant context, max 80 chars. Combine multi-line notes into one. Use "" if no note.
 - Add cardio/warm-up exercises as their own entries (Rower, Elliptical, Cycle, Spin Bike, Jump Rope, etc.) with weight: "—" or duration in reps.
-- ALWAYS append a treadmill run as the LAST exercise of every training day with: { "name": "🏃 Treadmill Run", "sets": "1", "reps": "20 min", "weight": "See run plan", "note": "End strong" }
+- ALWAYS append a treadmill run as the LAST exercise of every training day with: { "name": "Treadmill Run", "sets": "1", "reps": "20 min", "weight": "See run plan", "note": "End strong" }
 - Never invent exercises not in the PDF. Never invent weights/reps not in the PDF.
 - For exercise names: clean up spelling (Lyring → Lying, crossovr → Crossover, Tbar → T-Bar) and capitalize properly.`;
 
@@ -4778,7 +4778,7 @@ Rules:
 - Sets field: simple number for straight sets (e.g. "4"), or slash-separated for ramp-ups (e.g. "1/1/1/5" for 1/1/1 warm-up + 5 working)
 - Reps field: single number ("10"), range ("8-12"), slash-sep for different sets ("12/10/8/5/5"), or "F" for failure
 - Weight field: exact weights like "135lb" or "135/185/205lb" for ramp-ups, or descriptive like "Moderate", "Light→Moderate", "BW", or "—" for bodyweight/cardio
-- Always include a 20-min treadmill run as the last exercise each day with name "🏃 Treadmill Run", sets "1", reps "20 min", weight "See run plan"
+- Always include a 20-min treadmill run as the last exercise each day with name "Treadmill Run", sets "1", reps "20 min", weight "See run plan"
 - Include appropriate warm-up cardio as first exercise each day (rower, bike, jump rope, etc.)
 - Notes should be concise form cues or relevant context, under 60 chars
 - 9-12 exercises per day including warm-up and treadmill`;
