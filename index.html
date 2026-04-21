@@ -2085,6 +2085,7 @@ async function loadProfileAndData() {
   if (profile.goal_weight) state.goalWeight = profile.goal_weight;
   if (profile.starting_weight) state.startingWeight = profile.starting_weight;
   showAppShell();
+  loadCutWeights();
 }
 
 function maybeShowIosBanner() {
@@ -2188,6 +2189,31 @@ function syncToCloud() {
 
 /* ═════════════════ PROGRAMS MANAGER ═════════════════ */
 let savedPrograms = [];
+
+/* ═════════════════ CROSS-APP WEIGHT SYNC ═════════════════ */
+let cutWeights = [];
+
+function allWeights() {
+  const merged = [...(state.weights || [])];
+  const bbDates = new Set(merged.map(w => w.date));
+  for (const w of cutWeights) {
+    if (!bbDates.has(w.date)) merged.push(w);
+  }
+  return merged.sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
+async function loadCutWeights() {
+  if (!supa || !currentUser) return;
+  try {
+    const { data, error } = await supa.from('weights').select('date,weight').eq('user_id', currentUser.id).order('date', { ascending: true });
+    if (error || !data || data.length === 0) return;
+    cutWeights = data.map(r => ({ date: r.date, weight: r.weight, fromCut: true }));
+    if (document.getElementById('tab-weight')?.style.display !== 'none') {
+      drawWeightChart(); renderWeightHistory(); updateWeightStats();
+    }
+    renderHome();
+  } catch(e) { /* The Cut table unavailable — silent fallback */ }
+}
 
 async function loadPrograms() {
   if (!supa || !currentUser) return;
@@ -2788,7 +2814,7 @@ function showTab(id){
   if(id==="chart")drawStrengthChart();
   if(id==="workouts"){renderProgramTab();logEvent('program_tab_viewed');applyUiMode();}
   if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();applyUiMode();checkGymNudge();} else {stopSessionClock();releaseWakeLock();}
-  if(id==="weight"){drawWeightChart();renderWeightHistory();updateWeightStats();renderMeasurementHistory();}
+  if(id==="weight"){loadCutWeights();drawWeightChart();renderWeightHistory();updateWeightStats();renderMeasurementHistory();}
   if(id==="running"){renderRunCards();renderIncline();drawRunChart();}
   if(id==="stats"){renderStats();renderAchievements();}
   if(id==="warroom")renderWarRoom();
@@ -3132,7 +3158,7 @@ function renderHome(){
   `;
 
   // Cut journey
-  const sortedWeights = (state.weights || []).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const sortedWeights = allWeights().slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
   if(sortedWeights.length >= 2){
     const start = sortedWeights[0];
     const current = sortedWeights[sortedWeights.length-1];
@@ -3279,7 +3305,7 @@ function drawWeightChart(){
   const svg=document.getElementById("weightChart");if(!svg)return;
   const W=svg.parentElement.clientWidth-32||600,H=260;
   const pad={top:16,right:16,bottom:40,left:44},cW=W-pad.left-pad.right,cH=H-pad.top-pad.bottom;
-  const data=state.weights.slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const data=allWeights();
   if(data.length<2){svg.innerHTML=`<text x="50%" y="50%" fill="#555" font-size="12" text-anchor="middle">Need at least 2 entries</text>`;return}
   const wts=data.map(d=>d.weight);const minV=Math.floor(Math.min(...wts,state.goalWeight)/10)*10-5;const maxV=Math.ceil(Math.max(...wts)/10)*10+5;
   svg.setAttribute("width",W);svg.setAttribute("height",H);svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
@@ -3301,11 +3327,17 @@ function drawWeightChart(){
   // line
   const linePts=data.map(d=>`${xPos(d.date)},${yPos(d.weight)}`).join(" ");
   html+=`<polyline points="${linePts}" fill="none" stroke="var(--lime)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-  // dots
-  data.forEach(d=>html+=`<circle cx="${xPos(d.date)}" cy="${yPos(d.weight)}" r="3.5" fill="var(--lime)" class="wt-dot" data-date="${d.date}" data-weight="${d.weight}"/>`);
+  // dots — BB entries filled, Cut entries hollow
+  data.forEach(d=>{
+    if(d.fromCut){
+      html+=`<circle cx="${xPos(d.date)}" cy="${yPos(d.weight)}" r="3.5" fill="var(--bg)" stroke="var(--lime)" stroke-width="1.5" class="wt-dot" data-date="${d.date}" data-weight="${d.weight}" data-source="cut"/>`;
+    } else {
+      html+=`<circle cx="${xPos(d.date)}" cy="${yPos(d.weight)}" r="3.5" fill="var(--lime)" class="wt-dot" data-date="${d.date}" data-weight="${d.weight}"/>`;
+    }
+  });
   svg.innerHTML=html;
   svg.querySelectorAll(".wt-dot").forEach(dot=>{
-    dot.addEventListener("mouseenter",e=>{const tt=document.getElementById("tooltip");const dt=new Date(dot.dataset.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});tt.innerHTML=`<div class="mono" style="font-size:10px;color:#8a8a8a">${dt}</div><div style="font-size:13px;margin-top:3px"><strong style="color:var(--lime)">${dot.dataset.weight} lb</strong></div>`;tt.style.display="block";tt.style.left=(e.clientX+12)+"px";tt.style.top=(e.clientY-20)+"px"});
+    dot.addEventListener("mouseenter",e=>{const tt=document.getElementById("tooltip");const dt=new Date(dot.dataset.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});const src=dot.dataset.source==='cut'?' <span style="font-size:9px;color:#888">THE CUT</span>':'';tt.innerHTML=`<div class="mono" style="font-size:10px;color:#8a8a8a">${dt}${src}</div><div style="font-size:13px;margin-top:3px"><strong style="color:var(--lime)">${dot.dataset.weight} lb</strong></div>`;tt.style.display="block";tt.style.left=(e.clientX+12)+"px";tt.style.top=(e.clientY-20)+"px"});
     dot.addEventListener("mouseleave",()=>{document.getElementById("tooltip").style.display="none"});
   });
 }
@@ -3788,14 +3820,16 @@ function addWeight(){
 }
 function deleteWeight(date){state.weights=state.weights.filter(e=>e.date!==date);persist();drawWeightChart();renderWeightHistory();updateWeightStats()}
 function renderWeightHistory(){
-  const recent=state.weights.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
+  const recent=allWeights().slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
   document.getElementById("weightHistory").innerHTML=recent.map(e=>{
     const d=new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:12px;color:var(--text)">${d}</div></div><div style="display:flex;align-items:center;gap:10px"><span style="font-size:14px;color:var(--lime);font-weight:600;font-family:'JetBrains Mono'">${e.weight} lb</span><button class="bag-item-delete" onclick="deleteWeight('${e.date}')"><svg><use href="#i-trash"/></svg></button></div></div>`;
+    const badge=e.fromCut?`<span style="font-size:9px;color:#888;font-family:'JetBrains Mono';letter-spacing:.06em;margin-left:5px">THE CUT</span>`:'';
+    const del=e.fromCut?'':`<button class="bag-item-delete" onclick="deleteWeight('${e.date}')"><svg><use href="#i-trash"/></svg></button>`;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:12px;color:var(--text)">${d}${badge}</div></div><div style="display:flex;align-items:center;gap:10px"><span style="font-size:14px;color:var(--lime);font-weight:600;font-family:'JetBrains Mono'">${e.weight} lb</span>${del}</div></div>`;
   }).join("");
 }
 function updateWeightStats(){
-  const sorted=state.weights.slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const sorted=allWeights().slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
   if(sorted.length===0)return;
   const start=sorted[0],current=sorted[sorted.length-1];
   const lost=start.weight-current.weight;
@@ -4387,10 +4421,10 @@ const ACHIEVEMENTS = [
   {id:'bench_225',icon:_svg('i-plates'),name:'Plate Club',desc:'Bench 225+ (2 plates)',check:()=>checkLiftPR(['Bench Press','Incline Bench','Speed Bench'],225)},
   {id:'deadlift_315',icon:_svg('i-stats'),name:'315 Club',desc:'Deadlift 315+',check:()=>checkLiftPR(['Deadlift','Trap Bar Deadlift','Sumo Deadlift'],315)},
   {id:'squat_315',icon:_svg('i-body'),name:'3-Plate Squat',desc:'Squat 315+',check:()=>checkLiftPR(['Back Squat','Squat','Box Squat','Pulse Squats','Front Squat'],315)},
-  {id:'cut_25',icon:_svg('i-chart'),name:'Down 25',desc:'Lost 25+ lbs from start',check:()=>{const w=state.weights||[];if(w.length<2)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return(s[0].weight-s[s.length-1].weight)>=25}},
-  {id:'cut_50',icon:_svg('i-target'),name:'Down 50',desc:'Lost 50+ lbs',check:()=>{const w=state.weights||[];if(w.length<2)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return(s[0].weight-s[s.length-1].weight)>=50}},
-  {id:'cut_75',icon:_svg('i-trophy'),name:'Down 75',desc:'Lost 75+ lbs',check:()=>{const w=state.weights||[];if(w.length<2)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return(s[0].weight-s[s.length-1].weight)>=75}},
-  {id:'goal_hit',icon:_svg('i-crown'),name:'Goal Smasher',desc:'Hit your goal weight',check:()=>{const w=state.weights||[];if(w.length===0)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return s[s.length-1].weight<=(state.goalWeight||210)}},
+  {id:'cut_25',icon:_svg('i-chart'),name:'Down 25',desc:'Lost 25+ lbs from start',check:()=>{const w=allWeights();if(w.length<2)return false;return(w[0].weight-w[w.length-1].weight)>=25}},
+  {id:'cut_50',icon:_svg('i-target'),name:'Down 50',desc:'Lost 50+ lbs',check:()=>{const w=allWeights();if(w.length<2)return false;return(w[0].weight-w[w.length-1].weight)>=50}},
+  {id:'cut_75',icon:_svg('i-trophy'),name:'Down 75',desc:'Lost 75+ lbs',check:()=>{const w=allWeights();if(w.length<2)return false;return(w[0].weight-w[w.length-1].weight)>=75}},
+  {id:'goal_hit',icon:_svg('i-crown'),name:'Goal Smasher',desc:'Hit your goal weight',check:()=>{const w=allWeights();if(w.length===0)return false;return w[w.length-1].weight<=(state.goalWeight||210)}},
   {id:'block_done',icon:_svg('i-check'),name:'Block Complete',desc:'Finished first 4-week block',check:()=>state.block&&state.block.num>=2},
   {id:'measurements',icon:_svg('i-scale'),name:'Data Driven',desc:'Logged body measurements',check:()=>(state.measurements||[]).length>0},
   {id:'ai_generated',icon:_svg('i-sparkle'),name:'AI Powered',desc:'Generated a program with AI',check:()=>!!state.customProgram}
