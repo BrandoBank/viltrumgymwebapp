@@ -359,7 +359,7 @@
   .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
   .ach-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;transition:all 0.2s;opacity:0.4}
   .ach-card.unlocked{opacity:1;border-color:rgba(182,255,60,0.3);background:rgba(182,255,60,0.04)}
-  .ach-icon{font-size:30px;margin-bottom:8px;line-height:1}
+  .ach-icon{display:flex;align-items:center;justify-content:center;height:36px;margin-bottom:8px;color:var(--lime)}
   .ach-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.2}
   .ach-card.unlocked .ach-name{color:var(--lime)}
   .ach-desc{font-size:10px;color:var(--text-faint);line-height:1.4}
@@ -401,7 +401,7 @@
   .home-cut-progress-label{display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'}
   .home-activity-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start}
   .home-activity-item:last-child{border-bottom:none}
-  .home-activity-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center}
+  .home-activity-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:28px;height:28px;color:var(--text-dim)}
   .home-activity-body{flex:1;min-width:0}
   .home-activity-title{font-size:12px;color:var(--text);font-weight:500;margin-bottom:2px}
   .home-activity-meta{font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'}
@@ -742,6 +742,9 @@
     <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></symbol>
     <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
     <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+    <symbol id="i-muscle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5c1-2.5 4-3 5.5-1.5M6.5 6.5C5 8 5 11 7 12c-2 1-3 3.5-1.5 5.5M7 17.5C9 20 13 20 15 18c1.5-1.5 1.5-4 0-5.5M15 12.5c2-1 3-3.5 2-5.5C16 5 13.5 4.5 12 5"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M4 20V10l4 4 4-6 4 6 4-4v10"/></symbol>
   </defs>
 </svg>
 
@@ -817,7 +820,7 @@
         <img src="favicon-96x96.png" alt="BeeBuildz" style="width:64px;height:64px;display:block"/>
         <div class="auth-logo-text">BEEBUILDZ</div>
       </div>
-      <div class="auth-title">Welcome 👋</div>
+      <div class="auth-title">Welcome</div>
       <div class="auth-sub">What should we call you?</div>
       <div class="auth-input-group">
         <label class="auth-label">YOUR NAME</label>
@@ -1459,7 +1462,7 @@
       <div class="settings-group">
         <div class="settings-group-title" style="color:var(--red)">CLEAR ALL DATA</div>
         <div class="settings-group-desc">Permanently delete all your training data. This cannot be undone.</div>
-        <button class="btn" style="border-color:var(--red);color:var(--red)" onclick="confirmClearData()">⚠ CLEAR ALL DATA</button>
+        <button class="btn" style="border-color:var(--red);color:var(--red)" onclick="confirmClearData()"><svg style="width:14px;height:14px;margin-right:5px;vertical-align:-2px"><use href="#i-warning"/></svg>CLEAR ALL DATA</button>
       </div>
     </div>
 
@@ -1512,7 +1515,7 @@
 <div class="sync-indicator" id="syncIndicator">SYNCED</div>
 
 <!-- PR toast -->
-<div class="pr-toast" id="prToast">🏆 NEW PR!</div>
+<div class="pr-toast" id="prToast">NEW PR!</div>
 
 <!-- Confetti container -->
 <div class="confetti-container" id="confettiContainer"></div>
@@ -1653,10 +1656,10 @@
     <div id="programsList" style="margin-bottom:14px"></div>
 
     <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:14px;margin-bottom:14px">
-      <div style="font-size:10px;color:var(--text-faint);letter-spacing:0.15em;font-family:'JetBrains Mono';font-weight:600;margin-bottom:10px">📄 IMPORT FROM PDF</div>
+      <div style="font-size:10px;color:var(--text-faint);letter-spacing:0.15em;font-family:'JetBrains Mono';font-weight:600;margin-bottom:10px">IMPORT FROM PDF</div>
       <div style="font-size:11px;color:var(--text-faint);margin-bottom:10px;line-height:1.5">Upload a workout PDF from your trainer. AI will parse it into a structured program. Uses your Anthropic API key from War Room.</div>
       <input type="file" id="pdfUploadInput" accept="application/pdf" style="display:none" onchange="handlePdfUpload(event)"/>
-      <button class="auth-btn auth-btn-secondary" data-advanced onclick="document.getElementById('pdfUploadInput').click()" id="pdfUploadBtn">📄 UPLOAD PDF</button>
+      <button class="auth-btn auth-btn-secondary" data-advanced onclick="document.getElementById('pdfUploadInput').click()" id="pdfUploadBtn">UPLOAD PDF</button>
       <div id="pdfUploadStatus" style="margin-top:10px;font-size:11px"></div>
     </div>
 
@@ -2357,8 +2360,8 @@ function renderProgramTab() {
         <div class="panel-title">ADD NEW PROGRAM</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-        <button class="btn primary" data-advanced style="min-height:48px;font-size:12px" onclick="document.getElementById('pdfUploadInput').click()">📄 Upload Trainer PDF</button>
-        <button class="btn" style="min-height:48px;font-size:12px" onclick="showTab('warroom')">⚡ Generate with AI</button>
+        <button class="btn primary" data-advanced style="min-height:48px;font-size:12px;display:flex;align-items:center;justify-content:center;gap:7px" onclick="document.getElementById('pdfUploadInput').click()"><svg style="width:15px;height:15px;flex-shrink:0"><use href="#i-file"/></svg>Upload Trainer PDF</button>
+        <button class="btn" style="min-height:48px;font-size:12px;display:flex;align-items:center;justify-content:center;gap:7px" onclick="showTab('warroom')"><svg style="width:15px;height:15px;flex-shrink:0"><use href="#i-sparkle"/></svg>Generate with AI</button>
       </div>
       <div style="border-top:1px solid var(--border);padding-top:14px">
         <label style="display:block;font-size:10px;color:var(--text-faint);letter-spacing:0.12em;font-family:'JetBrains Mono';font-weight:600;margin-bottom:6px">SAVE CURRENT PROGRAM AS</label>
@@ -2965,7 +2968,7 @@ function checkNudges() {
   if (basics && sessions >= 5 && !seen.includes(NUDGE_BASICS_UNLOCK)) {
     nudges.push({
       id: NUDGE_BASICS_UNLOCK,
-      title: "You've been crushing it 🔥",
+      title: "You've been crushing it",
       body: "Ready for more? Enable War Room AI, Ask Coach, and advanced stats in Settings.",
       action: "UNLOCK ADVANCED FEATURES",
       actionFn: `toggleUiMode();dismissNudge('${NUDGE_BASICS_UNLOCK}')`,
@@ -3014,8 +3017,8 @@ function checkGymNudge() {
       </div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:14px">You're on the Powerbuilding 5-Day starter. Want your actual program?</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="btn primary" style="min-height:44px" onclick="logEvent('personalize_nudge_action',{action:'pdf'});dismissNudge('${NUDGE_GYM_PERSONALIZE}');document.getElementById('pdfUploadInput').click()">📄 Upload Trainer PDF</button>
-        <button class="btn" style="min-height:44px" onclick="logEvent('personalize_nudge_action',{action:'ai'});dismissNudge('${NUDGE_GYM_PERSONALIZE}');showTab('warroom')">⚡ Generate with AI</button>
+        <button class="btn primary" style="min-height:44px;display:flex;align-items:center;justify-content:center;gap:7px" onclick="logEvent('personalize_nudge_action',{action:'pdf'});dismissNudge('${NUDGE_GYM_PERSONALIZE}');document.getElementById('pdfUploadInput').click()"><svg style="width:15px;height:15px;flex-shrink:0"><use href="#i-file"/></svg>Upload Trainer PDF</button>
+        <button class="btn" style="min-height:44px;display:flex;align-items:center;justify-content:center;gap:7px" onclick="logEvent('personalize_nudge_action',{action:'ai'});dismissNudge('${NUDGE_GYM_PERSONALIZE}');showTab('warroom')"><svg style="width:15px;height:15px;flex-shrink:0"><use href="#i-sparkle"/></svg>Generate with AI</button>
         <button style="background:none;border:none;color:var(--text-faint);font-size:11px;cursor:pointer;text-decoration:underline;padding:6px 0;font-family:inherit;text-align:left" onclick="logEvent('personalize_nudge_action',{action:'dismiss'});dismissNudge('${NUDGE_GYM_PERSONALIZE}')">Stick with starter</button>
       </div>
     </div>`;
@@ -3157,13 +3160,13 @@ function renderHome(){
     const daysAgo = Math.floor((Date.now() - new Date(s.date).getTime()) / 86400000);
     const when = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`;
     const durStr = s.duration ? ` · ${s.duration}` : '';
-    activities.push({icon:'💪', title:`${s.day} session complete`, meta: when+durStr});
+    activities.push({icon:'<svg style="width:16px;height:16px"><use href="#i-dumbbell"/></svg>', title:`${s.day} session complete`, meta: when+durStr});
   });
   if(sortedWeights.length > 0){
     const last = sortedWeights[sortedWeights.length-1];
     const daysAgo = Math.floor((Date.now() - new Date(last.date).getTime()) / 86400000);
     const when = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`;
-    activities.push({icon:'⚖️', title:`Logged ${last.weight} lb`, meta: when});
+    activities.push({icon:'<svg style="width:16px;height:16px"><use href="#i-scale"/></svg>', title:`Logged ${last.weight} lb`, meta: when});
   }
   if(activities.length === 0){
     activity.innerHTML = '<div style="color:var(--text-faint);font-size:12px;font-style:italic;padding:10px 0">No activity yet. Complete a session or log a weight to populate this.</div>';
@@ -3225,13 +3228,13 @@ function renderHome(){
     }
     const goal = state.goalWeight || 210;
     if(current > goal){
-      milestones.push({icon:'👑', label:'Goal weight', meta:`${(current-goal).toFixed(1)}lb to go · ${goal}lb`});
+      milestones.push({icon:'<svg style="width:16px;height:16px"><use href="#i-crown"/></svg>', label:'Goal weight', meta:`${(current-goal).toFixed(1)}lb to go · ${goal}lb`});
     }
   }
   const currentStreak = calculateStreak();
   const nextStreakMilestone = currentStreak < 3 ? 3 : currentStreak < 6 ? 6 : currentStreak < 12 ? 12 : null;
   if(nextStreakMilestone){
-    milestones.push({icon:'🔥', label:`${nextStreakMilestone}-week streak`, meta:`${nextStreakMilestone - currentStreak} more weeks at 4+ sessions`});
+    milestones.push({icon:'<svg style="width:16px;height:16px"><use href="#i-flame"/></svg>', label:`${nextStreakMilestone}-week streak`, meta:`${nextStreakMilestone - currentStreak} more weeks at 4+ sessions`});
   }
   if(milestones.length === 0){
     milestoneEl.innerHTML = '<div style="color:var(--text-faint);font-size:12px;font-style:italic;padding:6px 0">Crushing them all right now. Set new goals in Edit Profile.</div>';
@@ -3640,7 +3643,7 @@ function updateTimerDisplay(exIdx){const el=document.getElementById("timer-"+exI
 /* ═════════════════ PR DETECTION (#11) ═════════════════ */
 function showPRToast(name){
   const el=document.getElementById('prToast');if(!el)return;
-  el.textContent=`🏆 NEW PR — ${name}`;
+  el.textContent=`NEW PR — ${name}`;
   el.classList.add('show');
   clearTimeout(showPRToast._t);
   showPRToast._t=setTimeout(()=>el.classList.remove('show'),2800);
@@ -4375,21 +4378,22 @@ function checkLiftPR(matchNames, weightThreshold){
   return false;
 }
 
+const _svg = id => `<svg style="width:24px;height:24px"><use href="#${id}"/></svg>`;
 const ACHIEVEMENTS = [
-  {id:'first_workout',icon:'🏁',name:'First Session',desc:'Completed your first workout',check:()=>(state.sessionHistory||[]).length > 0},
-  {id:'full_week',icon:'⚔️',name:'Full Week',desc:'5 sessions in one week',check:()=>calculateStreak() >= 1 && Object.keys(state.sessionHistory||[]).length >= 5},
-  {id:'streak_3',icon:'🔥',name:'3-Week Streak',desc:'3 weeks with 4+ sessions',check:()=>calculateStreak() >= 3},
-  {id:'streak_12',icon:'💪',name:'Dedicated',desc:'12-week streak',check:()=>calculateStreak() >= 12},
-  {id:'bench_225',icon:'🪑',name:'Plate Club',desc:'Bench 225+ (2 plates)',check:()=>checkLiftPR(['Bench Press','Incline Bench','Speed Bench'],225)},
-  {id:'deadlift_315',icon:'🏗️',name:'315 Club',desc:'Deadlift 315+',check:()=>checkLiftPR(['Deadlift','Trap Bar Deadlift','Sumo Deadlift'],315)},
-  {id:'squat_315',icon:'🦵',name:'3-Plate Squat',desc:'Squat 315+',check:()=>checkLiftPR(['Back Squat','Squat','Box Squat','Pulse Squats','Front Squat'],315)},
-  {id:'cut_25',icon:'📉',name:'Down 25',desc:'Lost 25+ lbs from start',check:()=>{const w=state.weights||[];if(w.length<2)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return(s[0].weight-s[s.length-1].weight)>=25}},
-  {id:'cut_50',icon:'🎯',name:'Down 50',desc:'Lost 50+ lbs',check:()=>{const w=state.weights||[];if(w.length<2)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return(s[0].weight-s[s.length-1].weight)>=50}},
-  {id:'cut_75',icon:'🏆',name:'Down 75',desc:'Lost 75+ lbs',check:()=>{const w=state.weights||[];if(w.length<2)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return(s[0].weight-s[s.length-1].weight)>=75}},
-  {id:'goal_hit',icon:'👑',name:'Goal Smasher',desc:'Hit your goal weight',check:()=>{const w=state.weights||[];if(w.length===0)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return s[s.length-1].weight<=(state.goalWeight||210)}},
-  {id:'block_done',icon:'🗓️',name:'Block Complete',desc:'Finished first 4-week block',check:()=>state.block&&state.block.num>=2},
-  {id:'measurements',icon:'📏',name:'Data Driven',desc:'Logged body measurements',check:()=>(state.measurements||[]).length>0},
-  {id:'ai_generated',icon:'🤖',name:'AI Powered',desc:'Generated a program with AI',check:()=>!!state.customProgram}
+  {id:'first_workout',icon:_svg('i-check'),name:'First Session',desc:'Completed your first workout',check:()=>(state.sessionHistory||[]).length > 0},
+  {id:'full_week',icon:_svg('i-dumbbell'),name:'Full Week',desc:'5 sessions in one week',check:()=>calculateStreak() >= 1 && Object.keys(state.sessionHistory||[]).length >= 5},
+  {id:'streak_3',icon:_svg('i-flame'),name:'3-Week Streak',desc:'3 weeks with 4+ sessions',check:()=>calculateStreak() >= 3},
+  {id:'streak_12',icon:_svg('i-muscle'),name:'Dedicated',desc:'12-week streak',check:()=>calculateStreak() >= 12},
+  {id:'bench_225',icon:_svg('i-plates'),name:'Plate Club',desc:'Bench 225+ (2 plates)',check:()=>checkLiftPR(['Bench Press','Incline Bench','Speed Bench'],225)},
+  {id:'deadlift_315',icon:_svg('i-stats'),name:'315 Club',desc:'Deadlift 315+',check:()=>checkLiftPR(['Deadlift','Trap Bar Deadlift','Sumo Deadlift'],315)},
+  {id:'squat_315',icon:_svg('i-body'),name:'3-Plate Squat',desc:'Squat 315+',check:()=>checkLiftPR(['Back Squat','Squat','Box Squat','Pulse Squats','Front Squat'],315)},
+  {id:'cut_25',icon:_svg('i-chart'),name:'Down 25',desc:'Lost 25+ lbs from start',check:()=>{const w=state.weights||[];if(w.length<2)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return(s[0].weight-s[s.length-1].weight)>=25}},
+  {id:'cut_50',icon:_svg('i-target'),name:'Down 50',desc:'Lost 50+ lbs',check:()=>{const w=state.weights||[];if(w.length<2)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return(s[0].weight-s[s.length-1].weight)>=50}},
+  {id:'cut_75',icon:_svg('i-trophy'),name:'Down 75',desc:'Lost 75+ lbs',check:()=>{const w=state.weights||[];if(w.length<2)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return(s[0].weight-s[s.length-1].weight)>=75}},
+  {id:'goal_hit',icon:_svg('i-crown'),name:'Goal Smasher',desc:'Hit your goal weight',check:()=>{const w=state.weights||[];if(w.length===0)return false;const s=[...w].sort((a,b)=>new Date(a.date)-new Date(b.date));return s[s.length-1].weight<=(state.goalWeight||210)}},
+  {id:'block_done',icon:_svg('i-check'),name:'Block Complete',desc:'Finished first 4-week block',check:()=>state.block&&state.block.num>=2},
+  {id:'measurements',icon:_svg('i-scale'),name:'Data Driven',desc:'Logged body measurements',check:()=>(state.measurements||[]).length>0},
+  {id:'ai_generated',icon:_svg('i-sparkle'),name:'AI Powered',desc:'Generated a program with AI',check:()=>!!state.customProgram}
 ];
 function renderAchievements(){
   const container = document.getElementById("achList");
@@ -4532,7 +4536,7 @@ CRITICAL RULES:
 
     logEvent('pdf_uploaded',{success:true,exercise_count:totalExercises});
     statusEl.innerHTML = '<div style="color:var(--lime)">✓ Parsed successfully. Name your program in the next dialog.</div>';
-    btn.textContent = "📄 UPLOAD ANOTHER PDF";
+    btn.textContent = "UPLOAD ANOTHER PDF";
     btn.disabled = false;
     closeModal('programs');
     setTimeout(() => openModal('pdfName'), 200);
@@ -4540,7 +4544,7 @@ CRITICAL RULES:
   } catch(err){
     console.error("PDF upload error:", err);
     statusEl.innerHTML = `<div style="color:var(--red);background:rgba(255,77,77,0.08);border:1px solid rgba(255,77,77,0.3);padding:10px;border-radius:8px;line-height:1.5">Error: ${err.message}</div>`;
-    btn.textContent = "📄 UPLOAD PDF";
+    btn.textContent = "UPLOAD PDF";
     btn.disabled = false;
   }
 }
