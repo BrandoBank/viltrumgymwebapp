@@ -649,36 +649,6 @@
     .home-date{font-size:9px;word-spacing:-1px}
   }
 
-  /* FORM CHECK (#9) */
-  .formcheck-cam-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-  .formcheck-cam-btn{flex:1;min-width:90px;min-height:44px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;color:var(--text-dim);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;letter-spacing:0.06em;transition:all 0.15s}
-  .formcheck-cam-btn:hover{border-color:var(--lime);color:var(--lime)}
-  .formcheck-cam-btn svg{width:18px;height:18px;stroke-width:1.8}
-  .formcheck-ex-select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);font-family:inherit;min-height:44px;margin-bottom:14px}
-  .formcheck-preview{width:100%;max-height:220px;object-fit:cover;border-radius:8px;background:var(--bg-raised);border:1px solid var(--border);display:none;margin-bottom:12px}
-  .formcheck-frames{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;scrollbar-width:none}
-  .formcheck-frames::-webkit-scrollbar{display:none}
-  .formcheck-frame{width:72px;height:108px;flex-shrink:0;border-radius:6px;object-fit:cover;border:1px solid var(--border)}
-  .formcheck-result{background:var(--bg);border:1px solid var(--border-lit);border-radius:10px;padding:16px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap}
-  .formcheck-result strong,.formcheck-result b{color:var(--lime)}
-
-  /* PROGRESS PHOTOS (#10) */
-  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
-  .photo-thumb{position:relative;aspect-ratio:3/4;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color 0.15s;background:var(--bg-raised)}
-  .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .photo-thumb.selected{border-color:var(--lime)}
-  .photo-thumb .photo-thumb-del{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);display:none;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:var(--red)}
-  .photo-thumb:hover .photo-thumb-del{display:flex}
-  .photo-thumb-date{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.65);font-size:9px;color:var(--text);padding:4px 6px;letter-spacing:0.06em;font-family:'JetBrains Mono'}
-  .photo-compare-bar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
-  .photo-action-btn{min-height:44px;padding:0 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.06em;transition:all 0.15s}
-  .photo-action-btn:hover{border-color:var(--lime);color:var(--lime)}
-  .photo-action-btn:disabled{opacity:0.4;cursor:default;pointer-events:none}
-  .photo-action-btn.primary{background:var(--lime);color:#000;border-color:var(--lime)}
-  .photo-compare-pair{display:flex;gap:10px;width:100%}
-  .photo-compare-col{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
-  .photo-compare-col img{width:100%;border-radius:8px;object-fit:cover}
-  .photo-compare-col-label{font-size:10px;color:var(--text-dim);text-align:center;letter-spacing:0.08em;font-family:'JetBrains Mono'}
 
   /* SETTINGS TOGGLE */
   .settings-toggle-row{margin-top:6px}
@@ -1385,8 +1355,8 @@
 
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-history"/></svg>WEEKLY CHECK-IN</div></div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:14px">Every Sunday, log the week: bodyweight, measurements, training feel, and a photo. Consistent weekly check-ins are how you see the transformation others can't.</div>
-      <button class="btn primary"><svg><use href="#i-check"/></svg>Log this week</button>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:14px">Log your weight and body measurements every Sunday. Consistent weekly check-ins are how you see the transformation others can't.</div>
+      <button class="btn primary" onclick="showTab('weight')"><svg><use href="#i-scale"/></svg>LOG WEIGHT & MEASUREMENTS</button>
     </div>
 
     <div class="panel">
@@ -2011,17 +1981,18 @@ function renderWizardPrograms() {
   const sub = document.getElementById('wzProgramSub');
   container.innerHTML = '';
   if (hasStrength) {
-    sub.textContent = 'Choose a strength program to start with.';
+    sub.innerHTML = 'Choose a starting program. <span style="color:var(--lime)">Not sure? Pick Hybrid — 4 days/week is a great starting point.</span>';
     [
-      {id:'powerbuilding', name:'Powerbuilding 5-Day', desc:'The default El Camino program. Heavy compounds + accessory work, Mon–Fri.', tags:['5 DAYS/WK','STRENGTH','HYPERTROPHY']},
-      {id:'ppl', name:'Hypertrophy 6-Day PPL', desc:'Push / Pull / Legs × 2 per week. Volume-focused for muscle building.', tags:['6 DAYS/WK','HYPERTROPHY','INTERMEDIATE']},
-      {id:'hybrid', name:'Hybrid Strength + Cardio', desc:'4-day upper/lower split. Heavy compounds + conditioning work.', tags:['4 DAYS/WK','STRENGTH','CONDITIONING']},
-      {id:'empty', name:'Empty — Build My Own', desc:'Start with a blank 3-day template and build from scratch.', tags:['CUSTOM']}
+      {id:'powerbuilding', name:'Powerbuilding 5-Day', desc:'The default El Camino program. Heavy compounds + accessory work, Mon–Fri. Best if you can commit to 5 days every week.', tags:['5 DAYS/WK','STRENGTH','HYPERTROPHY']},
+      {id:'ppl', name:'Hypertrophy 6-Day PPL', desc:'Push / Pull / Legs × 2 per week. Volume-focused for muscle building. High commitment — for experienced lifters.', tags:['6 DAYS/WK','HYPERTROPHY','INTERMEDIATE']},
+      {id:'hybrid', name:'Hybrid Strength + Cardio', desc:'4-day upper/lower split. Heavy compounds + conditioning work. Flexible schedule — easy to stay consistent.', tags:['4 DAYS/WK','STRENGTH','CONDITIONING'], recommended:true},
+      {id:'empty', name:'Empty — Build My Own', desc:'Start with a blank 3-day template and build from scratch. You\'ll add exercises manually.', tags:['CUSTOM']}
     ].forEach(p => {
       const card = document.createElement('div');
       card.className = 'wz-program-card' + (wizardState.program === p.id ? ' active' : '');
       card.onclick = () => { wizardState.program = p.id; renderWizardPrograms(); };
-      card.innerHTML = `<div class="wz-program-card-name">${p.name}</div><div class="wz-program-card-desc">${p.desc}</div><div class="wz-program-tags">${p.tags.map(t=>`<span class="wz-program-tag">${t}</span>`).join('')}</div>`;
+      const badge = p.recommended ? `<span style="display:inline-block;background:var(--lime);color:#000;font-size:9px;font-weight:700;letter-spacing:.08em;padding:2px 6px;border-radius:3px;margin-bottom:6px">★ RECOMMENDED</span><br>` : '';
+      card.innerHTML = `${badge}<div class="wz-program-card-name">${p.name}</div><div class="wz-program-card-desc">${p.desc}</div><div class="wz-program-tags">${p.tags.map(t=>`<span class="wz-program-tag">${t}</span>`).join('')}</div>`;
       container.appendChild(card);
     });
   } else {
@@ -2717,7 +2688,7 @@ function showTab(id){
   if(id==="home")renderHome();
   if(id==="chart")drawStrengthChart();
   if(id==="workouts")renderProgram();
-  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();} else {stopSessionClock();releaseWakeLock();}
+  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();applyUiMode();} else {stopSessionClock();releaseWakeLock();}
   if(id==="weight"){drawWeightChart();renderWeightHistory();updateWeightStats();renderMeasurementHistory();}
   if(id==="running"){renderRunCards();renderIncline();drawRunChart();}
   if(id==="stats"){renderStats();renderAchievements();}
@@ -2974,7 +2945,7 @@ function renderHome(){
 
   // Date line
   const now = new Date();
-  dateEl.textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase() + ` · BLOCK ${state.block.num} · WEEK ${state.block.week} OF 4`;
+  dateEl.textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase() + ` · WEEK ${state.block.week} OF 4`;
 
   // Today's workout card
   const todayName = now.toLocaleDateString('en-US',{weekday:'long'});
@@ -3028,10 +2999,10 @@ function renderHome(){
       <div class="home-mini-label mono">WK STREAK</div>
       <div class="home-mini-sub">${streak >= 3 ? 'Dedicated' : streak >= 1 ? 'Building' : 'Start today'}</div>
     </div>
-    <div class="home-mini-stat">
+    <div class="home-mini-stat" title="Based on days since last session and muscle fatigue you've logged">
       <div class="home-mini-val">${readiness}</div>
       <div class="home-mini-label mono">READINESS</div>
-      <div class="home-mini-sub">${readiness >= 85 ? 'Push hard' : readiness >= 70 ? 'Train smart' : 'Recovery'}</div>
+      <div class="home-mini-sub">${readiness >= 85 ? 'Push hard' : readiness >= 70 ? 'Train smart' : 'Take it easy'}</div>
     </div>
   `;
 
