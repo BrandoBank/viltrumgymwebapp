@@ -190,3 +190,50 @@ You will never pay Supabase for this stack.
 - Clears the session on this device
 - Sign in with different credentials to switch users
 - All data stays in Supabase keyed to each user's auth.uid() — nothing is lost when switching
+
+---
+
+## iOS Home Screen Icon — Cache Busting
+
+Apple caches the `apple-touch-icon.png` aggressively. After redeploying updated icons, the old bee may persist on the home screen. Here's the dance to force a refresh:
+
+**After any icon update:**
+
+1. **Remove the app from your home screen** — long press the icon → Remove App → Remove from Home Screen (this doesn't delete data, just the shortcut)
+2. **Open Safari** and navigate to `viltrumgymtrainer.netlify.app`
+3. **Force-quit Safari** first if the old icon still shows in the share sheet: double-tap home / swipe up → swipe Safari away → reopen
+4. **Share → Add to Home Screen** — you should now see the new bee icon in the preview
+
+**If the icon still shows old after step 4:**
+
+- In Safari, go to `Settings → Safari → Clear History and Website Data` — this nukes the icon cache
+- Repeat steps 2–4
+
+**Why this happens:** iOS caches the touch icon at the OS level, separate from Safari's regular cache. The share-sheet preview is what gets burned in. There's no programmatic cache-bust — you have to physically remove and re-add.
+
+---
+
+## Resetting a User's Data (e.g. after a bug)
+
+To wipe a specific user's BeeBuildz data without touching their auth account or other users:
+
+```sql
+-- Step 1: Find their user ID
+SELECT id, email, created_at 
+FROM auth.users 
+WHERE email = 'their@email.com';
+
+-- Step 2: Wipe their BeeBuildz rows (swap in their actual UUID)
+DO $$
+DECLARE
+  target_id uuid;
+BEGIN
+  SELECT id INTO target_id FROM auth.users WHERE email = 'their@email.com';
+  DELETE FROM bb_user_data  WHERE user_id = target_id;
+  DELETE FROM bb_programs   WHERE user_id = target_id;
+  DELETE FROM bb_profiles   WHERE id      = target_id;
+  RAISE NOTICE 'Deleted BeeBuildz data for: %', target_id;
+END $$;
+```
+
+Their login still works — they'll be walked through fresh profile setup on next sign-in. Run in Supabase Dashboard → SQL Editor.
