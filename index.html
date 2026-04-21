@@ -649,6 +649,50 @@
     .home-date{font-size:9px;word-spacing:-1px}
   }
 
+  /* FORM CHECK (#9) */
+  .formcheck-cam-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .formcheck-cam-btn{flex:1;min-width:90px;min-height:44px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;color:var(--text-dim);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;letter-spacing:0.06em;transition:all 0.15s}
+  .formcheck-cam-btn:hover{border-color:var(--lime);color:var(--lime)}
+  .formcheck-cam-btn svg{width:18px;height:18px;stroke-width:1.8}
+  .formcheck-ex-select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);font-family:inherit;min-height:44px;margin-bottom:14px}
+  .formcheck-preview{width:100%;max-height:220px;object-fit:cover;border-radius:8px;background:var(--bg-raised);border:1px solid var(--border);display:none;margin-bottom:12px}
+  .formcheck-frames{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;scrollbar-width:none}
+  .formcheck-frames::-webkit-scrollbar{display:none}
+  .formcheck-frame{width:72px;height:108px;flex-shrink:0;border-radius:6px;object-fit:cover;border:1px solid var(--border)}
+  .formcheck-result{background:var(--bg);border:1px solid var(--border-lit);border-radius:10px;padding:16px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap}
+  .formcheck-result strong,.formcheck-result b{color:var(--lime)}
+
+  /* PROGRESS PHOTOS (#10) */
+  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+  .photo-thumb{position:relative;aspect-ratio:3/4;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color 0.15s;background:var(--bg-raised)}
+  .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .photo-thumb.selected{border-color:var(--lime)}
+  .photo-thumb .photo-thumb-del{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);display:none;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:var(--red)}
+  .photo-thumb:hover .photo-thumb-del{display:flex}
+  .photo-thumb-date{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.65);font-size:9px;color:var(--text);padding:4px 6px;letter-spacing:0.06em;font-family:'JetBrains Mono'}
+  .photo-compare-bar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+  .photo-action-btn{min-height:44px;padding:0 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.06em;transition:all 0.15s}
+  .photo-action-btn:hover{border-color:var(--lime);color:var(--lime)}
+  .photo-action-btn:disabled{opacity:0.4;cursor:default;pointer-events:none}
+  .photo-action-btn.primary{background:var(--lime);color:#000;border-color:var(--lime)}
+  .photo-compare-pair{display:flex;gap:10px;width:100%}
+  .photo-compare-col{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+  .photo-compare-col img{width:100%;border-radius:8px;object-fit:cover}
+  .photo-compare-col-label{font-size:10px;color:var(--text-dim);text-align:center;letter-spacing:0.08em;font-family:'JetBrains Mono'}
+
+  /* SETTINGS TOGGLE */
+  .settings-toggle-row{margin-top:6px}
+  .settings-toggle-btn{display:inline-flex;align-items:center;padding:8px 16px;border-radius:20px;background:var(--bg);border:1px solid var(--border);color:var(--text-dim);font-family:'JetBrains Mono';font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em}
+  .settings-toggle-btn.active{background:rgba(182,255,60,0.12);border-color:var(--lime);color:var(--lime)}
+
+  /* NUDGE CARDS */
+  .nudge-card{background:linear-gradient(135deg,rgba(182,255,60,0.06) 0%,var(--bg-card) 100%);border:1px solid rgba(182,255,60,0.25);border-radius:12px;padding:16px;margin-bottom:14px;position:relative}
+  .nudge-title{font-size:13px;font-weight:700;margin-bottom:5px;color:var(--text)}
+  .nudge-text{font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:12px}
+  .nudge-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .nudge-dismiss{font-size:11px;color:var(--text-faint);background:none;border:none;cursor:pointer;padding:4px 0;font-family:inherit;text-decoration:underline}
+  .nudge-dismiss:hover{color:var(--text-dim)}
+
   /* LANDSCAPE PHONE — compact header + nav */
   @media(max-height:500px) and (orientation:landscape){
     .app-header{padding:6px max(12px,env(safe-area-inset-right)) 6px max(12px,env(safe-area-inset-left))}
@@ -726,6 +770,8 @@
     <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15L19 4M18 5l2 2M15 8l2 2"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></symbol>
     <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></symbol>
   </defs>
 </svg>
 
@@ -789,6 +835,7 @@
     <div id="profileAlert"></div>
     <div class="wizard-progress" id="wizardProgress">
       <span class="wizard-dot active"></span>
+      <span class="wizard-dot"></span>
       <span class="wizard-dot"></span>
       <span class="wizard-dot"></span>
       <span class="wizard-dot"></span>
@@ -876,9 +923,33 @@
       <div class="wz-program-cards" id="wzProgramCards"></div>
       <div class="wizard-nav">
         <button class="wizard-back" onclick="wizardBack(3)">← BACK</button>
+        <button class="auth-btn" onclick="wizardNext(3)">CONTINUE →</button>
+      </div>
+      <button class="wizard-skip" onclick="wizardNext(3,true)">I'll decide later</button>
+    </div>
+
+    <!-- Step 4: Density / ui_mode -->
+    <div id="wz-4" class="wizard-step" style="display:none">
+      <div class="auth-title">How much do you want to see?</div>
+      <div class="auth-sub">You can change this any time in Settings.</div>
+      <div class="module-grid" style="grid-template-columns:1fr 1fr;margin:20px 0">
+        <div class="module-card active" id="wz-mode-basics" onclick="wzSelectMode('basics')">
+          <div class="module-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:#000"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></div>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M12 12h.01M12 16h.01"/></svg>
+          <div class="module-card-name">JUST THE BASICS</div>
+          <div class="module-card-sub">Log workouts, track weight, keep it simple</div>
+        </div>
+        <div class="module-card" id="wz-mode-advanced" onclick="wzSelectMode('advanced')">
+          <div class="module-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:#000"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></div>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>
+          <div class="module-card-name">ALL FEATURES</div>
+          <div class="module-card-sub">AI builder, Ask Coach, advanced stats — give me everything</div>
+        </div>
+      </div>
+      <div class="wizard-nav">
+        <button class="wizard-back" onclick="wizardBack(4)">← BACK</button>
         <button class="auth-btn" id="wzFinishBtn" onclick="wizardFinish()">START TRAINING →</button>
       </div>
-      <button class="wizard-skip" onclick="wizardFinish(true)">I'll set this up later</button>
     </div>
   </div>
 </div>
@@ -900,7 +971,7 @@
     </button>
     <div class="user-menu-dropdown" id="userMenuDropdown">
       <button class="user-menu-item" onclick="openModal('profileEdit');closeUserMenu()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>Edit Profile</button>
-      <button class="user-menu-item" onclick="openModal('programs');closeUserMenu()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 8v8m3-10v12m12-12v12m3-10v8M6 12h12"/></svg>My Programs</button>
+      <button class="user-menu-item" data-advanced onclick="openModal('programs');closeUserMenu()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 8v8m3-10v12m12-12v12m3-10v8M6 12h12"/></svg>My Programs</button>
       <div class="user-menu-divider"></div>
       <button class="user-menu-item" onclick="signOut()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</button>
     </div>
@@ -950,11 +1021,7 @@
   <button class="tab active" data-tab="checklist"><svg><use href="#i-check-list"/></svg>GYM MODE</button>
   <button class="tab" data-tab="workouts"><svg><use href="#i-dumbbell"/></svg>PROGRAM</button>
   <button class="tab" data-tab="weight"><svg><use href="#i-scale"/></svg>WEIGHT</button>
-  <button class="tab" data-tab="stats"><svg><use href="#i-stats"/></svg>STATS</button>
-  <button class="tab" data-tab="chart"><svg><use href="#i-chart"/></svg>STRENGTH</button>
-  <button class="tab" data-tab="running"><svg><use href="#i-run"/></svg>RUN PLAN</button>
-  <button class="tab" data-tab="warroom"><svg><use href="#i-warroom"/></svg>WAR ROOM</button>
-  <button class="tab" data-tab="tools"><svg><use href="#i-tools"/></svg>TOOLS</button>
+  <button class="tab" data-tab="more" onclick="openModal('moreTabs');return false"><svg><use href="#i-grid"/></svg>MORE</button>
 </nav>
 
 <div class="tooltip-box" id="tooltip"></div>
@@ -976,34 +1043,38 @@
       <!-- Populated by renderHome -->
     </div>
 
-    <!-- Today's target muscles compact visual -->
-    <div class="panel" id="homeTargetPanel">
+    <!-- NUDGE AREA — populated by checkNudges() -->
+    <div id="homeNudgeArea"></div>
+
+    <!-- CUT JOURNEY — visible in basics + advanced -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-scale"/></svg>CUT JOURNEY</div></div>
+      <div id="homeCutSummary"></div>
+    </div>
+
+    <!-- Today's target muscles — advanced only -->
+    <div class="panel" id="homeTargetPanel" data-advanced>
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-body"/></svg>TODAY'S TARGET MUSCLES</div></div>
       <div id="homeTargetMap"></div>
     </div>
 
-    <div class="grid-2">
-      <div class="panel">
-        <div class="panel-header"><div class="panel-title"><svg><use href="#i-scale"/></svg>CUT JOURNEY</div></div>
-        <div id="homeCutSummary"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-header"><div class="panel-title"><svg><use href="#i-flame"/></svg>RECENT ACTIVITY</div></div>
-        <div id="homeRecentActivity"></div>
-      </div>
+    <!-- Recent activity — advanced only -->
+    <div class="panel" data-advanced>
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-flame"/></svg>RECENT ACTIVITY</div></div>
+      <div id="homeRecentActivity"></div>
     </div>
 
-    <div class="panel">
+    <div class="panel" data-advanced>
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-trophy"/></svg>NEXT MILESTONE</div></div>
       <div id="homeNextMilestone"></div>
     </div>
 
-    <div class="panel">
+    <div class="panel" data-advanced>
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-dumbbell"/></svg>UP NEXT</div></div>
       <div id="homeNextSession" style="font-size:13px;color:var(--text-dim);line-height:1.7"></div>
     </div>
 
-    <div class="panel">
+    <div class="panel" data-advanced>
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-insight"/></svg>COACHING TIP OF THE DAY</div></div>
       <div id="homeTip" style="font-size:13px;color:var(--text-dim);line-height:1.7;font-style:italic"></div>
     </div>
@@ -1063,7 +1134,7 @@
     <div class="tools-bar">
       <button class="tool-btn" onclick="openModal('restTimer')"><svg><use href="#i-clock"/></svg>Rest Timer</button>
       <button class="tool-btn" onclick="openModal('plates')"><svg><use href="#i-plates"/></svg>Plate Calc</button>
-      <button class="tool-btn" onclick="openModal('onerm')"><svg><use href="#i-calc"/></svg>1RM Calc</button>
+      <button class="tool-btn" data-advanced onclick="openModal('onerm')"><svg><use href="#i-calc"/></svg>1RM Calc</button>
       <button class="tool-btn" onclick="openModal('warmup')"><svg><use href="#i-warmup"/></svg>Warm-up</button>
       <button class="tool-btn" onclick="openModal('breathing')"><svg><use href="#i-warmup"/></svg>Breathing</button>
       <button class="tool-btn" onclick="toggleFocusMode()"><svg><use href="#i-target"/></svg><span id="focusBtnLabel">Focus Mode</span></button>
@@ -1208,7 +1279,7 @@
       <div id="prList"></div>
     </div>
 
-    <div class="panel">
+    <div class="panel" data-advanced>
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-trophy"/></svg>ACHIEVEMENTS</div></div>
       <div style="font-size:11px;color:var(--text-faint);margin-bottom:14px;line-height:1.5">Unlock badges as you hit milestones. They auto-check based on your data.</div>
       <div id="achList" class="ach-grid"></div>
@@ -1288,7 +1359,7 @@
 
   <!-- TOOLS TAB -->
   <section id="tab-tools" class="tab-content" style="display:none">
-    <div class="panel">
+    <div class="panel" data-advanced>
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-warroom"/></svg>ASK COACH</div></div>
       <div style="font-size:12px;color:var(--text-faint);margin-bottom:12px;line-height:1.5">Got a question? Form, programming, recovery, pain, nutrition — ask anything. Uses your Anthropic API key from War Room.</div>
       <textarea id="askCoachInput" placeholder="e.g., Why do I feel pain in my left shoulder when benching? Or: How do I know if I'm progressing fast enough?" style="width:100%;min-height:80px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;line-height:1.6;resize:vertical;margin-bottom:10px"></textarea>
@@ -1350,6 +1421,93 @@
     </div>
   </section>
 
+  <!-- SETTINGS TAB -->
+  <section id="tab-settings" class="tab-content" style="display:none">
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-settings"/></svg>DISPLAY</div></div>
+      <div class="settings-group">
+        <div class="settings-group-title">SHOW ADVANCED FEATURES</div>
+        <div class="settings-group-desc">Enable War Room AI builder, Ask Coach, Stats, and other advanced features. Turn off for a simpler, focused experience.</div>
+        <div class="settings-toggle-row">
+          <button class="settings-toggle-btn" id="uiModeToggle" onclick="toggleUiMode()">
+            <span id="uiModeLabel">—</span>
+          </button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title">AMOLED MODE</div>
+        <div class="settings-group-desc">Pure black background. Saves battery on OLED screens and makes the lime pop harder.</div>
+        <button class="btn primary" onclick="toggleAmoled()"><svg><use href="#i-check"/></svg>TOGGLE AMOLED</button>
+        <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';margin-top:8px" id="amoledStatusSettings">—</div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title">FOCUS MODE DEFAULT</div>
+        <div class="settings-group-desc">Start Gym Mode in focus mode automatically — hides nav and all non-workout UI.</div>
+        <button class="btn" onclick="toggleFocusModeDefault()" id="focusModeDefaultBtn">—</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-dumbbell"/></svg>MODULES</div></div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.5">Enable or disable training modules. Changes apply immediately.</div>
+      <div id="settingsModuleList"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-body"/></svg>ACCOUNT</div></div>
+      <div class="settings-group" id="settingsProfileSummary">
+        <div id="settingsAccountName" style="font-size:15px;font-weight:600;margin-bottom:4px">—</div>
+        <div id="settingsAccountEmail" style="font-size:11px;color:var(--text-dim)">—</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="openModal('editProfile')"><svg><use href="#i-edit"/></svg>Edit Profile</button>
+        <button class="btn" onclick="signOut()"><svg><use href="#i-x"/></svg>Sign Out</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-key"/></svg>DATA</div></div>
+      <div class="settings-group">
+        <div class="settings-group-title">EXPORT</div>
+        <div class="settings-group-desc">Download all your BeeBuildz data as JSON. Save to iCloud, email, or Dropbox.</div>
+        <button class="btn primary" onclick="exportData()"><svg><use href="#i-arrow"/></svg>DOWNLOAD BACKUP</button>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title">IMPORT</div>
+        <div class="settings-group-desc">Restore from a previous backup. Replaces all current data.</div>
+        <input type="file" id="importFileSettings" class="file-input-hidden" accept=".json" onchange="importData(event)"/>
+        <button class="btn" onclick="document.getElementById('importFileSettings').click()"><svg><use href="#i-arrow"/></svg>SELECT BACKUP FILE</button>
+      </div>
+      <div class="settings-group" data-advanced>
+        <div class="settings-group-title">MY USAGE — LAST 30 DAYS</div>
+        <div style="font-size:11px;color:var(--text-faint);margin-bottom:10px">What features you actually use. Data-driven decisions about what to keep.</div>
+        <div id="usageChart" style="min-height:60px"></div>
+        <div id="unusedFeatures" style="margin-top:10px"></div>
+        <button class="btn" style="margin-top:8px" onclick="loadUsageData()"><svg><use href="#i-history"/></svg>REFRESH USAGE</button>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title" style="color:var(--red)">CLEAR ALL DATA</div>
+        <div class="settings-group-desc">Permanently delete all your training data. This cannot be undone.</div>
+        <button class="btn" style="border-color:var(--red);color:var(--red)" onclick="confirmClearData()">⚠ CLEAR ALL DATA</button>
+      </div>
+    </div>
+
+    <div class="panel" data-advanced>
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-key"/></svg>PRIVACY & API</div></div>
+      <div class="settings-group">
+        <div class="settings-group-title">ANTHROPIC API KEY</div>
+        <div class="settings-group-desc">Used by War Room and Ask Coach. Stored only in your browser — never sent to our servers.</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input type="password" id="settingsApiKey" class="auth-input" style="margin:0;flex:1" placeholder="sk-ant-…"/>
+          <button class="btn primary" onclick="saveApiKeyFromSettings()">SAVE</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-faint);margin-top:6px" id="settingsApiKeyStatus">—</div>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 
 <!-- MOBILE BOTTOM NAV — mirrors top tabbar, fixed to bottom -->
@@ -1358,11 +1516,7 @@
   <button class="bottom-nav-tab active" data-tab="checklist"><svg><use href="#i-check-list"/></svg>GYM</button>
   <button class="bottom-nav-tab" data-tab="workouts"><svg><use href="#i-dumbbell"/></svg>PROGRAM</button>
   <button class="bottom-nav-tab" data-tab="weight"><svg><use href="#i-scale"/></svg>WEIGHT</button>
-  <button class="bottom-nav-tab" data-tab="stats"><svg><use href="#i-stats"/></svg>STATS</button>
-  <button class="bottom-nav-tab" data-tab="chart"><svg><use href="#i-chart"/></svg>STRENGTH</button>
-  <button class="bottom-nav-tab" data-tab="running"><svg><use href="#i-run"/></svg>RUN</button>
-  <button class="bottom-nav-tab" data-tab="warroom"><svg><use href="#i-warroom"/></svg>WAR ROOM</button>
-  <button class="bottom-nav-tab" data-tab="tools"><svg><use href="#i-tools"/></svg>TOOLS</button>
+  <button class="bottom-nav-tab" data-tab="more" onclick="openModal('moreTabs');return false"><svg><use href="#i-grid"/></svg>MORE</button>
 </nav>
 
 </div><!-- /appShell -->
@@ -1372,13 +1526,7 @@
 <div class="modal-backdrop" id="modal-moreTabs">
   <div class="modal" style="max-width:420px">
     <div class="modal-header"><div class="modal-title">MORE</div><button class="modal-close" onclick="closeModal('moreTabs')"><svg><use href="#i-x"/></svg></button></div>
-    <div class="more-grid">
-      <button class="more-btn" onclick="showTab('stats');closeModal('moreTabs')"><svg><use href="#i-stats"/></svg>STATS</button>
-      <button class="more-btn" onclick="showTab('chart');closeModal('moreTabs')"><svg><use href="#i-chart"/></svg>STRENGTH</button>
-      <button class="more-btn" onclick="showTab('running');closeModal('moreTabs')"><svg><use href="#i-run"/></svg>RUN PLAN</button>
-      <button class="more-btn" onclick="showTab('warroom');closeModal('moreTabs')"><svg><use href="#i-warroom"/></svg>WAR ROOM</button>
-      <button class="more-btn" onclick="showTab('tools');closeModal('moreTabs')"><svg><use href="#i-tools"/></svg>TOOLS</button>
-    </div>
+    <div class="more-grid" id="moreTabsGrid"><!-- populated by renderMoreModal() --></div>
   </div>
 </div>
 
@@ -1538,7 +1686,7 @@
       <div style="font-size:10px;color:var(--text-faint);letter-spacing:0.15em;font-family:'JetBrains Mono';font-weight:600;margin-bottom:10px">📄 IMPORT FROM PDF</div>
       <div style="font-size:11px;color:var(--text-faint);margin-bottom:10px;line-height:1.5">Upload a workout PDF from your trainer. AI will parse it into a structured program. Uses your Anthropic API key from War Room.</div>
       <input type="file" id="pdfUploadInput" accept="application/pdf" style="display:none" onchange="handlePdfUpload(event)"/>
-      <button class="auth-btn auth-btn-secondary" onclick="document.getElementById('pdfUploadInput').click()" id="pdfUploadBtn">📄 UPLOAD PDF</button>
+      <button class="auth-btn auth-btn-secondary" data-advanced onclick="document.getElementById('pdfUploadInput').click()" id="pdfUploadBtn">📄 UPLOAD PDF</button>
       <div id="pdfUploadStatus" style="margin-top:10px;font-size:11px"></div>
     </div>
 
@@ -1809,12 +1957,18 @@ function applyModuleVisibility() {
 }
 
 /* ═══════════════════ ONBOARDING WIZARD ═══════════════════ */
-let wizardState = {step:0, modules:['strength'], program:'powerbuilding'};
+let wizardState = {step:0, modules:['strength'], program:'powerbuilding', uiMode:'basics'};
 
 function wizardUpdateDots() {
   document.querySelectorAll('#wizardProgress .wizard-dot').forEach((dot,i) => {
     dot.classList.toggle('active', i === wizardState.step);
   });
+}
+
+function wzSelectMode(mode) {
+  wizardState.uiMode = mode;
+  document.getElementById('wz-mode-basics').classList.toggle('active', mode === 'basics');
+  document.getElementById('wz-mode-advanced').classList.toggle('active', mode === 'advanced');
 }
 
 function wizardNext(fromStep, skip=false) {
@@ -1824,6 +1978,7 @@ function wizardNext(fromStep, skip=false) {
     document.getElementById('profileAlert').innerHTML = '';
   }
   if (fromStep === 2 && skip) wizardState.modules = ['strength'];
+  if (fromStep === 3 && skip) wizardState.program = 'powerbuilding';
   document.getElementById('wz-' + fromStep).style.display = 'none';
   wizardState.step = fromStep + 1;
   if (wizardState.step === 3) renderWizardPrograms();
@@ -1894,10 +2049,12 @@ async function wizardFinish(skip=false) {
       starting_weight: isNaN(startingWeight) ? null : startingWeight,
       goal_weight: isNaN(goalWeight) ? null : goalWeight,
       height_inches: isNaN(height) ? null : height,
-      enabled_modules: wizardState.modules
+      enabled_modules: wizardState.modules,
+      ui_mode: wizardState.uiMode
     });
     if (error) throw error;
-    currentProfile = { display_name: name, starting_weight: startingWeight, goal_weight: goalWeight, height_inches: height, enabled_modules: wizardState.modules };
+    currentProfile = { display_name: name, starting_weight: startingWeight, goal_weight: goalWeight, height_inches: height, enabled_modules: wizardState.modules, ui_mode: wizardState.uiMode };
+    logEvent('feature_shown',{ui_mode: wizardState.uiMode});
     // Wipe all local state from any previous user on this device
     Object.keys(SK).forEach(k => localStorage.removeItem(SK[k]));
     state.checklist={}; state.setLog={}; state.expanded={}; state.fatigue={};
@@ -1937,6 +2094,7 @@ async function loadProfileAndData() {
   }
   currentProfile = profile;
   if (!Array.isArray(currentProfile.enabled_modules)) currentProfile.enabled_modules = ['strength'];
+  if (!currentProfile.ui_mode) currentProfile.ui_mode = 'advanced'; // existing users get all features
   // Fetch user data blob
   const { data: udata } = await supa.from('bb_user_data').select('data').eq('user_id', currentUser.id).maybeSingle();
   if (udata && udata.data) {
@@ -1979,6 +2137,7 @@ function showAppShell() {
   if(bn) bn.style.display = ''; // remove inline style, let CSS media query control it
   maybeShowIosBanner();
   applyModuleVisibility();
+  applyUiMode();
   if (currentProfile) {
     const name = currentProfile.display_name || 'User';
     document.getElementById('userMenuName').textContent = name;
@@ -2484,7 +2643,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -2508,9 +2667,30 @@ let state={
   focusMode:load(SK.focusMode,false),
   coachNotes:load(SK.coachNotes,{}),
   personalBests:load(SK.personalBests,{}),
+  nudgesSeen:load(SK.nudgesSeen,[]),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes)}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);}
+
+/* ═════════════════ ANALYTICS ═════════════════ */
+async function logEvent(name, data={}) {
+  if (!supa || !currentUser) return;
+  supa.from('bb_events').insert({user_id:currentUser.id,event_name:name,event_data:data}).then(()=>{}).catch(()=>{});
+}
+
+/* ═════════════════ UI MODE ═════════════════ */
+function isBasicsMode(){return (currentProfile?.ui_mode||'basics')==='basics';}
+function applyUiMode(){
+  const basics=isBasicsMode();
+  // Gate elements with data-advanced attribute
+  document.querySelectorAll('[data-advanced]').forEach(el=>{
+    el.style.display=basics?'none':'';
+  });
+  // Gate elements with data-basics-only
+  document.querySelectorAll('[data-basics-only]').forEach(el=>{
+    el.style.display=basics?'':'none';
+  });
+}
 
 /* ═════════════════ HELPERS ═════════════════ */
 const key=(d,i)=>`${d}_${i}`;
@@ -2524,10 +2704,16 @@ const numSets=(s)=>{const m=s.toString().match(/\d+/g);return m?m.length:parseIn
 /* ═════════════════ TAB SWITCHING ═════════════════ */
 function showTab(id){
   state.activeTab=id;
-  ["home","chart","workouts","checklist","weight","running","stats","warroom","tools"].forEach(t=>{
+  logEvent('tab_viewed',{tab:id});
+  ["home","chart","workouts","checklist","weight","running","stats","warroom","tools","settings"].forEach(t=>{
     const el=document.getElementById("tab-"+t);if(el)el.style.display=t===id?"block":"none";
   });
-  document.querySelectorAll(".tab, .bottom-nav-tab").forEach(btn=>btn.classList.toggle("active",btn.dataset.tab===id));
+  // Highlight "More" nav btn when a secondary tab is active
+  const secondaryTabs=["stats","chart","running","warroom","tools","settings"];
+  document.querySelectorAll(".tab, .bottom-nav-tab").forEach(btn=>{
+    if(btn.dataset.tab==="more") btn.classList.toggle("active",secondaryTabs.includes(id));
+    else btn.classList.toggle("active",btn.dataset.tab===id);
+  });
   if(id==="home")renderHome();
   if(id==="chart")drawStrengthChart();
   if(id==="workouts")renderProgram();
@@ -2537,6 +2723,7 @@ function showTab(id){
   if(id==="stats"){renderStats();renderAchievements();}
   if(id==="warroom")renderWarRoom();
   if(id==="tools"){renderBag();renderMuscleFatigue();}
+  if(id==="settings")renderSettings();
   updateReadinessDisplay();
   updateStreakDisplay();
   // Scroll to top of content when changing tabs on mobile
@@ -2544,6 +2731,202 @@ function showTab(id){
 }
 document.getElementById("tabbar").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)showTab(b.dataset.tab)});
 document.getElementById("bottomNav")?.addEventListener("click",e=>{const b=e.target.closest(".bottom-nav-tab");if(b)showTab(b.dataset.tab)});
+
+/* ═════════════════ SETTINGS ═════════════════ */
+function renderSettings() {
+  // Account info
+  const nameEl = document.getElementById('settingsAccountName');
+  const emailEl = document.getElementById('settingsAccountEmail');
+  if (nameEl) nameEl.textContent = currentProfile?.display_name || 'User';
+  if (emailEl) emailEl.textContent = currentUser?.email || '—';
+
+  // AMOLED status
+  const amoledSt = document.getElementById('amoledStatusSettings');
+  if (amoledSt) amoledSt.textContent = state.amoled ? 'ON — Pure black background' : 'OFF — Dark gray background';
+
+  // Focus mode default
+  const fmBtn = document.getElementById('focusModeDefaultBtn');
+  if (fmBtn) fmBtn.textContent = state.focusMode ? '✓ Focus Mode ON by default' : 'Focus Mode OFF by default';
+
+  // UI mode toggle
+  const uiBtn = document.getElementById('uiModeToggle');
+  const uiLbl = document.getElementById('uiModeLabel');
+  const basics = isBasicsMode();
+  if (uiLbl) uiLbl.textContent = basics ? 'BASICS MODE — tap to unlock all features' : 'ALL FEATURES — tap to simplify';
+  if (uiBtn) uiBtn.classList.toggle('active', !basics);
+
+  // API key
+  const apiEl = document.getElementById('settingsApiKey');
+  const apiSt = document.getElementById('settingsApiKeyStatus');
+  if (apiEl) apiEl.value = state.apiKey ? '••••••••••••••••' : '';
+  if (apiSt) apiSt.textContent = state.apiKey ? '✓ API key saved' : 'No key saved';
+
+  // Modules
+  const modList = document.getElementById('settingsModuleList');
+  if (modList) {
+    const modules = currentProfile?.enabled_modules || ['strength'];
+    const allMods = [
+      {id:'strength', label:'Strength Training', desc:'Gym Mode, Programs, PR tracking'},
+      {id:'running', label:'Running', desc:'Run plan, treadmill sync, cardio tracking'},
+    ];
+    modList.innerHTML = allMods.map(m => {
+      const on = modules.includes(m.id);
+      return `<div class="settings-group" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div><div class="settings-group-title">${m.label}</div><div class="settings-group-desc">${m.desc}</div></div>
+        <button class="settings-toggle-btn${on?' active':''}" onclick="toggleModuleFromSettings('${m.id}')">${on?'ON':'OFF'}</button>
+      </div>`;
+    }).join('');
+  }
+
+  // Usage data
+  loadUsageData();
+  applyUiMode();
+}
+
+async function toggleUiMode() {
+  if (!currentProfile) return;
+  const newMode = isBasicsMode() ? 'advanced' : 'basics';
+  currentProfile.ui_mode = newMode;
+  if (supa && currentUser) {
+    await supa.from('bb_profiles').update({ui_mode: newMode}).eq('id', currentUser.id);
+  }
+  logEvent('feature_shown', {ui_mode: newMode});
+  applyUiMode();
+  renderMoreModal();
+  renderSettings();
+}
+
+function toggleFocusModeDefault() {
+  state.focusMode = !state.focusMode;
+  persist();
+  renderSettings();
+}
+
+function saveApiKeyFromSettings() {
+  const val = document.getElementById('settingsApiKey').value.trim();
+  if (!val || val.startsWith('•')) return;
+  state.apiKey = val;
+  persist();
+  const st = document.getElementById('settingsApiKeyStatus');
+  if (st) st.textContent = '✓ Saved';
+}
+
+function confirmClearData() {
+  if (!confirm('Delete ALL your BeeBuildz data? This cannot be undone.\n\nYour account and login will still exist.')) return;
+  Object.keys(SK).forEach(k => localStorage.removeItem(SK[k]));
+  state.checklist={}; state.setLog={}; state.weights=[];
+  state.measurements=[]; state.sessionHistory=[]; state.personalBests={};
+  state.coachNotes={}; state.customProgram=null; state.nudgesSeen=[];
+  persist();
+  alert('All data cleared. Reload to start fresh.');
+  location.reload();
+}
+
+async function toggleModuleFromSettings(modId) {
+  if (!currentProfile) return;
+  const mods = Array.isArray(currentProfile.enabled_modules) ? [...currentProfile.enabled_modules] : ['strength'];
+  const idx = mods.indexOf(modId);
+  if (idx >= 0) {
+    if (mods.length === 1) return; // always keep at least one
+    mods.splice(idx, 1);
+  } else {
+    mods.push(modId);
+  }
+  currentProfile.enabled_modules = mods;
+  if (supa && currentUser) {
+    await supa.from('bb_profiles').update({enabled_modules: mods}).eq('id', currentUser.id);
+  }
+  logEvent(idx >= 0 ? 'module_disabled' : 'module_enabled', {module: modId});
+  applyModuleVisibility();
+  renderSettings();
+}
+
+async function loadUsageData() {
+  const container = document.getElementById('usageChart');
+  const unusedEl = document.getElementById('unusedFeatures');
+  if (!container || !supa || !currentUser) return;
+  const since = new Date(Date.now() - 30*24*60*60*1000).toISOString();
+  const {data, error} = await supa.from('bb_events')
+    .select('event_name')
+    .eq('user_id', currentUser.id)
+    .gte('created_at', since);
+  if (error || !data) { container.innerHTML = '<div style="color:var(--text-faint);font-size:11px">No usage data yet.</div>'; return; }
+  const counts = {};
+  data.forEach(e => { counts[e.event_name] = (counts[e.event_name]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1] || 1;
+  container.innerHTML = sorted.map(([name, count]) =>
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="font-size:10px;color:var(--text-dim);font-family:'JetBrains Mono';min-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+      <div style="flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden"><div style="height:100%;width:${Math.round(count/max*100)}%;background:var(--lime);border-radius:4px"></div></div>
+      <div style="font-size:10px;color:var(--text-faint);min-width:24px;text-align:right">${count}</div>
+    </div>`
+  ).join('') || '<div style="color:var(--text-faint);font-size:11px">No events yet — use the app and come back.</div>';
+
+  const allEvents = ['tab_viewed','set_logged','session_completed','weight_logged','ai_coach_asked','ai_workout_generated','pdf_uploaded','measurement_logged'];
+  const unused = allEvents.filter(e => !counts[e]);
+  if (unusedEl) {
+    unusedEl.innerHTML = unused.length
+      ? `<div style="font-size:11px;color:var(--text-faint)">Haven't used in 30 days: <span style="color:var(--orange)">${unused.join(', ')}</span></div>`
+      : '<div style="font-size:11px;color:var(--lime)">✓ You\'ve used all tracked features</div>';
+  }
+}
+
+/* ═════════════════ NUDGES ═════════════════ */
+const NUDGE_BASICS_UNLOCK = 'basics_unlock_5sessions';
+const NUDGE_COACH_TEASER  = 'coach_teaser_10sessions';
+const NUDGE_PDF_TEASER    = 'pdf_teaser_programs';
+
+function dismissNudge(id) {
+  state.nudgesSeen = state.nudgesSeen || [];
+  if (!state.nudgesSeen.includes(id)) state.nudgesSeen.push(id);
+  persist();
+  const el = document.getElementById('nudge-' + id);
+  if (el) el.remove();
+}
+
+function checkNudges() {
+  const area = document.getElementById('homeNudgeArea');
+  if (!area) return;
+  const seen = state.nudgesSeen || [];
+  const sessions = (state.sessionHistory || []).length;
+  const basics = isBasicsMode();
+  const nudges = [];
+
+  // Nudge 1: basics users after 5 sessions → unlock prompt
+  if (basics && sessions >= 5 && !seen.includes(NUDGE_BASICS_UNLOCK)) {
+    nudges.push({
+      id: NUDGE_BASICS_UNLOCK,
+      title: "You've been crushing it 🔥",
+      body: "Ready for more? Enable War Room AI, Ask Coach, and advanced stats in Settings.",
+      action: "UNLOCK ADVANCED FEATURES",
+      actionFn: `toggleUiMode();dismissNudge('${NUDGE_BASICS_UNLOCK}')`,
+    });
+  }
+
+  // Nudge 2: advanced users after 10 sessions who haven't tried Ask Coach
+  if (!basics && sessions >= 10 && !seen.includes(NUDGE_COACH_TEASER)) {
+    nudges.push({
+      id: NUDGE_COACH_TEASER,
+      title: "Got a training question?",
+      body: "Ask Coach knows your program, your history, and your goals. Try it in the Tools tab.",
+      action: "OPEN TOOLS",
+      actionFn: `showTab('tools');dismissNudge('${NUDGE_COACH_TEASER}')`,
+    });
+  }
+
+  area.innerHTML = nudges.map(n => `
+    <div class="nudge-card" id="nudge-${n.id}">
+      <div class="nudge-body">
+        <div class="nudge-title">${n.title}</div>
+        <div class="nudge-text">${n.body}</div>
+        <div class="nudge-actions">
+          <button class="btn primary" style="font-size:10px;padding:7px 12px" onclick="${n.actionFn}">${n.action}</button>
+          <button class="nudge-dismiss" onclick="dismissNudge('${n.id}')">Not now</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
 
 /* ═════════════════ HOME LANDING ═════════════════ */
 const TIPS = [
@@ -2581,6 +2964,7 @@ function renderHome(){
   const activity = document.getElementById("homeRecentActivity");
   const tipEl = document.getElementById("homeTip");
   if(!greeting) return;
+  checkNudges();
 
   // Greeting based on time of day
   const hour = new Date().getHours();
@@ -3066,6 +3450,8 @@ function toggleSet(exIdx,s){
     haptic(40);
     detectPR(exIdx,d);
     startTimer(exIdx);
+    const exName=(WORKOUTS[state.activeDay]?.exercises[exIdx]||{}).name||'';
+    logEvent('set_logged',{exercise:exName,weight:d.weight||null,reps:d.reps||null,rpe:d.rpe||null});
     const nS=numSets(WORKOUTS[state.activeDay].exercises[exIdx].sets);
     let all=true;
     for(let i=1;i<=nS;i++) if(!(state.setLog[setKey(state.activeDay,exIdx,i)]||{}).done) all=false;
@@ -3301,6 +3687,7 @@ function addWeight(){
   else state.weights.push({date,weight:wt});
   state.weights.sort((a,b)=>new Date(a.date)-new Date(b.date));
   persist();drawWeightChart();renderWeightHistory();updateWeightStats();
+  logEvent('weight_logged',{weight:wt});
   document.getElementById("wtValue").value="";
 }
 function deleteWeight(date){state.weights=state.weights.filter(e=>e.date!==date);persist();drawWeightChart();renderWeightHistory();updateWeightStats()}
@@ -3871,6 +4258,8 @@ function logSessionComplete(day, durationLabel){
   if(!existing){
     state.sessionHistory.push({date: today, day, duration: durationLabel||null});
     persist();
+    const mins = durationLabel ? parseInt(durationLabel) : null;
+    logEvent('session_completed',{day, duration_minutes: mins});
   }
   updateReadinessDisplay();
   updateStreakDisplay();
@@ -4048,6 +4437,7 @@ CRITICAL RULES:
     const suggestedName = file.name.replace(/\.pdf$/i, "").replace(/_/g, " ").replace(/\s+/g, " ").trim();
     document.getElementById("pdfProgramName").value = suggestedName;
 
+    logEvent('pdf_uploaded',{success:true,exercise_count:totalExercises});
     statusEl.innerHTML = '<div style="color:var(--lime)">✓ Parsed successfully. Name your program in the next dialog.</div>';
     btn.textContent = "📄 UPLOAD ANOTHER PDF";
     btn.disabled = false;
@@ -4129,6 +4519,7 @@ async function askCoach(){
     return;
   }
 
+  logEvent('ai_coach_asked');
   btn.disabled = true;
   const oldLabel = btn.innerHTML;
   btn.innerHTML = '<svg><use href="#i-target"/></svg>THINKING…';
@@ -4268,6 +4659,7 @@ async function generateWorkout(){
     return;
   }
 
+  logEvent('ai_workout_generated',{prompt: prompt.slice(0,80)});
   const btn = document.getElementById("genBtn");
   btn.disabled = true;
   setWarStatus("Generating workout with Claude...", "loading");
@@ -4477,7 +4869,24 @@ function renderMuscleFatigue(){
 }
 
 /* ═════════════════ MODALS ═════════════════ */
-function openModal(id){document.getElementById("modal-"+id).classList.add("open");if(id==="plates")calcPlates();if(id==="onerm")calcOneRM();if(id==="warmup")renderWarmup();if(id==="history")renderHistory()}
+function renderMoreModal(){
+  const basics=isBasicsMode();
+  const modules=Array.isArray(currentProfile?.enabled_modules)?currentProfile.enabled_modules:['strength'];
+  const hasRun=modules.includes('running');
+  const items=[
+    {tab:'tools',icon:'i-tools',label:'TOOLS',show:true},
+    {tab:'stats',icon:'i-stats',label:'STATS',show:!basics},
+    {tab:'chart',icon:'i-chart',label:'STRENGTH',show:!basics},
+    {tab:'running',icon:'i-run',label:'RUN PLAN',show:hasRun},
+    {tab:'warroom',icon:'i-warroom',label:'WAR ROOM',show:!basics},
+    {tab:'settings',icon:'i-settings',label:'SETTINGS',show:true},
+  ];
+  const activeTab=state.activeTab;
+  const grid=document.getElementById('moreTabsGrid');
+  if(!grid)return;
+  grid.innerHTML=items.filter(i=>i.show).map(i=>`<button class="more-btn${activeTab===i.tab?' active':''}" onclick="showTab('${i.tab}');closeModal('moreTabs')"><svg><use href="#${i.icon}"/></svg>${i.label}</button>`).join('');
+}
+function openModal(id){document.getElementById("modal-"+id).classList.add("open");if(id==="plates")calcPlates();if(id==="onerm")calcOneRM();if(id==="warmup")renderWarmup();if(id==="history")renderHistory();if(id==="moreTabs")renderMoreModal();}
 function closeModal(id){document.getElementById("modal-"+id).classList.remove("open")}
 document.querySelectorAll(".modal-backdrop").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open")}));
 
