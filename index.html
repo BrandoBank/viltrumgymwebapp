@@ -990,8 +990,8 @@
 
 <!-- TAB BAR -->
 <nav class="tabbar" id="tabbar">
-  <button class="tab" data-tab="home"><svg><use href="#i-home"/></svg>HOME</button>
-  <button class="tab active" data-tab="checklist"><svg><use href="#i-check-list"/></svg>GYM MODE</button>
+  <button class="tab active" data-tab="home"><svg><use href="#i-home"/></svg>HOME</button>
+  <button class="tab" data-tab="checklist"><svg><use href="#i-check-list"/></svg>GYM MODE</button>
   <button class="tab" data-tab="workouts"><svg><use href="#i-dumbbell"/></svg>PROGRAM</button>
   <button class="tab" data-tab="weight"><svg><use href="#i-scale"/></svg>WEIGHT</button>
   <button class="tab" data-tab="more" onclick="openModal('moreTabs');return false"><svg><use href="#i-grid"/></svg>MORE</button>
@@ -1002,7 +1002,7 @@
 <main class="content">
 
   <!-- HOME TAB -->
-  <section id="tab-home" class="tab-content" style="display:none">
+  <section id="tab-home" class="tab-content">
     <div class="home-hero">
       <div class="home-greeting" id="homeGreeting">Welcome back</div>
       <div class="home-date" id="homeDate">—</div>
@@ -1101,7 +1101,7 @@
   </section>
 
   <!-- GYM MODE TAB -->
-  <section id="tab-checklist" class="tab-content">
+  <section id="tab-checklist" class="tab-content" style="display:none">
     <div class="tools-bar">
       <button class="tool-btn" onclick="openModal('restTimer')"><svg><use href="#i-clock"/></svg>Rest Timer</button>
       <button class="tool-btn" onclick="openModal('plates')"><svg><use href="#i-plates"/></svg>Plate Calc</button>
@@ -1485,8 +1485,8 @@
 
 <!-- MOBILE BOTTOM NAV — mirrors top tabbar, fixed to bottom -->
 <nav class="bottom-nav" id="bottomNav">
-  <button class="bottom-nav-tab" data-tab="home"><svg><use href="#i-home"/></svg>HOME</button>
-  <button class="bottom-nav-tab active" data-tab="checklist"><svg><use href="#i-check-list"/></svg>GYM</button>
+  <button class="bottom-nav-tab active" data-tab="home"><svg><use href="#i-home"/></svg>HOME</button>
+  <button class="bottom-nav-tab" data-tab="checklist"><svg><use href="#i-check-list"/></svg>GYM</button>
   <button class="bottom-nav-tab" data-tab="workouts"><svg><use href="#i-dumbbell"/></svg>PROGRAM</button>
   <button class="bottom-nav-tab" data-tab="weight"><svg><use href="#i-scale"/></svg>WEIGHT</button>
   <button class="bottom-nav-tab" data-tab="more" onclick="openModal('moreTabs');return false"><svg><use href="#i-grid"/></svg>MORE</button>
@@ -2121,11 +2121,12 @@ function showAppShell() {
     document.getElementById('userMenuName').textContent = 'Local';
     document.getElementById('userAvatar').textContent = 'L';
   }
-  // Initial render — default to HOME
+  // Initial render — always land on Home
   renderBlockDots();
   updateReadinessDisplay();
   updateStreakDisplay();
-  renderHome();
+  showTab('home');
+  logEvent('default_tab_home');
 }
 
 function toggleUserMenu() {
@@ -2744,7 +2745,7 @@ const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{retur
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
 let state={
-  activeDay:"Monday",activeTab:"checklist",
+  activeDay:"Monday",activeTab:"home",
   checklist:load(SK.checklist,{}),
   setLog:load(SK.setLog,{}),
   expanded:load(SK.expanded,{}),
@@ -3250,7 +3251,7 @@ function renderHome(){
     const nextLostMilestone = lost < 25 ? 25 : lost < 50 ? 50 : lost < 75 ? 75 : lost < 100 ? 100 : null;
     if(nextLostMilestone){
       const away = (nextLostMilestone - lost).toFixed(1);
-      milestones.push({icon:'📉', label:`${nextLostMilestone}lb total lost`, meta:`${away}lb away · ${lost.toFixed(1)}/${nextLostMilestone}lb`});
+      milestones.push({icon:'<svg style="width:16px;height:16px"><use href="#i-chart"/></svg>', label:`${nextLostMilestone}lb total lost`, meta:`${away}lb away · ${lost.toFixed(1)}/${nextLostMilestone}lb`});
     }
     const goal = state.goalWeight || 210;
     if(current > goal){
