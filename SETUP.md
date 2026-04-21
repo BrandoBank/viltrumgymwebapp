@@ -6,6 +6,18 @@
 
 ---
 
+## 0. Migration — Add `enabled_modules` Column (run once)
+
+If you already ran the schema from a previous session, run this one additional line:
+
+```sql
+ALTER TABLE bb_profiles ADD COLUMN IF NOT EXISTS enabled_modules text[] DEFAULT ARRAY['strength'];
+```
+
+Existing users (you and your GF) will automatically get `['strength']` as their default — no data loss, no re-signup needed.
+
+---
+
 ## 1. Add the BeeBuildz Schema
 
 1. Open your existing Supabase dashboard at **https://supabase.com/dashboard**.
