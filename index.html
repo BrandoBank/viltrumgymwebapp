@@ -745,6 +745,10 @@
     <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
     <symbol id="i-muscle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5c1-2.5 4-3 5.5-1.5M6.5 6.5C5 8 5 11 7 12c-2 1-3 3.5-1.5 5.5M7 17.5C9 20 13 20 15 18c1.5-1.5 1.5-4 0-5.5M15 12.5c2-1 3-3.5 2-5.5C16 5 13.5 4.5 12 5"/></symbol>
     <symbol id="i-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M4 20V10l4 4 4-6 4 6 4-4v10"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+    <symbol id="i-battery-low" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="18" height="10" rx="2"/><path d="M23 11v3"/><rect x="3" y="9" width="4" height="6" rx="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-wellness" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
   </defs>
 </svg>
 
@@ -875,11 +879,20 @@
           <div class="module-card-name">HIKING</div>
           <div class="module-card-sub">Trails & outdoor activity</div>
         </div>
-        <div class="module-card disabled">
-          <div class="module-card-soon">SOON</div>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/></svg>
-          <div class="module-card-name">NUTRITION</div>
-          <div class="module-card-sub">Calories & macros</div>
+        <div class="module-card" id="mod-wellness" onclick="toggleModule('wellness')">
+          <div class="module-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:#000"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></div>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <div class="module-card-name">WELLNESS</div>
+          <div class="module-card-sub">Energy check-ins & mobility</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:12px;background:var(--bg-card);border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">COMING SOON</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span style="font-size:10px;color:var(--text-faint);background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px"><svg style="width:10px;height:10px"><use href="#i-lock"/></svg>Cycle Tracking</span>
+          <span style="font-size:10px;color:var(--text-faint);background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px"><svg style="width:10px;height:10px"><use href="#i-lock"/></svg>Pilates Library</span>
+          <span style="font-size:10px;color:var(--text-faint);background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px"><svg style="width:10px;height:10px"><use href="#i-lock"/></svg>Dance Module</span>
+          <span style="font-size:10px;color:var(--text-faint);background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px"><svg style="width:10px;height:10px"><use href="#i-lock"/></svg>Hiking Log</span>
         </div>
       </div>
       <div class="wizard-nav">
@@ -1019,6 +1032,16 @@
     <!-- NUDGE AREA — populated by checkNudges() -->
     <div id="homeNudgeArea"></div>
 
+    <!-- WELLNESS: Energy check-in (hidden for non-wellness users) -->
+    <div id="homeEnergyCard" style="display:none"></div>
+
+    <!-- WELLNESS: Mobility flow button (hidden for non-wellness users) -->
+    <div id="homeMobilityArea" style="display:none">
+      <div class="panel">
+        <button class="btn" onclick="startMobilityFlow()" style="min-height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px"><svg style="width:15px;height:15px"><use href="#i-warmup"/></svg>15-min Mobility Flow</button>
+      </div>
+    </div>
+
     <!-- CUT JOURNEY — visible in basics + advanced -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-scale"/></svg>CUT JOURNEY</div></div>
@@ -1111,6 +1134,9 @@
       <button class="tool-btn" onclick="toggleFocusMode()"><svg><use href="#i-target"/></svg><span id="focusBtnLabel">Focus Mode</span></button>
       <button class="tool-btn" onclick="openModal('history')"><svg><use href="#i-history"/></svg>Last Session</button>
     </div>
+
+    <!-- WELLNESS: Train Light banner (rendered by checkTrainLightBanner) -->
+    <div id="trainLightBanner" style="display:none"></div>
 
     <div id="gymNudgeArea"></div>
 
@@ -1419,6 +1445,13 @@
         <div class="settings-group-desc">Start Gym Mode in focus mode automatically — hides nav and all non-workout UI.</div>
         <button class="btn" onclick="toggleFocusModeDefault()" id="focusModeDefaultBtn">—</button>
       </div>
+      <div class="settings-group" id="trainLightSettingsGroup" style="display:none">
+        <div class="settings-group-title">TRAIN LIGHT MODE</div>
+        <div class="settings-group-desc">Scale your session on tough days — 70% weight, half volume, longer rest. A banner appears in Gym Mode as a reminder.</div>
+        <div class="settings-toggle-row">
+          <button class="settings-toggle-btn" id="trainLightToggleBtn" onclick="toggleTrainLight()">OFF</button>
+        </div>
+      </div>
     </div>
 
     <div class="panel">
@@ -1481,6 +1514,56 @@
 
   </section>
 
+  <!-- WELLNESS TAB -->
+  <section id="tab-wellness" class="tab-content" style="display:none">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-wellness"/></svg>ENERGY TODAY</div></div>
+      <div id="wellnessEnergyCard"><!-- populated by renderWellnessTab --></div>
+    </div>
+    <div class="panel" data-advanced>
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-activity"/></svg>LAST 7 DAYS</div></div>
+      <div id="energyChartWrap" style="overflow:hidden">
+        <svg id="energyChart" style="width:100%;height:80px"></svg>
+      </div>
+      <div id="energyChartLegend" style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-battery-low"/></svg>TRAIN LIGHT</div></div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.5">Scale your session on tough days — 70% weight, half volume, longer rest, or swap for mobility.</div>
+      <div class="settings-toggle-row">
+        <button class="settings-toggle-btn" id="trainLightWellnessBtn" onclick="toggleTrainLight()">OFF</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-warmup"/></svg>MOBILITY</div></div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.5">A guided 10-exercise flow with auto-advance timer. About 11 minutes total.</div>
+      <button class="btn primary" onclick="startMobilityFlow()" style="min-height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px">
+        <svg style="width:15px;height:15px"><use href="#i-warmup"/></svg>Start 15-min Mobility Flow
+      </button>
+    </div>
+    <div class="panel">
+      <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:12px">COMING SOON</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:flex-start;gap:10px;opacity:0.55">
+          <svg style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:var(--text-faint)"><use href="#i-lock"/></svg>
+          <div><div style="font-size:12px;font-weight:600;color:var(--text-dim)">Cycle Tracking</div><div style="font-size:11px;color:var(--text-faint)">Phase-aware training and energy guidance</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;opacity:0.55">
+          <svg style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:var(--text-faint)"><use href="#i-lock"/></svg>
+          <div><div style="font-size:12px;font-weight:600;color:var(--text-dim)">Pilates Library</div><div style="font-size:11px;color:var(--text-faint)">Guided flows and exercise sequences</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;opacity:0.55">
+          <svg style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:var(--text-faint)"><use href="#i-lock"/></svg>
+          <div><div style="font-size:12px;font-weight:600;color:var(--text-dim)">Dance Module</div><div style="font-size:11px;color:var(--text-faint)">Session logging and tracking for dancers</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;opacity:0.55">
+          <svg style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:var(--text-faint)"><use href="#i-lock"/></svg>
+          <div><div style="font-size:12px;font-weight:600;color:var(--text-dim)">Hiking Log</div><div style="font-size:11px;color:var(--text-faint)">Trail sessions, elevation, and distance</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <!-- MOBILE BOTTOM NAV — mirrors top tabbar, fixed to bottom -->
@@ -1494,6 +1577,40 @@
 
 </div><!-- /appShell -->
 
+
+<!-- MOBILITY FLOW MODAL -->
+<div class="modal-backdrop" id="modal-mobility">
+  <div class="modal" style="max-height:88vh;display:flex;flex-direction:column;overflow:hidden">
+    <div class="modal-header" style="flex-shrink:0">
+      <div class="modal-title">15-MIN MOBILITY FLOW</div>
+      <button class="modal-close" onclick="mobilityQuit()"><svg><use href="#i-x"/></svg></button>
+    </div>
+    <div style="height:3px;background:var(--border);margin:-16px -20px 16px;flex-shrink:0">
+      <div id="mobilityProgress" style="height:100%;background:var(--lime);transition:width 0.4s;width:0%"></div>
+    </div>
+    <div id="mobilityCounter" style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:16px;flex-shrink:0;letter-spacing:.1em">1 / 10</div>
+    <div id="mobilityExerciseView" style="flex:1;display:flex;flex-direction:column;overflow:auto">
+      <div style="flex:1">
+        <div id="mobilityExName" style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.2"></div>
+        <div id="mobilityExDesc" style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:20px"></div>
+      </div>
+      <div style="text-align:center;padding:16px 0;flex-shrink:0">
+        <div id="mobilityTimer" style="font-size:64px;font-weight:700;color:var(--lime);font-family:'JetBrains Mono';line-height:1">45</div>
+        <div style="font-size:10px;color:var(--text-faint);margin-top:6px;font-family:'JetBrains Mono';letter-spacing:.1em">SECONDS REMAINING</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;padding-bottom:4px">
+        <button class="btn primary" onclick="mobilitySkip()" style="min-height:44px">Skip →</button>
+        <button onclick="mobilityQuit()" style="background:none;border:none;color:var(--text-faint);font-size:11px;cursor:pointer;font-family:inherit;padding:8px;min-height:44px">Quit flow</button>
+      </div>
+    </div>
+    <div id="mobilityCompleteView" style="display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 0">
+      <svg style="width:48px;height:48px;color:var(--lime);margin-bottom:16px"><use href="#i-check"/></svg>
+      <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px">Flow Complete</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:24px">Well done. Take a moment to breathe and return to the day ahead.</div>
+      <button class="btn primary" onclick="closeModal('mobility')" style="min-height:44px;width:100%">Done</button>
+    </div>
+  </div>
+</div>
 
 <!-- MORE TABS MODAL -->
 <div class="modal-backdrop" id="modal-moreTabs">
@@ -1912,7 +2029,7 @@ async function saveProfile() {
 }
 
 /* ═══════════════════ MODULE INFRASTRUCTURE ═══════════════════ */
-const MODULE_TABS = {checklist:'strength',workouts:'strength',stats:'strength',chart:'strength',running:'running'};
+const MODULE_TABS = {checklist:'strength',workouts:'strength',stats:'strength',chart:'strength',running:'running',wellness:'wellness'};
 
 function hasModule(mod) {
   const mods = currentProfile?.enabled_modules;
@@ -2740,7 +2857,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -2765,9 +2882,12 @@ let state={
   coachNotes:load(SK.coachNotes,{}),
   personalBests:load(SK.personalBests,{}),
   nudgesSeen:load(SK.nudgesSeen,[]),
+  dailyEnergy:load(SK.dailyEnergy,[]),
+  trainLightMode:load(SK.trainLightMode,false),
+  trainLightDismissed:load(SK.trainLightDismissed,null),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
 async function logEvent(name, data={}) {
@@ -2802,7 +2922,7 @@ const numSets=(s)=>{const m=s.toString().match(/\d+/g);return m?m.length:parseIn
 function showTab(id){
   state.activeTab=id;
   logEvent('tab_viewed',{tab:id});
-  ["home","chart","workouts","checklist","weight","running","stats","warroom","tools","settings"].forEach(t=>{
+  ["home","chart","workouts","checklist","weight","running","stats","warroom","tools","settings","wellness"].forEach(t=>{
     const el=document.getElementById("tab-"+t);if(el)el.style.display=t===id?"block":"none";
   });
   // Highlight "More" nav btn when a secondary tab is active
@@ -2814,13 +2934,14 @@ function showTab(id){
   if(id==="home")renderHome();
   if(id==="chart")drawStrengthChart();
   if(id==="workouts"){renderProgramTab();logEvent('program_tab_viewed');applyUiMode();}
-  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();applyUiMode();checkGymNudge();} else {stopSessionClock();releaseWakeLock();}
+  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();applyUiMode();checkGymNudge();checkTrainLightBanner();} else {stopSessionClock();releaseWakeLock();}
   if(id==="weight"){loadCutWeights();drawWeightChart();renderWeightHistory();updateWeightStats();renderMeasurementHistory();}
   if(id==="running"){renderRunCards();renderIncline();drawRunChart();}
   if(id==="stats"){renderStats();renderAchievements();}
   if(id==="warroom")renderWarRoom();
   if(id==="tools"){renderBag();renderMuscleFatigue();}
   if(id==="settings")renderSettings();
+  if(id==="wellness")renderWellnessTab();
   updateReadinessDisplay();
   updateStreakDisplay();
   // Scroll to top of content when changing tabs on mobile
@@ -2865,6 +2986,7 @@ function renderSettings() {
     const allMods = [
       {id:'strength', label:'Strength Training', desc:'Gym Mode, Programs, PR tracking'},
       {id:'running', label:'Running', desc:'Run plan, treadmill sync, cardio tracking'},
+      {id:'wellness', label:'Wellness', desc:'Energy check-ins, mobility flows, and low-capacity day tools'},
     ];
     modList.innerHTML = allMods.map(m => {
       const on = modules.includes(m.id);
@@ -2873,6 +2995,16 @@ function renderSettings() {
         <button class="settings-toggle-btn${on?' active':''}" onclick="toggleModuleFromSettings('${m.id}')">${on?'ON':'OFF'}</button>
       </div>`;
     }).join('');
+  }
+
+  // Train Light toggle (wellness only)
+  const tlGroup = document.getElementById('trainLightSettingsGroup');
+  const tlBtn = document.getElementById('trainLightToggleBtn');
+  if (tlGroup && tlBtn) {
+    const wellnessOn = hasModule('wellness');
+    tlGroup.style.display = wellnessOn ? '' : 'none';
+    tlBtn.textContent = state.trainLightMode ? 'ON' : 'OFF';
+    tlBtn.classList.toggle('active', state.trainLightMode);
   }
 
   // Usage data
@@ -3051,6 +3183,284 @@ function checkGymNudge() {
     </div>`;
 }
 
+/* ═════════════════ WELLNESS MODULE ═════════════════ */
+
+function todayEnergyLevel() {
+  const today = new Date().toISOString().slice(0,10);
+  return (state.dailyEnergy || []).find(e => e.date === today)?.level || null;
+}
+
+function logEnergyLevel(level) {
+  const today = new Date().toISOString().slice(0,10);
+  const arr = [...(state.dailyEnergy || [])];
+  const idx = arr.findIndex(e => e.date === today);
+  if (idx >= 0) arr[idx].level = level; else arr.push({date:today, level});
+  state.dailyEnergy = arr;
+  persist();
+  logEvent('energy_logged', {level});
+  haptic(30);
+  checkHomeEnergyCard();
+  if (hasModule('wellness') && state.activeTab === 'wellness') renderWellnessTab();
+}
+
+function clearTodayEnergy() {
+  const today = new Date().toISOString().slice(0,10);
+  state.dailyEnergy = (state.dailyEnergy || []).filter(e => e.date !== today);
+  persist();
+  checkHomeEnergyCard();
+  if (hasModule('wellness') && state.activeTab === 'wellness') renderWellnessTab();
+}
+
+function checkHomeEnergyCard() {
+  const area = document.getElementById('homeEnergyCard');
+  const mobArea = document.getElementById('homeMobilityArea');
+  if (!area) return;
+  if (!hasModule('wellness')) { area.style.display = 'none'; if(mobArea) mobArea.style.display='none'; return; }
+  area.style.display = '';
+  if (mobArea) mobArea.style.display = '';
+  const level = todayEnergyLevel();
+  const icons = {high:'i-flame', moderate:'i-activity', low:'i-battery-low'};
+  const labels = {high:'High', moderate:'Moderate', low:'Low'};
+  if (level) {
+    area.innerHTML = `
+      <div class="panel" style="border-left:3px solid var(--lime);padding:14px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:4px">ENERGY TODAY</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <svg style="width:16px;height:16px;color:var(--lime)"><use href="#${icons[level]}"/></svg>
+              <span style="font-size:14px;font-weight:600;color:var(--text)">${labels[level]}</span>
+            </div>
+          </div>
+          <button onclick="clearTodayEnergy()" style="font-size:11px;color:var(--text-faint);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;padding:4px;min-height:44px">change</button>
+        </div>
+      </div>`;
+  } else {
+    area.innerHTML = `
+      <div class="panel">
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px">How's your energy today?</div>
+        <div style="display:flex;gap:8px">
+          ${[['high','i-flame','HIGH'],['moderate','i-activity','MODERATE'],['low','i-battery-low','LOW']].map(([lvl,icon,lbl]) => `
+            <button onclick="logEnergyLevel('${lvl}')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;cursor:pointer;min-height:64px;font-family:inherit">
+              <svg style="width:18px;height:18px;color:var(--lime)"><use href="#${icon}"/></svg>
+              <span style="font-size:9px;color:var(--text-dim);font-family:'JetBrains Mono';letter-spacing:.08em">${lbl}</span>
+            </button>`).join('')}
+        </div>
+      </div>`;
+  }
+}
+
+function toggleTrainLight() {
+  state.trainLightMode = !state.trainLightMode;
+  persist();
+  logEvent(state.trainLightMode ? 'train_light_enabled' : 'train_light_disabled');
+  checkTrainLightBanner();
+  renderSettings();
+  if (hasModule('wellness') && state.activeTab === 'wellness') renderWellnessTab();
+}
+
+function checkTrainLightBanner() {
+  const banner = document.getElementById('trainLightBanner');
+  if (!banner) return;
+  if (!hasModule('wellness') || !state.trainLightMode) { banner.style.display = 'none'; return; }
+  const today = new Date().toISOString().slice(0,10);
+  if (state.trainLightDismissed === today) { banner.style.display = 'none'; return; }
+  banner.style.display = '';
+  banner.innerHTML = `
+    <div style="background:var(--bg-card);border-left:3px solid var(--lime);padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--lime);margin-bottom:4px;display:flex;align-items:center;gap:6px">
+          <svg style="width:13px;height:13px"><use href="#i-battery-low"/></svg>TRAIN LIGHT MODE
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);line-height:1.5">Consider scaling weights to 70%, cutting volume in half, longer rest, or swapping main work for mobility. This is permission — not an order.</div>
+      </div>
+      <button onclick="dismissTrainLightBanner()" style="background:none;border:none;color:var(--text-faint);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;min-width:28px;min-height:28px;flex-shrink:0">✕</button>
+    </div>`;
+}
+
+function dismissTrainLightBanner() {
+  state.trainLightDismissed = new Date().toISOString().slice(0,10);
+  persist();
+  checkTrainLightBanner();
+}
+
+// ─── Mobility Flow ───────────────────────────────────────────────────────────
+const MOBILITY_FLOW = [
+  {name:'Cat-Cow', seconds:45, desc:'On hands and knees. Arch your spine up on exhale, drop it down on inhale. Move slowly.'},
+  {name:'Deep Breathing', seconds:60, desc:'Sit comfortably. 4 counts in through the nose, hold 4, out 4. Eyes closed if you like.'},
+  {name:"Child's Pose", seconds:60, desc:'Kneel and fold forward, arms extended ahead. Sink hips back toward heels. Breathe.'},
+  {name:'Hip Opener — Butterfly', seconds:60, desc:'Sit with soles together, knees out to the sides. Gently press knees toward the floor.'},
+  {name:'Pigeon Pose', seconds:45, desc:'Right shin forward, left leg extended back. Fold forward. Hold. Repeat left side.'},
+  {name:'Seated Forward Fold', seconds:60, desc:'Legs straight out. Hinge at hips and reach toward your feet. Hold the furthest comfortable point.'},
+  {name:'Spinal Twist', seconds:45, desc:'One knee bent, twist gently toward it. Keep the spine tall. Hold, breathe, switch sides.'},
+  {name:'Glute Bridge', seconds:60, desc:'On your back, feet flat. Slowly raise and lower hips. Controlled tempo — feel the squeeze.'},
+  {name:'Shoulder Rolls', seconds:45, desc:'Standing or seated. Roll shoulders backward in wide, slow circles. Let tension release.'},
+  {name:'Savasana Breathing', seconds:60, desc:'Lie flat. Close your eyes. Breathe naturally. Nothing to do right now — just be here.'},
+];
+
+let mobilityState = {active:false, index:0, remaining:0, interval:null};
+
+function startMobilityFlow() {
+  clearInterval(mobilityState.interval);
+  mobilityState = {active:true, index:0, remaining:MOBILITY_FLOW[0].seconds, interval:null};
+  logEvent('mobility_started');
+  // Reset modal views
+  const ev = document.getElementById('mobilityExerciseView');
+  const cv = document.getElementById('mobilityCompleteView');
+  if (ev) { ev.style.display = 'flex'; ev.style.flexDirection = 'column'; }
+  if (cv) cv.style.display = 'none';
+  openModal('mobility');
+  renderMobilitySlide();
+  mobilityTick();
+}
+
+function renderMobilitySlide() {
+  const ex = MOBILITY_FLOW[mobilityState.index];
+  const prog = document.getElementById('mobilityProgress');
+  const name = document.getElementById('mobilityExName');
+  const desc = document.getElementById('mobilityExDesc');
+  const timer = document.getElementById('mobilityTimer');
+  const counter = document.getElementById('mobilityCounter');
+  if (!prog) return;
+  prog.style.width = `${(mobilityState.index / MOBILITY_FLOW.length) * 100}%`;
+  name.textContent = ex.name;
+  desc.textContent = ex.desc;
+  timer.textContent = mobilityState.remaining;
+  counter.textContent = `${mobilityState.index + 1} / ${MOBILITY_FLOW.length}`;
+}
+
+function mobilityTick() {
+  clearInterval(mobilityState.interval);
+  mobilityState.interval = setInterval(() => {
+    mobilityState.remaining--;
+    const timerEl = document.getElementById('mobilityTimer');
+    if (timerEl) timerEl.textContent = mobilityState.remaining;
+    if (mobilityState.remaining <= 0) {
+      clearInterval(mobilityState.interval);
+      haptic([40,30,40]);
+      mobilityState.index++;
+      if (mobilityState.index >= MOBILITY_FLOW.length) {
+        mobilityState.active = false;
+        const totalMin = Math.round(MOBILITY_FLOW.reduce((a,e)=>a+e.seconds,0)/60);
+        logEvent('mobility_completed', {duration_minutes:totalMin});
+        haptic([60,40,60,40,60]);
+        const prog = document.getElementById('mobilityProgress');
+        if (prog) prog.style.width = '100%';
+        const ev = document.getElementById('mobilityExerciseView');
+        const cv = document.getElementById('mobilityCompleteView');
+        if (ev) ev.style.display = 'none';
+        if (cv) { cv.style.display = 'flex'; cv.style.flexDirection = 'column'; }
+      } else {
+        mobilityState.remaining = MOBILITY_FLOW[mobilityState.index].seconds;
+        renderMobilitySlide();
+        mobilityTick();
+      }
+    }
+  }, 1000);
+}
+
+function mobilitySkip() {
+  clearInterval(mobilityState.interval);
+  mobilityState.index++;
+  if (mobilityState.index >= MOBILITY_FLOW.length) {
+    mobilityState.active = false;
+    const totalMin = Math.round(MOBILITY_FLOW.reduce((a,e)=>a+e.seconds,0)/60);
+    logEvent('mobility_completed', {duration_minutes:totalMin});
+    haptic([60,40,60,40,60]);
+    const prog = document.getElementById('mobilityProgress');
+    if (prog) prog.style.width = '100%';
+    const ev = document.getElementById('mobilityExerciseView');
+    const cv = document.getElementById('mobilityCompleteView');
+    if (ev) ev.style.display = 'none';
+    if (cv) { cv.style.display = 'flex'; cv.style.flexDirection = 'column'; }
+  } else {
+    mobilityState.remaining = MOBILITY_FLOW[mobilityState.index].seconds;
+    renderMobilitySlide();
+    mobilityTick();
+  }
+}
+
+function mobilityQuit() {
+  if (mobilityState.active && !confirm('Quit the mobility flow? Progress will be lost.')) return;
+  clearInterval(mobilityState.interval);
+  mobilityState.active = false;
+  closeModal('mobility');
+}
+
+// ─── Wellness Hub Tab ────────────────────────────────────────────────────────
+function renderWellnessTab() {
+  // Energy card (same logic as Home but in the Wellness tab)
+  const wCard = document.getElementById('wellnessEnergyCard');
+  if (wCard) {
+    const level = todayEnergyLevel();
+    const icons = {high:'i-flame', moderate:'i-activity', low:'i-battery-low'};
+    const labels = {high:'High', moderate:'Moderate', low:'Low'};
+    if (level) {
+      wCard.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">
+          <div style="display:flex;align-items:center;gap:10px">
+            <svg style="width:20px;height:20px;color:var(--lime)"><use href="#${icons[level]}"/></svg>
+            <span style="font-size:16px;font-weight:600;color:var(--text)">${labels[level]}</span>
+          </div>
+          <button onclick="clearTodayEnergy()" style="font-size:11px;color:var(--text-faint);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;padding:4px;min-height:44px">change</button>
+        </div>`;
+    } else {
+      wCard.innerHTML = `
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Tap to log your energy level for today.</div>
+        <div style="display:flex;gap:8px">
+          ${[['high','i-flame','HIGH'],['moderate','i-activity','MODERATE'],['low','i-battery-low','LOW']].map(([lvl,icon,lbl]) => `
+            <button onclick="logEnergyLevel('${lvl}')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;min-height:64px;font-family:inherit">
+              <svg style="width:18px;height:18px;color:var(--lime)"><use href="#${icon}"/></svg>
+              <span style="font-size:9px;color:var(--text-dim);font-family:'JetBrains Mono';letter-spacing:.08em">${lbl}</span>
+            </button>`).join('')}
+        </div>`;
+    }
+  }
+  // 7-day energy chart
+  renderEnergyChart();
+  // Train Light buttons
+  const wb = document.getElementById('trainLightWellnessBtn');
+  if (wb) { wb.textContent = state.trainLightMode ? 'ON' : 'OFF'; wb.classList.toggle('active', state.trainLightMode); }
+}
+
+function renderEnergyChart() {
+  const svg = document.getElementById('energyChart');
+  const legend = document.getElementById('energyChartLegend');
+  if (!svg) return;
+  const W = svg.parentElement?.clientWidth || 300;
+  const H = 80;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  // Build last 7 days array
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().slice(0,10);
+    const entry = (state.dailyEnergy || []).find(e => e.date === dateStr);
+    days.push({date: dateStr, label: d.toLocaleDateString('en-US',{weekday:'narrow'}), level: entry?.level || null});
+  }
+  const colorMap = {high:'var(--lime)', moderate:'#5b8fff', low:'#ff6b35'};
+  const barW = Math.floor(W / 7) - 4;
+  const gap = (W - barW * 7) / 8;
+  let html = '';
+  days.forEach((d, i) => {
+    const x = gap + i * (barW + gap);
+    const color = d.level ? colorMap[d.level] : 'var(--border)';
+    const barH = d.level ? (d.level === 'high' ? 40 : d.level === 'moderate' ? 28 : 18) : 6;
+    const y = H - 20 - barH;
+    html += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="3" fill="${color}" opacity="${d.level ? '0.9' : '0.4'}"/>`;
+    html += `<text x="${x + barW/2}" y="${H - 4}" fill="#555" font-size="9" font-family="JetBrains Mono" text-anchor="middle">${d.label}</text>`;
+  });
+  svg.innerHTML = html;
+  if (legend) {
+    legend.innerHTML = `
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--lime);border-radius:2px;display:inline-block"></span>High</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#5b8fff;border-radius:2px;display:inline-block"></span>Moderate</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#ff6b35;border-radius:2px;display:inline-block"></span>Low</span>`;
+  }
+}
+
 /* ═════════════════ HOME LANDING ═════════════════ */
 const TIPS = [
   "The set you almost skipped is the one that grows muscle. Compounds are non-negotiable.",
@@ -3088,6 +3498,7 @@ function renderHome(){
   const tipEl = document.getElementById("homeTip");
   if(!greeting) return;
   checkNudges();
+  checkHomeEnergyCard();
 
   // Greeting based on time of day
   const hour = new Date().getHours();
@@ -4323,6 +4734,9 @@ function renderMeasurementHistory(){
 /* ═════════════════ READINESS + STREAK (REAL) ═════════════════ */
 function calculateReadiness(){
   let score = 100;
+  const energyLevel = todayEnergyLevel();
+  if (energyLevel === 'low') score -= 15;
+  else if (energyLevel === 'high') score += 5;
   const fatigueLevels = state.fatigue || {};
   Object.values(fatigueLevels).forEach(level => {
     if(level === 'heavy') score -= 10;
@@ -5006,8 +5420,10 @@ function renderMoreModal(){
   const basics=isBasicsMode();
   const modules=Array.isArray(currentProfile?.enabled_modules)?currentProfile.enabled_modules:['strength'];
   const hasRun=modules.includes('running');
+  const hasWellness=modules.includes('wellness');
   const items=[
     {tab:'tools',icon:'i-tools',label:'TOOLS',show:true},
+    {tab:'wellness',icon:'i-wellness',label:'WELLNESS',show:!basics&&hasWellness},
     {tab:'stats',icon:'i-stats',label:'STATS',show:!basics},
     {tab:'chart',icon:'i-chart',label:'STRENGTH',show:!basics},
     {tab:'running',icon:'i-run',label:'RUN PLAN',show:hasRun},
