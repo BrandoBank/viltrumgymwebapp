@@ -2308,7 +2308,7 @@ async function deleteProgram(id) {
 
 /* ═════════════════ DATA ═════════════════ */
 const DAY_ORDER=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-let DAYS=DAY_ORDER.filter(d=>d in WORKOUTS);
+let DAYS=[];
 function refreshDays(){DAYS=DAY_ORDER.filter(d=>d in WORKOUTS);}
 
 const EXERCISE_LIBRARY={
@@ -4746,6 +4746,7 @@ Rules:
 
 // Default workouts snapshot so we can restore
 const DEFAULT_WORKOUTS = JSON.parse(JSON.stringify(WORKOUTS));
+refreshDays(); // seed DAYS now that WORKOUTS is defined
 
 /* ═══════════════════ PROGRAM TEMPLATES ═══════════════════ */
 const PROGRAM_TEMPLATES = {
