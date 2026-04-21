@@ -495,6 +495,10 @@
   .wake-indicator svg{width:12px;height:12px;stroke-width:2;animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
+  /* PR TOAST */
+  .pr-toast{position:fixed;top:calc(env(safe-area-inset-top) + 70px);left:50%;transform:translateX(-50%) translateY(-12px);background:var(--lime);color:#000;font-weight:700;font-size:13px;letter-spacing:0.05em;padding:10px 22px;border-radius:24px;opacity:0;pointer-events:none;transition:opacity 0.25s,transform 0.25s;z-index:500;white-space:nowrap;box-shadow:0 4px 20px rgba(182,255,60,0.4)}
+  .pr-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
   /* CONFETTI */
   .confetti-container{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden}
   .confetti{position:absolute;width:8px;height:8px;background:var(--lime);opacity:0;animation:confetti-fall 3s ease-out forwards}
@@ -1388,6 +1392,9 @@
 
 <!-- Sync Indicator -->
 <div class="sync-indicator" id="syncIndicator">SYNCED</div>
+
+<!-- PR toast -->
+<div class="pr-toast" id="prToast">🏆 NEW PR!</div>
 
 <!-- Confetti container -->
 <div class="confetti-container" id="confettiContainer"></div>
@@ -2477,7 +2484,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -2500,6 +2507,7 @@ let state={
   amoled:load(SK.amoled,false),
   focusMode:load(SK.focusMode,false),
   coachNotes:load(SK.coachNotes,{}),
+  personalBests:load(SK.personalBests,{}),
   timer:{running:false,seconds:0,interval:null}
 };
 function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes)}
@@ -2523,7 +2531,7 @@ function showTab(id){
   if(id==="home")renderHome();
   if(id==="chart")drawStrengthChart();
   if(id==="workouts")renderProgram();
-  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();} else {releaseWakeLock();}
+  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();} else {stopSessionClock();releaseWakeLock();}
   if(id==="weight"){drawWeightChart();renderWeightHistory();updateWeightStats();renderMeasurementHistory();}
   if(id==="running"){renderRunCards();renderIncline();drawRunChart();}
   if(id==="stats"){renderStats();renderAchievements();}
@@ -2671,7 +2679,8 @@ function renderHome(){
   recentSessions.forEach(s => {
     const daysAgo = Math.floor((Date.now() - new Date(s.date).getTime()) / 86400000);
     const when = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`;
-    activities.push({icon:'💪', title:`${s.day} session complete`, meta: when});
+    const durStr = s.duration ? ` · ${s.duration}` : '';
+    activities.push({icon:'💪', title:`${s.day} session complete`, meta: when+durStr});
   });
   if(sortedWeights.length > 0){
     const last = sortedWeights[sortedWeights.length-1];
@@ -2992,7 +3001,8 @@ function renderSetLog(exIdx,nSets){
   if(nSets >= 3){
     html+=`<div class="set-log-bulk"><button class="bulk-btn" onclick="copyFirstToAll(${exIdx},${nSets})"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy set 1 to all</button><button class="bulk-btn" onclick="markAllSetsDone(${exIdx},${nSets})"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>Mark all done</button></div>`;
   }
-  html+=`<div class="rest-timer"><div><div class="rest-timer-display" id="timer-${exIdx}">1:30</div><div class="rest-timer-label mono">REST</div></div><div class="timer-controls"><button class="timer-btn" onclick="startTimer(${exIdx})"><svg><use href="#i-play"/></svg></button><button class="timer-btn" onclick="pauseTimer()"><svg><use href="#i-pause"/></svg></button><button class="timer-btn" onclick="resetTimer(${exIdx})"><svg><use href="#i-reset"/></svg></button></div></div></div>`;
+  const restSecs=getRestSeconds(ex.name);
+  html+=`<div class="rest-timer"><div><div class="rest-timer-display" id="timer-${exIdx}">${formatRestTime(restSecs)}</div><div class="rest-timer-label mono">REST</div></div><div class="timer-controls"><button class="timer-btn" onclick="startTimer(${exIdx})"><svg><use href="#i-play"/></svg></button><button class="timer-btn" onclick="pauseTimer()"><svg><use href="#i-pause"/></svg></button><button class="timer-btn" onclick="resetTimer(${exIdx})"><svg><use href="#i-reset"/></svg></button></div></div></div>`;
   return html;
 }
 
@@ -3014,6 +3024,8 @@ function copyFirstToAll(exIdx, nSets){
 }
 
 function markAllSetsDone(exIdx, nSets){
+  let bestWeight = 0;
+  let bestData = null;
   for(let s=1; s<=nSets; s++){
     const k = setKey(state.activeDay, exIdx, s);
     const d = state.setLog[k] || {};
@@ -3027,7 +3039,10 @@ function markAllSetsDone(exIdx, nSets){
       d.done = true;
     }
     state.setLog[k] = d;
+    if((d.weight||0) > bestWeight){ bestWeight=d.weight||0; bestData=d; }
   }
+  // Check PR against the heaviest set in this bulk-complete
+  if(bestData) detectPR(exIdx, bestData);
   state.checklist[key(state.activeDay, exIdx)] = true;
   haptic([60, 40, 60]);
   persist();
@@ -3049,6 +3064,7 @@ function toggleSet(exIdx,s){
     if(rEl && rEl.value) d.reps = parseInt(rEl.value);
     if(pEl && pEl.value) d.rpe = parseInt(pEl.value);
     haptic(40);
+    detectPR(exIdx,d);
     startTimer(exIdx);
     const nS=numSets(WORKOUTS[state.activeDay].exercises[exIdx].sets);
     let all=true;
@@ -3064,7 +3080,7 @@ function resetDay(){WORKOUTS[state.activeDay].exercises.forEach((_,i)=>{delete s
 
 function renderChecklist(){
   renderRings();const d=state.activeDay,p=pct(d);
-  document.getElementById("checkDayTitle").innerHTML=`<div class="day-title-text">${WORKOUTS[d].label}</div><div class="day-title-meta mono">${doneCount(d)} OF ${totalCount(d)} COMPLETE · BLOCK ${state.block.num} WK ${state.block.week}</div>`;
+  document.getElementById("checkDayTitle").innerHTML=`<div class="day-title-text">${WORKOUTS[d].label}</div><div class="day-title-meta mono" id="checkDayMeta">${buildDayMeta(d)}</div>`;
   document.getElementById("resetBtn").style.display=doneCount(d)>0?"inline-flex":"none";
   document.getElementById("progBarFill").style.width=p+"%";
   renderCheckItems();
@@ -3073,11 +3089,14 @@ function renderChecklist(){
   const wasComplete=banner.style.display==="block";
   banner.style.display=p===100?"block":"none";
   if(p===100){
-    document.getElementById("completeDay").textContent=d+" done. Rest up, eat your protein.";
+    const dur=sessionStartTime?formatSessionTime(Date.now()-sessionStartTime):null;
+    document.getElementById("completeDay").innerHTML=d+' done. Rest up, eat your protein.'+(dur?` <span style="color:var(--lime);font-weight:700">· ${dur}</span>`:'');
     if(!wasComplete){
       fireConfetti();
       haptic([100,50,100,50,200]);
-      logSessionComplete(d);
+      logSessionComplete(d,dur);
+      stopSessionClock();
+      sessionStartTime=null;
     }
   }
 }
@@ -3112,11 +3131,75 @@ function saveCoachNote(value){
   }, 600);
 }
 
-/* ═════════════════ REST TIMER ═════════════════ */
-function startTimer(exIdx){if(state.timer.interval)clearInterval(state.timer.interval);state.timer.running=true;state.timer.seconds=90;updateTimerDisplay(exIdx);state.timer.interval=setInterval(()=>{state.timer.seconds--;updateTimerDisplay(exIdx);if(state.timer.seconds<=0){clearInterval(state.timer.interval);state.timer.running=false;try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const g=ctx.createGain();osc.connect(g);g.connect(ctx.destination);osc.frequency.value=880;g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.3);osc.start();osc.stop(ctx.currentTime+0.3)}catch{}}},1000)}
+/* ═════════════════ REST TIMER (#13 — smart defaults per exercise) ═════════════════ */
+const COMPOUND_PATTERNS = ['bench press','overhead press','barbell press','db press','squat','deadlift','trap bar','barbell row','t-bar row','pull-up','pullup','weighted dip','barbell curl'];
+const ISOLATION_PATTERNS = ['curl','lateral raise','fly','flye','pushdown','extension','kickback','crunch','plank','calf raise','face pull','shrug','leg raise','ab '];
+function getRestSeconds(exName){
+  if(!exName) return 90;
+  const n = exName.toLowerCase();
+  if(COMPOUND_PATTERNS.some(p=>n.includes(p))) return 180;
+  if(ISOLATION_PATTERNS.some(p=>n.includes(p))) return 90;
+  return 120;
+}
+function formatRestTime(s){const m=Math.floor(s/60),r=s%60;return`${m}:${r.toString().padStart(2,'0')}`}
+function startTimer(exIdx){
+  if(state.timer.interval)clearInterval(state.timer.interval);
+  const exName=WORKOUTS[state.activeDay]?.exercises[exIdx]?.name;
+  state.timer.running=true;state.timer.seconds=getRestSeconds(exName);
+  updateTimerDisplay(exIdx);
+  state.timer.interval=setInterval(()=>{state.timer.seconds--;updateTimerDisplay(exIdx);if(state.timer.seconds<=0){clearInterval(state.timer.interval);state.timer.running=false;try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const g=ctx.createGain();osc.connect(g);g.connect(ctx.destination);osc.frequency.value=880;g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.3);osc.start();osc.stop(ctx.currentTime+0.3)}catch{}}},1000);
+}
 function pauseTimer(){if(state.timer.interval)clearInterval(state.timer.interval);state.timer.running=false}
-function resetTimer(exIdx){pauseTimer();state.timer.seconds=90;updateTimerDisplay(exIdx)}
+function resetTimer(exIdx){
+  pauseTimer();
+  const exName=WORKOUTS[state.activeDay]?.exercises[exIdx]?.name;
+  state.timer.seconds=getRestSeconds(exName);
+  updateTimerDisplay(exIdx);
+}
 function updateTimerDisplay(exIdx){const el=document.getElementById("timer-"+exIdx);if(!el)return;const s=Math.max(0,state.timer.seconds),m=Math.floor(s/60),r=s%60;el.textContent=`${m}:${r.toString().padStart(2,"0")}`;el.style.color=s<=10&&state.timer.running?"var(--red)":"var(--lime)"}
+
+/* ═════════════════ PR DETECTION (#11) ═════════════════ */
+function showPRToast(name){
+  const el=document.getElementById('prToast');if(!el)return;
+  el.textContent=`🏆 NEW PR — ${name}`;
+  el.classList.add('show');
+  clearTimeout(showPRToast._t);
+  showPRToast._t=setTimeout(()=>el.classList.remove('show'),2800);
+}
+function detectPR(exIdx, setData, celebrate=true){
+  if(!setData.weight||setData.weight<=0) return false;
+  const ex=WORKOUTS[state.activeDay]?.exercises[exIdx];if(!ex) return false;
+  const name=ex.name;
+  const prev=(state.personalBests||{})[name];
+  if(!prev||setData.weight>prev.weight){
+    if(!state.personalBests) state.personalBests={};
+    state.personalBests[name]={weight:setData.weight,reps:setData.reps||null,date:new Date().toISOString().slice(0,10),day:state.activeDay};
+    if(prev&&celebrate){showPRToast(name);fireConfetti();haptic([100,50,200]);}
+    return !!prev; // true only if it beat an existing record
+  }
+  return false;
+}
+
+/* ═════════════════ SESSION DURATION TIMER (#12) ═════════════════ */
+let sessionStartTime=null;
+let sessionClockInterval=null;
+function formatSessionTime(ms){const totalSec=Math.floor(ms/1000),h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60),s=totalSec%60;return h>0?`${h}h ${m}m`:`${m}:${s.toString().padStart(2,'0')}`}
+function startSessionClock(){
+  if(sessionStartTime) return; // already running
+  sessionStartTime=Date.now();
+  sessionClockInterval=setInterval(()=>{
+    const el=document.getElementById('checkDayMeta');
+    if(el) el.textContent=buildDayMeta(state.activeDay);
+  },10000); // refresh display every 10s
+}
+function stopSessionClock(){
+  if(sessionClockInterval){clearInterval(sessionClockInterval);sessionClockInterval=null;}
+}
+function buildDayMeta(d){
+  const base=`${doneCount(d)} OF ${totalCount(d)} COMPLETE · BLOCK ${state.block.num} WK ${state.block.week}`;
+  if(!sessionStartTime||pct(d)===100) return base;
+  return base+` · ⏱ ${formatSessionTime(Date.now()-sessionStartTime)}`;
+}
 
 /* ═════════════════ MUSCLE MAP (anatomy SVG) ═════════════════ */
 function renderMuscleMapToday(){
@@ -3345,15 +3428,15 @@ function renderStats(){
   document.getElementById("currentStreak").textContent=totalSessions>=4?1:0;
   document.getElementById("statsBlock").textContent=state.block.num;
   document.getElementById("statsBlockSub").textContent=`Week ${state.block.week} of 4`;
-  // PRs based on strength data
-  const prs=[
-    {lift:"Back Squat",weight:245,date:"March 2026"},
-    {lift:"Bench Press",weight:215,date:"February 2026"},
-    {lift:"Trap Bar Deadlift",weight:305,date:"March 2026"},
-    {lift:"Conventional Deadlift",weight:285,date:"March 2026"},
-    {lift:"Military Press",weight:115,date:"Varies"},
-  ];
-  document.getElementById("prList").innerHTML=prs.map(pr=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;color:var(--text);font-weight:500">${pr.lift}</div><div style="font-size:10px;color:var(--text-faint);margin-top:2px">${pr.date}</div></div><div style="display:flex;align-items:center;gap:10px"><svg style="width:14px;height:14px;color:var(--lime)" fill="none" stroke="currentColor"><use href="#i-trophy"/></svg><span style="font-size:16px;color:var(--lime);font-weight:700;font-family:'JetBrains Mono'">${pr.weight} lb</span></div></div>`).join("");
+  // PRs from live tracking
+  const pbs = state.personalBests || {};
+  const prEntries = Object.entries(pbs).sort((a,b)=>b[1].weight-a[1].weight);
+  const prEl = document.getElementById("prList");
+  if(prEntries.length===0){
+    prEl.innerHTML='<div style="color:var(--text-faint);font-size:12px;font-style:italic;padding:10px 0">No PRs logged yet — they\'ll appear here automatically when you beat your best weight on any lift.</div>';
+  } else {
+    prEl.innerHTML=prEntries.map(([lift,pr])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;color:var(--text);font-weight:500">${lift}</div><div style="font-size:10px;color:var(--text-faint);margin-top:2px">${pr.reps?pr.reps+' reps · ':''} ${pr.date}</div></div><div style="display:flex;align-items:center;gap:10px"><svg style="width:14px;height:14px;color:var(--lime)" fill="none" stroke="currentColor"><use href="#i-trophy"/></svg><span style="font-size:16px;color:var(--lime);font-weight:700;font-family:'JetBrains Mono'">${pr.weight} lb</span></div></div>`).join('');
+  }
   renderVolumeChart();
   renderProgrammingCheck();
   renderHeatmap();
@@ -3781,12 +3864,12 @@ function updateStreakDisplay(){
   const el2 = document.getElementById("currentStreak");
   if(el2) el2.textContent = streak;
 }
-function logSessionComplete(day){
+function logSessionComplete(day, durationLabel){
   const today = new Date().toISOString().slice(0,10);
   state.sessionHistory = state.sessionHistory || [];
   const existing = state.sessionHistory.find(s => s.date === today && s.day === day);
   if(!existing){
-    state.sessionHistory.push({date: today, day});
+    state.sessionHistory.push({date: today, day, duration: durationLabel||null});
     persist();
   }
   updateReadinessDisplay();
