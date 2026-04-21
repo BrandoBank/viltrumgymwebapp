@@ -941,7 +941,7 @@
     </button>
     <div class="user-menu-dropdown" id="userMenuDropdown">
       <button class="user-menu-item" onclick="openModal('profileEdit');closeUserMenu()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>Edit Profile</button>
-      <button class="user-menu-item" data-advanced onclick="openModal('programs');closeUserMenu()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 8v8m3-10v12m12-12v12m3-10v8M6 12h12"/></svg>My Programs</button>
+      <button class="user-menu-item" data-advanced onclick="showTab('workouts');closeUserMenu()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 8v8m3-10v12m12-12v12m3-10v8M6 12h12"/></svg>My Programs</button>
       <div class="user-menu-divider"></div>
       <button class="user-menu-item" onclick="signOut()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</button>
     </div>
@@ -1093,10 +1093,8 @@
 
   <!-- PROGRAM TAB -->
   <section id="tab-workouts" class="tab-content" style="display:none">
-    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap" id="dayBtnsProgram"></div>
-    <div id="programHeader" style="margin-bottom:16px"></div>
-    <div class="panel" style="padding:0;overflow:hidden"><div id="programTable"></div></div>
-    <div style="margin-top:12px;padding:12px 14px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:0.08em">F = to failure · BW = bodyweight · s = dumbbells · weights show current block</div>
+    <div id="programTabContent"></div>
+    <div id="pdfUploadStatus" style="font-size:11px;margin-top:10px"></div>
   </section>
 
   <!-- GYM MODE TAB -->
@@ -2238,6 +2236,7 @@ async function saveCurrentAsProgram() {
     persist();
     document.getElementById('newProgramName').value = '';
     renderProgramsList();
+    renderProgramTab?.();
   } catch (err) { alert('Error: ' + err.message); }
 }
 
@@ -2253,7 +2252,7 @@ async function activateProgram(id) {
     state.customProgram = prog.data;
     persist();
     renderProgramsList();
-    renderProgram?.();
+    renderProgramTab?.();
     renderChecklist?.();
   } catch (err) { alert('Error: ' + err.message); }
 }
@@ -2267,6 +2266,7 @@ async function renameProgram(id) {
     await supa.from('bb_programs').update({ name: newName }).eq('id', id);
     prog.name = newName;
     renderProgramsList();
+    renderProgramTab?.();
   } catch (err) { alert('Error: ' + err.message); }
 }
 
@@ -2276,7 +2276,101 @@ async function deleteProgram(id) {
     await supa.from('bb_programs').delete().eq('id', id);
     savedPrograms = savedPrograms.filter(p => p.id !== id);
     renderProgramsList();
+    renderProgramTab?.();
   } catch (err) { alert('Error: ' + err.message); }
+}
+
+let programDayExpanded = {};
+
+function renderProgramTab() {
+  const container = document.getElementById('programTabContent');
+  if (!container) return;
+  const activeProgram = savedPrograms.find(p => p.is_active);
+  const isStarter = state.customProgram === null;
+  const programName = activeProgram ? activeProgram.name : isStarter ? 'Powerbuilding 5-Day' : 'Custom Program';
+  const programDesc = isStarter
+    ? 'Starter template — personalize via PDF upload or AI generation below'
+    : activeProgram
+      ? `Saved ${new Date(activeProgram.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`
+      : 'Imported from PDF or generated via AI';
+
+  const daysHTML = DAYS.map(day => {
+    const w = WORKOUTS[day];
+    const exp = !!programDayExpanded[day];
+    const rows = exp ? w.exercises.map((ex,i) => `
+      <div style="display:grid;grid-template-columns:2fr .6fr .8fr 1fr;padding:10px 14px;border-top:1px solid var(--border);align-items:center;background:${i%2===0?'var(--bg)':'var(--bg-card)'}">
+        <span style="font-size:12px;font-weight:500">${ex.name}</span>
+        <span style="font-size:11px;color:var(--lime);font-family:'JetBrains Mono'">${ex.sets}</span>
+        <span style="font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono'">${ex.reps}</span>
+        <span style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'">${applyProgressiveOverload(ex.weight)}</span>
+      </div>`).join('') : '';
+    return `
+      <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px;overflow:hidden">
+        <button onclick="toggleProgramDay('${day}')" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--bg-card);border:none;cursor:pointer;min-height:44px;font-family:inherit">
+          <div>
+            <span style="font-size:11px;font-weight:700;color:var(--lime);letter-spacing:0.12em;font-family:'JetBrains Mono'">${day.slice(0,3).toUpperCase()}</span>
+            <span style="font-size:12px;color:var(--text-dim);margin-left:10px">${w.label}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:9px;color:var(--text-faint);font-family:'JetBrains Mono'">${w.exercises.length} EX</span>
+            <svg style="width:16px;height:16px;color:var(--text-faint);transform:${exp?'rotate(180deg)':'rotate(0deg)'};transition:transform 0.2s;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </button>
+        ${rows}
+      </div>`;
+  }).join('');
+
+  const savedHTML = (!supa || localOnlyMode) ? '' : `
+    <div style="margin-top:24px">
+      <div style="font-size:10px;color:var(--text-faint);letter-spacing:0.15em;font-family:'JetBrains Mono';font-weight:600;margin-bottom:12px">SAVED PROGRAMS</div>
+      ${savedPrograms.length === 0
+        ? '<div style="color:var(--text-faint);font-size:12px;font-style:italic;padding:8px 0">No saved programs yet. Generate one in War Room or save the current program below.</div>'
+        : savedPrograms.map(p => `
+          <div class="program-card ${p.is_active ? 'active' : ''}">
+            <div class="program-card-head">
+              <div class="program-card-name">${p.name}</div>
+              ${p.is_active ? '<span class="program-badge">ACTIVE</span>' : ''}
+            </div>
+            <div class="program-card-meta">Created ${new Date(p.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+            <div class="program-card-actions">
+              ${p.is_active ? '' : `<button class="btn primary" style="min-height:44px" onclick="activateProgram('${p.id}')">ACTIVATE</button>`}
+              <button class="btn" style="min-height:44px" onclick="renameProgram('${p.id}')">RENAME</button>
+              <button class="btn danger" style="min-height:44px" onclick="deleteProgram('${p.id}')">DELETE</button>
+            </div>
+          </div>`).join('')
+      }
+    </div>`;
+
+  container.innerHTML = `
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-header" style="margin-bottom:4px">
+        <div class="panel-title"><svg style="width:16px;height:16px"><use href="#i-stats"/></svg>ACTIVE PROGRAM</div>
+        ${activeProgram ? `<button class="btn" style="font-size:10px;padding:5px 10px;min-height:36px" onclick="renameProgram('${activeProgram.id}')">RENAME</button>` : ''}
+      </div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${programName}</div>
+      <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:16px">${programDesc}</div>
+      ${daysHTML}
+      ${savedHTML}
+    </div>
+    <div class="panel">
+      <div class="panel-header" style="margin-bottom:14px">
+        <div class="panel-title">ADD NEW PROGRAM</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+        <button class="btn primary" data-advanced style="min-height:48px;font-size:12px" onclick="document.getElementById('pdfUploadInput').click()">📄 Upload Trainer PDF</button>
+        <button class="btn" style="min-height:48px;font-size:12px" onclick="showTab('warroom')">⚡ Generate with AI</button>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:14px">
+        <label style="display:block;font-size:10px;color:var(--text-faint);letter-spacing:0.12em;font-family:'JetBrains Mono';font-weight:600;margin-bottom:6px">SAVE CURRENT PROGRAM AS</label>
+        <input type="text" class="auth-input" id="newProgramName" placeholder="e.g., El Camino Block 1" style="margin-bottom:10px"/>
+        <button class="btn" style="min-height:44px;width:100%" onclick="saveCurrentAsProgram()">+ SAVE CURRENT AS TEMPLATE</button>
+      </div>
+    </div>`;
+}
+
+function toggleProgramDay(day) {
+  programDayExpanded[day] = !programDayExpanded[day];
+  renderProgramTab();
 }
 
 /* ═════════════════ DATA ═════════════════ */
@@ -2689,7 +2783,7 @@ function showTab(id){
   });
   if(id==="home")renderHome();
   if(id==="chart")drawStrengthChart();
-  if(id==="workouts")renderProgram();
+  if(id==="workouts"){renderProgramTab();logEvent('program_tab_viewed');applyUiMode();}
   if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();applyUiMode();checkGymNudge();} else {stopSessionClock();releaseWakeLock();}
   if(id==="weight"){drawWeightChart();renderWeightHistory();updateWeightStats();renderMeasurementHistory();}
   if(id==="running"){renderRunCards();renderIncline();drawRunChart();}
@@ -4497,12 +4591,12 @@ async function confirmSavePdfProgram(){
 
   if(activate){
     haptic([60,40,60]);
-    renderProgram?.();
+    renderProgramTab?.();
     renderChecklist?.();
     showTab('checklist');
   } else {
     haptic(40);
-    openModal('programs');
+    showTab('workouts');
   }
 }
 
@@ -4839,7 +4933,7 @@ function restoreDefaultProgram(){
   persist();
   setWarStatus("Default program restored", "success");
   renderWarRoom();
-  renderProgram();
+  renderProgramTab?.();
 }
 
 // Load custom program on init if present
