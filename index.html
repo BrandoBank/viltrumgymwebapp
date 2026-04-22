@@ -3839,19 +3839,20 @@ function setRunStartDate(dateStr) {
   renderRunCards();
 }
 
+function hasLoggedRunOn(dateStr) {
+  return state.runLog.some(e => e.date === dateStr);
+}
+
 function hasLoggedRunToday() {
-  const today = new Date().toISOString().slice(0,10);
-  return state.runLog.some(e => e.date === today);
+  return hasLoggedRunOn(new Date().toISOString().slice(0,10));
 }
 
 function getWeeklyMiles() {
   if (!state.runStartDate) return 0;
   const week = getCurrentRunWeek();
   if (!week) return 0;
-  // Current calendar week start = Monday of this week
   const today = new Date(); today.setHours(0,0,0,0);
-  const dayOfWeek = today.getDay(); // 0=Sun,1=Mon,...
-  const daysFromMon = (dayOfWeek + 6) % 7;
+  const daysFromMon = (today.getDay() + 6) % 7;
   const weekStart = new Date(today); weekStart.setDate(today.getDate() - daysFromMon);
   const weekStartStr = weekStart.toISOString().slice(0,10);
   return state.runLog
@@ -3859,16 +3860,37 @@ function getWeeklyMiles() {
     .reduce((sum, e) => sum + (e.miles || 0), 0);
 }
 
-function logRunSession() {
-  const today = new Date().toISOString().slice(0,10);
-  if (hasLoggedRunToday()) return;
-  const phase = getCurrentRunPhase();
+function logRunSession(dateStr) {
+  const target = dateStr || new Date().toISOString().slice(0,10);
+  if (hasLoggedRunOn(target)) return;
+  // Calculate which plan phase was active on that date
+  const start = new Date(state.runStartDate); start.setHours(0,0,0,0);
+  const targetDate = new Date(target); targetDate.setHours(0,0,0,0);
+  const daysDiff = Math.floor((targetDate - start) / 86400000);
+  const weekForDate = Math.max(1, Math.min(Math.floor(daysDiff / 7) + 1, 16));
+  const idx = Math.min(Math.floor((weekForDate - 1) / 2), RUN_PLAN.length - 1);
+  const phase = RUN_PLAN[Math.max(0, idx)];
   const miles = phase.miles || 0;
-  state.runLog.push({date: today, miles, phase: phase.phase});
+  state.runLog.push({date: target, miles, phase: phase.phase});
   persist();
   haptic([30]);
-  logEvent('run_logged', {date: today, miles, phase: phase.phase});
+  logEvent('run_logged', {date: target, miles, phase: phase.phase});
   renderRunCards();
+}
+
+// Returns unlogged dates from start date up to today (max 7 days back)
+function getUnloggedRunDates() {
+  if (!state.runStartDate) return [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(state.runStartDate); start.setHours(0,0,0,0);
+  const cutoff = new Date(today); cutoff.setDate(today.getDate() - 7);
+  const from = start > cutoff ? start : cutoff;
+  const dates = [];
+  for (let d = new Date(from); d <= today; d.setDate(d.getDate() + 1)) {
+    const ds = d.toISOString().slice(0,10);
+    if (!hasLoggedRunOn(ds)) dates.push(ds);
+  }
+  return dates;
 }
 
 function getCurrentRunPhase(){
@@ -3936,10 +3958,17 @@ function renderRunCards(){
           </div>
           <div style="font-size:10px;color:var(--text-faint);margin-top:5px">Started ${started}</div>
           ${(() => {
-            const logged = hasLoggedRunToday();
-            return logged
-              ? `<div style="margin-top:10px;width:100%;padding:10px;border-radius:8px;background:var(--border);font-family:'JetBrains Mono';font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--lime);text-align:center">✓ RUN LOGGED TODAY</div>`
-              : `<button onclick="logRunSession()" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-family:'JetBrains Mono';font-size:12px;font-weight:700;letter-spacing:.08em;background:transparent;color:var(--text);transition:all 0.2s">+ LOG SOLO RUN</button>`;
+            const today = new Date().toISOString().slice(0,10);
+            const unlogged = getUnloggedRunDates();
+            const todayLogged = hasLoggedRunToday();
+            const fmt = ds => {
+              const d = new Date(ds + 'T12:00:00');
+              return ds === today ? 'TODAY' : d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+            };
+            const btns = unlogged.map(ds =>
+              `<button onclick="logRunSession('${ds}')" style="margin-top:8px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-family:'JetBrains Mono';font-size:12px;font-weight:700;letter-spacing:.08em;background:transparent;color:var(--text)">+ LOG ${fmt(ds)}</button>`
+            ).join('');
+            return (todayLogged ? `<div style="margin-top:10px;padding:10px;border-radius:8px;background:var(--border);font-family:'JetBrains Mono';font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--lime);text-align:center">✓ RUN LOGGED TODAY</div>` : '') + btns;
           })()}
         </div>`;
     }
