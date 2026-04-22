@@ -4362,7 +4362,6 @@ function getBodyMapSVG(activeGroups,view){
 }
 
 /* ═════════════════ RUN ═════════════════ */
-function renderRunCards(){const c=document.getElementById("runCards");c.innerHTML=RUN_PLAN.map(p=>`<div class="run-card" style="border-left-color:${p.color}"><div class="run-card-head"><div><div class="run-week mono">${p.week}</div><div class="run-phase">${p.phase}</div></div><span class="run-type-tag" style="background:${p.color}22;color:${p.color}">${p.type}</span></div><div class="run-structure mono">${p.structure}</div><div class="run-tip">${p.tip}</div></div>`).join("")}
 function renderIncline(){const data=[["Steady State","1–2%","Simulates outdoor resistance, engages glutes more"],["Intervals","Flat 0%","Already working hard — don't add incline on bursts"],["Fartlek","0–0.5%","Surges are the stimulus, keep simple"],["Tempo","1%","Reinforces good posture under sustained effort"]];document.getElementById("inclineList").innerHTML=data.map(([t,i,w],idx)=>`<div style="display:grid;grid-template-columns:1.2fr .7fr 2fr;gap:12px;padding:11px 0;${idx<3?'border-bottom:1px solid var(--border)':''};align-items:center"><span style="font-size:13px">${t}</span><span style="font-size:11px;color:var(--lime);font-family:'JetBrains Mono';font-weight:700">${i}</span><span style="font-size:11px;color:var(--text-faint);font-style:italic">${w}</span></div>`).join("")}
 
 /* ═════════════════ WEIGHT TAB ═════════════════ */
@@ -4881,25 +4880,39 @@ function renderMeasurementHistory(){
 
 /* ═════════════════ READINESS + STREAK (REAL) ═════════════════ */
 function calculateReadiness(){
-  let score = 100;
+  const sessions = state.sessionHistory || [];
+  const today = new Date().toISOString().slice(0,10);
+
+  // Days since last session (primary signal)
+  const pastSessions = sessions.filter(s => s.date < today).sort((a,b) => b.date.localeCompare(a.date));
+  const lastSession = pastSessions[0];
+  let score = 75; // neutral baseline
+  if (lastSession) {
+    const daysSince = Math.floor((new Date(today) - new Date(lastSession.date)) / 86400000);
+    if (daysSince === 1) score += 10;      // normal 1-day rest
+    else if (daysSince === 2) score += 20; // well rested
+    else if (daysSince >= 3) score += 12;  // rested but maybe rusty
+    // daysSince === 0 = no bonus (already trained today)
+  } else {
+    score += 15; // fresh start, no history
+  }
+
+  // Weekly volume — penalise if stacking too many sessions
+  const weekStart = (() => {
+    const d = new Date(today); d.setHours(0,0,0,0);
+    const daysFromMon = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() - daysFromMon);
+    return d.toISOString().slice(0,10);
+  })();
+  const sessionsThisWeek = sessions.filter(s => s.date >= weekStart && s.date <= today).length;
+  if (sessionsThisWeek >= 5) score -= 12;
+  else if (sessionsThisWeek >= 4) score -= 6;
+
+  // Energy check-in (only if done today via wellness module)
   const energyLevel = todayEnergyLevel();
   if (energyLevel === 'low') score -= 15;
-  else if (energyLevel === 'high') score += 5;
-  const fatigueLevels = state.fatigue || {};
-  Object.values(fatigueLevels).forEach(level => {
-    if(level === 'heavy') score -= 10;
-    else if(level === 'mod') score -= 5;
-    else if(level === 'light') score -= 2;
-  });
-  const today = new Date().toISOString().slice(0,10);
-  const sessions = state.sessionHistory || [];
-  const trainedToday = sessions.some(s => s.date === today);
-  if(trainedToday) score -= 8;
-  if(sessions.length > 0){
-    const last = sessions[sessions.length-1];
-    const days = Math.floor((Date.now() - new Date(last.date).getTime()) / 86400000);
-    if(days >= 2 && days <= 5) score += 5;
-  }
+  else if (energyLevel === 'high') score += 8;
+
   return Math.max(40, Math.min(100, score));
 }
 function updateReadinessDisplay(){
