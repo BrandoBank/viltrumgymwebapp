@@ -1444,6 +1444,18 @@
         <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';margin-top:8px" id="amoledStatusSettings">—</div>
       </div>
       <div class="settings-group">
+        <div class="settings-group-title">ACCENT COLOR</div>
+        <div class="settings-group-desc">Changes the highlight color used throughout the app.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px" id="accentColorPicker">
+          <button onclick="setAccentColor('#B6FF3C')" data-color="#B6FF3C" style="width:36px;height:36px;border-radius:50%;background:#B6FF3C;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Lime"></button>
+          <button onclick="setAccentColor('#60A5FA')" data-color="#60A5FA" style="width:36px;height:36px;border-radius:50%;background:#60A5FA;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Blue"></button>
+          <button onclick="setAccentColor('#FB923C')" data-color="#FB923C" style="width:36px;height:36px;border-radius:50%;background:#FB923C;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Orange"></button>
+          <button onclick="setAccentColor('#F472B6')" data-color="#F472B6" style="width:36px;height:36px;border-radius:50%;background:#F472B6;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Pink"></button>
+          <button onclick="setAccentColor('#A78BFA')" data-color="#A78BFA" style="width:36px;height:36px;border-radius:50%;background:#A78BFA;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Purple"></button>
+          <button onclick="setAccentColor('#2DD4BF')" data-color="#2DD4BF" style="width:36px;height:36px;border-radius:50%;background:#2DD4BF;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Teal"></button>
+        </div>
+      </div>
+      <div class="settings-group">
         <div class="settings-group-title">FOCUS MODE DEFAULT</div>
         <div class="settings-group-desc">Start Gym Mode in focus mode automatically — hides nav and all non-workout UI.</div>
         <button class="btn" onclick="toggleFocusModeDefault()" id="focusModeDefaultBtn">—</button>
@@ -2240,6 +2252,7 @@ function showAppShell() {
   maybeShowIosBanner();
   applyModuleVisibility();
   applyUiMode();
+  initAccentColor();
   if (currentProfile) {
     const name = currentProfile.display_name || 'User';
     document.getElementById('userMenuName').textContent = name;
@@ -2867,7 +2880,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -2897,9 +2910,10 @@ let state={
   trainLightDismissed:load(SK.trainLightDismissed,null),
   runStartDate:load(SK.runStartDate,null),
   runLog:load(SK.runLog,[]),
+  accentColor:load(SK.accentColor,'#B6FF3C'),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
 async function logEvent(name, data={}) {
@@ -5038,6 +5052,29 @@ function toggleFocusMode(){
   persist();
   haptic(30);
 }
+function applyAccentColor(hex) {
+  document.documentElement.style.setProperty('--lime', hex);
+}
+
+function setAccentColor(hex) {
+  state.accentColor = hex;
+  persist();
+  applyAccentColor(hex);
+  // Update picker ring to show active
+  document.querySelectorAll('#accentColorPicker button').forEach(btn => {
+    btn.style.borderColor = btn.dataset.color === hex ? '#fff' : 'transparent';
+  });
+  haptic(30);
+}
+
+function initAccentColor() {
+  const hex = state.accentColor || '#B6FF3C';
+  applyAccentColor(hex);
+  document.querySelectorAll('#accentColorPicker button').forEach(btn => {
+    btn.style.borderColor = btn.dataset.color === hex ? '#fff' : 'transparent';
+  });
+}
+
 function toggleAmoled(){
   document.body.classList.toggle("amoled");
   state.amoled = document.body.classList.contains("amoled");
