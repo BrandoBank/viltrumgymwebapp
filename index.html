@@ -1231,7 +1231,7 @@
     <div class="grid-4">
       <div class="stat-card"><div class="stat-card-label mono">CURRENT PACE</div><div class="stat-card-value" style="color:var(--lime)" id="runCurrentPaceVal">—</div><div class="stat-card-sub" id="runCurrentPaceSub">—</div></div>
       <div class="stat-card"><div class="stat-card-label mono">TARGET PACE</div><div class="stat-card-value" style="color:var(--lime)">6.5 mph</div><div class="stat-card-sub">9:14 min/mile</div></div>
-      <div class="stat-card"><div class="stat-card-label mono">DURATION</div><div class="stat-card-value">20 min</div><div class="stat-card-sub">Every session</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">THIS WEEK</div><div class="stat-card-value" style="color:var(--lime)" id="runWeekMilesVal">—</div><div class="stat-card-sub" id="runWeekMilesSub">miles logged</div></div>
       <div class="stat-card"><div class="stat-card-label mono">WEEK</div><div class="stat-card-value" style="color:var(--lime)" id="runWeekVal">—</div><div class="stat-card-sub" id="runWeekSub">of 16</div></div>
     </div>
     <div id="runPlanStatus" style="margin-bottom:4px"></div>
@@ -2805,14 +2805,14 @@ const WORKOUTS={
 const STRENGTH=[{label:"Dec",squat:205,bench:135,deadlift:225},{label:"Jan",squat:235,bench:185,deadlift:235},{label:"Feb",squat:245,bench:215,deadlift:265},{label:"Mar W1",squat:235,bench:200,deadlift:285},{label:"Mar W2",squat:245,bench:185,deadlift:305},{label:"Apr",squat:205,bench:185,deadlift:245}];
 
 const RUN_PLAN=[
-  {week:"Wk 1–2",phase:"Baseline",type:"Steady State",structure:"20 min @ 5.0 mph",target:5.0,tip:"Lock in baseline. Nasal breathing, chest tall.",color:"#8a8a8a"},
-  {week:"Wk 3–4",phase:"Intro Intervals",type:"Interval",structure:"2 min @ 5.5 → 1 min @ 4.5 × 6 rounds",target:5.5,tip:"4.5 mph recovery is active rest, not walking.",color:"#ff8c42"},
-  {week:"Wk 5–6",phase:"Push Pace",type:"Steady State",structure:"20 min @ 5.3–5.5 mph",target:5.4,tip:"Hold 5.3 all 20 min. Finish strong → bump to 5.5.",color:"#ff8c42"},
-  {week:"Wk 7–8",phase:"Fartlek",type:"Fartlek",structure:"Base 5.0 · surge to 6.0 for 45s every 3 min × 5",target:6.0,tip:"Fartlek trains recovery at pace.",color:"#4da3ff"},
-  {week:"Wk 9–10",phase:"Extended Intervals",type:"Interval",structure:"3 min @ 6.0 → 90s @ 4.5 × 5 rounds",target:6.0,tip:"More time above ceiling. Gains live here.",color:"#4da3ff"},
-  {week:"Wk 11–12",phase:"Consolidate",type:"Steady State",structure:"20 min @ 5.7–6.0 mph",target:5.9,tip:"5.5 should feel like a jog now. Push 5.8+.",color:"#b6ff3c"},
-  {week:"Wk 13–14",phase:"Threshold",type:"Tempo",structure:"5 min @ 5.0 · 12 min @ 6.2–6.5 · 3 min @ 5.0",target:6.4,tip:"Trains lactate threshold. Sweet spot zone.",color:"#b6ff3c"},
-  {week:"Wk 15–16",phase:"New Baseline",type:"Steady State",structure:"20 min @ 6.0–6.5 mph",target:6.3,tip:"16 weeks from 5.0 → 6.0+. Real achievement.",color:"#b97aff"}
+  {week:"Wk 1–2",phase:"Baseline",type:"Steady State",structure:"20 min @ 5.0 mph",target:5.0,miles:1.67,tip:"Lock in baseline. Nasal breathing, chest tall.",color:"#8a8a8a"},
+  {week:"Wk 3–4",phase:"Intro Intervals",type:"Interval",structure:"2 min @ 5.5 → 1 min @ 4.5 × 6 rounds",target:5.5,miles:1.55,tip:"4.5 mph recovery is active rest, not walking.",color:"#ff8c42"},
+  {week:"Wk 5–6",phase:"Push Pace",type:"Steady State",structure:"20 min @ 5.3–5.5 mph",target:5.4,miles:1.80,tip:"Hold 5.3 all 20 min. Finish strong → bump to 5.5.",color:"#ff8c42"},
+  {week:"Wk 7–8",phase:"Fartlek",type:"Fartlek",structure:"Base 5.0 · surge to 6.0 for 45s every 3 min × 5",target:6.0,miles:1.31,tip:"Fartlek trains recovery at pace.",color:"#4da3ff"},
+  {week:"Wk 9–10",phase:"Extended Intervals",type:"Interval",structure:"3 min @ 6.0 → 90s @ 4.5 × 5 rounds",target:6.0,miles:2.06,tip:"More time above ceiling. Gains live here.",color:"#4da3ff"},
+  {week:"Wk 11–12",phase:"Consolidate",type:"Steady State",structure:"20 min @ 5.7–6.0 mph",target:5.9,miles:1.95,tip:"5.5 should feel like a jog now. Push 5.8+.",color:"#b6ff3c"},
+  {week:"Wk 13–14",phase:"Threshold",type:"Tempo",structure:"5 min @ 5.0 · 12 min @ 6.2–6.5 · 3 min @ 5.0",target:6.4,miles:1.94,tip:"Trains lactate threshold. Sweet spot zone.",color:"#b6ff3c"},
+  {week:"Wk 15–16",phase:"New Baseline",type:"Steady State",structure:"20 min @ 6.0–6.5 mph",target:6.3,miles:2.08,tip:"16 weeks from 5.0 → 6.0+. Real achievement.",color:"#b97aff"}
 ];
 
 const DEFAULT_BAG=["Lifting belt","Wrist wraps","Knee sleeves","Lifting shoes","Chalk","Headphones","Water bottle","Pre-workout","Protein shake","Small towel"];
@@ -2858,7 +2858,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -2887,9 +2887,10 @@ let state={
   trainLightMode:load(SK.trainLightMode,false),
   trainLightDismissed:load(SK.trainLightDismissed,null),
   runStartDate:load(SK.runStartDate,null),
+  runLog:load(SK.runLog,[]),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
 async function logEvent(name, data={}) {
@@ -3828,6 +3829,38 @@ function setRunStartDate(dateStr) {
   renderRunCards();
 }
 
+function hasLoggedRunToday() {
+  const today = new Date().toISOString().slice(0,10);
+  return state.runLog.some(e => e.date === today);
+}
+
+function getWeeklyMiles() {
+  if (!state.runStartDate) return 0;
+  const week = getCurrentRunWeek();
+  if (!week) return 0;
+  // Current calendar week start = Monday of this week
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dayOfWeek = today.getDay(); // 0=Sun,1=Mon,...
+  const daysFromMon = (dayOfWeek + 6) % 7;
+  const weekStart = new Date(today); weekStart.setDate(today.getDate() - daysFromMon);
+  const weekStartStr = weekStart.toISOString().slice(0,10);
+  return state.runLog
+    .filter(e => e.date >= weekStartStr)
+    .reduce((sum, e) => sum + (e.miles || 0), 0);
+}
+
+function logRunSession() {
+  const today = new Date().toISOString().slice(0,10);
+  if (hasLoggedRunToday()) return;
+  const phase = getCurrentRunPhase();
+  const miles = phase.miles || 0;
+  state.runLog.push({date: today, miles, phase: phase.phase});
+  persist();
+  haptic([30]);
+  logEvent('run_logged', {date: today, miles, phase: phase.phase});
+  renderRunCards();
+}
+
 function getCurrentRunPhase(){
   const week = getCurrentRunWeek();
   if (week === null) return RUN_PLAN[0];
@@ -3854,10 +3887,17 @@ function renderRunCards(){
   const paceSub = document.getElementById('runCurrentPaceSub');
   const weekVal = document.getElementById('runWeekVal');
   const weekSub = document.getElementById('runWeekSub');
+  const weekMilesVal = document.getElementById('runWeekMilesVal');
+  const weekMilesSub = document.getElementById('runWeekMilesSub');
   if (paceVal) paceVal.textContent = week ? `${phase.target} mph` : '—';
   if (paceSub) paceSub.textContent = week ? mphToMinMile(phase.target) : 'Start plan to track';
   if (weekVal) weekVal.textContent = week ? `Wk ${week}` : '—';
   if (weekSub) weekSub.textContent = week ? `of 16 · ${phase.phase}` : 'of 16';
+  if (weekMilesVal) {
+    const wm = getWeeklyMiles();
+    weekMilesVal.textContent = wm > 0 ? `${wm.toFixed(2)}` : '—';
+    if (weekMilesSub) weekMilesSub.textContent = wm > 0 ? 'mi this week' : 'miles logged';
+  }
 
   // Plan start/status bar
   if (statusEl) {
@@ -3885,6 +3925,10 @@ function renderRunCards(){
             <div style="height:100%;width:${pct}%;background:var(--lime);border-radius:2px;transition:width 0.4s"></div>
           </div>
           <div style="font-size:10px;color:var(--text-faint);margin-top:5px">Started ${started}</div>
+          ${(() => {
+            const logged = hasLoggedRunToday();
+            return `<button onclick="${logged ? '' : 'logRunSession()'}" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:none;cursor:${logged?'default':'pointer'};font-family:'JetBrains Mono';font-size:12px;font-weight:700;letter-spacing:.08em;background:${logged?'var(--border)':'var(--lime)'};color:${logged?'var(--text-dim)':'#000'};transition:all 0.2s">${logged ? '✓ RUN LOGGED TODAY' : '+ LOG TODAY\'S RUN'}</button>`;
+          })()}
         </div>`;
     }
   }
