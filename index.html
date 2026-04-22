@@ -467,6 +467,66 @@
   .wz-program-tag{font-size:9px;font-weight:700;letter-spacing:0.08em;background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--text-faint);font-family:'JetBrains Mono'}
   .wz-program-card.active .wz-program-tag{border-color:var(--lime-dim);color:var(--lime)}
 
+  /* ── ONBOARDING REDESIGN ── */
+  #authScreen{background:#050505;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto}
+  #profileSetup{background:#050505;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto}
+  .wz-landing-view{width:100%;max-width:400px;min-height:100vh;display:flex;flex-direction:column;padding:60px 32px 48px;box-sizing:border-box}
+  .wz-form-view{width:100%;max-width:400px;min-height:100vh;display:flex;flex-direction:column;padding:60px 32px 48px;box-sizing:border-box}
+  .wz-hero-logo{width:min(38vw,130px);height:min(38vw,130px);display:block;animation:wz-pulse 4s ease-in-out infinite}
+  @keyframes wz-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+  .wz-hero-name{font-size:28px;font-weight:700;color:var(--lime);letter-spacing:0.14em}
+  .wz-hero-tagline{font-size:13px;color:#555;letter-spacing:0.03em}
+  .wz-btn-primary{width:100%;padding:15px;background:var(--lime);color:#000;border:none;border-radius:10px;font-weight:700;font-size:15px;letter-spacing:0.03em;cursor:pointer;font-family:inherit;transition:transform 0.15s,opacity 0.15s}
+  .wz-btn-primary:active{transform:scale(0.97)}
+  .wz-btn-ghost{width:100%;padding:15px;background:none;color:#777;border:1px solid #252525;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;transition:color 0.2s,border-color 0.2s}
+  .wz-btn-ghost:active{color:#aaa;border-color:#444}
+  .wz-screen{width:100%;max-width:400px;min-height:100vh;display:flex;flex-direction:column;padding:56px 32px 44px;box-sizing:border-box}
+  @keyframes wz-slide-in{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes wz-slide-back{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+  @media(prefers-reduced-motion:reduce){.wz-anim-in,.wz-anim-back{animation:none !important}}
+  .wz-anim-in{animation:wz-slide-in 0.35s ease-out forwards}
+  .wz-anim-back{animation:wz-slide-back 0.35s ease-out forwards}
+  .wz-back-btn{background:none;border:none;color:#555;font-size:13px;letter-spacing:0.04em;padding:0;cursor:pointer;font-family:inherit;min-height:44px;display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin-bottom:4px}
+  .wz-back-btn:active{color:#888}
+  .wz-question{font-size:clamp(26px,8vw,38px);font-weight:700;color:#fff;line-height:1.15;letter-spacing:-0.01em;margin-bottom:44px}
+  .wz-input-wrap{margin-bottom:30px;position:relative}
+  .wz-input-bare{width:100%;background:none;border:none;border-bottom:2px solid #252525;color:#fff;font-size:22px;font-weight:600;font-family:inherit;padding:8px 0 10px;outline:none;transition:border-color 0.2s}
+  .wz-input-bare::placeholder{color:#333}
+  .wz-input-bare:focus{border-bottom-color:transparent}
+  .wz-input-bare:focus + .wz-input-line{width:100%}
+  .wz-input-line{position:absolute;bottom:0;left:0;height:2px;width:0;background:var(--lime);transition:width 0.25s ease-out;border-radius:1px;pointer-events:none}
+  .wz-input-hint{font-size:10px;color:#444;margin-top:7px;font-family:'JetBrains Mono';letter-spacing:0.1em}
+  .wz-continue{width:100%;padding:15px;background:var(--lime);color:#000;border:none;border-radius:10px;font-weight:700;font-size:15px;letter-spacing:0.03em;cursor:pointer;font-family:inherit;transition:transform 0.15s,opacity 0.3s;opacity:0;pointer-events:none}
+  .wz-continue.ready{opacity:1;pointer-events:auto}
+  .wz-continue:active{transform:scale(0.97)}
+  .wz-skip-link{background:none;border:none;color:#444;font-size:13px;text-align:center;width:100%;padding:16px;cursor:pointer;font-family:inherit}
+  .wz-skip-link:active{color:#666}
+  .wz-tile{width:100%;padding:17px;background:#0e0e0e;border:2px solid #1e1e1e;border-radius:12px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color 0.2s,background 0.2s;margin-bottom:10px;text-align:left;font-family:inherit}
+  .wz-tile.active{border-color:var(--lime);background:rgba(182,255,60,0.04)}
+  .wz-tile.disabled{opacity:0.3;cursor:default;pointer-events:none}
+  .wz-tile-icon{width:40px;height:40px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s}
+  .wz-tile.active .wz-tile-icon{background:rgba(182,255,60,0.08)}
+  .wz-tile-icon svg{width:18px;height:18px;color:#555;stroke-width:1.8;transition:color 0.2s}
+  .wz-tile.active .wz-tile-icon svg{color:var(--lime)}
+  .wz-tile-label{font-size:15px;font-weight:700;color:#fff}
+  .wz-tile-sub{font-size:12px;color:#555;margin-top:2px}
+  .wz-tile-soon{font-size:9px;background:#1a1a1a;border:1px solid #252525;border-radius:3px;padding:2px 6px;color:#444;font-family:'JetBrains Mono';letter-spacing:0.08em;margin-left:auto;flex-shrink:0}
+  .wz-prog-card{width:100%;padding:16px 18px;background:#0e0e0e;border:2px solid #1e1e1e;border-radius:12px;cursor:pointer;transition:border-color 0.2s,background 0.2s;margin-bottom:10px;text-align:left;display:flex;align-items:flex-start;gap:14px;font-family:inherit}
+  .wz-prog-card.active{border-color:var(--lime);background:rgba(182,255,60,0.04)}
+  .wz-prog-dot{width:10px;height:10px;border-radius:50%;border:2px solid #333;flex-shrink:0;margin-top:4px;transition:all 0.2s}
+  .wz-prog-card.active .wz-prog-dot{background:var(--lime);border-color:var(--lime)}
+  .wz-prog-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
+  .wz-prog-desc{font-size:12px;color:#555;line-height:1.4}
+  .wz-prog-rec{font-size:9px;font-family:'JetBrains Mono';letter-spacing:0.1em;color:var(--lime);margin-top:5px}
+  .wz-prog-badge{display:inline-block;background:var(--lime);color:#000;font-size:9px;font-weight:700;letter-spacing:.1em;padding:2px 7px;border-radius:3px;margin-bottom:7px;font-family:'JetBrains Mono'}
+  .wz-prog-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  .wz-prog-tag{font-size:9px;font-family:'JetBrains Mono';letter-spacing:0.08em;color:var(--text-faint);background:#111;border:1px solid #222;border-radius:3px;padding:2px 6px}
+  .wz-transition-screen{position:fixed;inset:0;background:#050505;z-index:250;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px}
+  .wz-trans-logo{width:90px;height:90px;animation:wz-trans-in 0.7s ease-out forwards;opacity:0}
+  .wz-trans-name{animation:wz-trans-in 0.7s 0.3s ease-out forwards;opacity:0;font-size:22px;font-weight:700;color:#fff;text-align:center;line-height:1.3}
+  .wz-trans-sub{animation:wz-trans-in 0.7s 0.55s ease-out forwards;opacity:0;font-size:13px;color:#444;letter-spacing:0.04em;text-align:center}
+  @keyframes wz-trans-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
   /* USER MENU */
   .user-menu-btn{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg-raised);border:1px solid var(--border);border-radius:20px;color:var(--text);font-size:11px;font-family:inherit;cursor:pointer}
   .user-menu-btn:hover{border-color:var(--lime)}
@@ -782,166 +842,133 @@
 
 <!-- AUTH SCREEN (shown if not logged in) -->
 <div class="auth-screen" id="authScreen" style="display:none">
-  <div class="auth-box">
-    <div class="auth-logo">
-      <img src="favicon-96x96.png" alt="BeeBuildz"/>
-      <div class="auth-logo-text">BEEBUILDZ</div>
+  <!-- Landing view: logo + two CTAs -->
+  <div class="wz-landing-view" id="wz-landing-view">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center">
+      <img src="favicon-96x96.png" alt="BeeBuildz" class="wz-hero-logo"/>
+      <div class="wz-hero-name">BEEBUILDZ</div>
+      <div class="wz-hero-tagline">Strength training · built for the cut</div>
     </div>
-    <div class="auth-title" id="authTitle">Sign In</div>
-    <div class="auth-sub" id="authSub">Welcome back. Log in to continue tracking.</div>
-    <div id="authAlert"></div>
-    <div class="auth-input-group" id="nameGroup" style="display:none">
-      <label class="auth-label">DISPLAY NAME</label>
-      <input type="text" class="auth-input" id="authName" placeholder="e.g., Brandon"/>
+    <div style="display:flex;flex-direction:column;gap:10px;padding-top:24px">
+      <button class="wz-btn-primary" onclick="wzShowForm('signup')">Get started</button>
+      <button class="wz-btn-ghost" onclick="wzShowForm('signin')">Sign in</button>
     </div>
-    <div class="auth-input-group">
-      <label class="auth-label">EMAIL</label>
-      <input type="email" class="auth-input" id="authEmail" placeholder="you@example.com" autocomplete="email"/>
+  </div>
+  <!-- Form view: email + password (slides in) -->
+  <div class="wz-form-view" id="wz-form-view" style="display:none">
+    <button class="wz-back-btn" onclick="wzHideForm()">← Back</button>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+      <div class="wz-question" id="authFormTitle" style="margin-bottom:36px">Create account</div>
+      <div id="authAlert"></div>
+      <div class="wz-input-wrap" id="nameGroup" style="display:none">
+        <input type="text" class="wz-input-bare" id="authName" placeholder="Your name" autocomplete="given-name" oninput="wzCheckAuthReady()"/>
+        <div class="wz-input-line"></div>
+        <div class="wz-input-hint">DISPLAY NAME</div>
+      </div>
+      <div class="wz-input-wrap">
+        <input type="email" class="wz-input-bare" id="authEmail" placeholder="Email address" autocomplete="email" oninput="wzCheckAuthReady()"/>
+        <div class="wz-input-line"></div>
+        <div class="wz-input-hint">EMAIL</div>
+      </div>
+      <div class="wz-input-wrap">
+        <input type="password" class="wz-input-bare" id="authPassword" placeholder="Password" autocomplete="current-password" oninput="wzCheckAuthReady()"/>
+        <div class="wz-input-line"></div>
+        <div class="wz-input-hint">PASSWORD — MIN 6 CHARACTERS</div>
+      </div>
     </div>
-    <div class="auth-input-group">
-      <label class="auth-label">PASSWORD</label>
-      <input type="password" class="auth-input" id="authPassword" placeholder="At least 6 characters" autocomplete="current-password"/>
-    </div>
-    <button class="auth-btn" id="authSubmitBtn" onclick="submitAuth()">SIGN IN</button>
-    <div class="auth-toggle">
-      <span id="authToggleText">Don't have an account?</span>
-      <button onclick="toggleAuthMode()" id="authToggleBtn">Sign up</button>
-    </div>
+    <button class="wz-continue" id="authSubmitBtn" onclick="submitAuth()">Continue</button>
   </div>
 </div>
 
-<!-- PROFILE SETUP — 5-step onboarding wizard -->
+<!-- PROFILE SETUP — redesigned 4-screen onboarding -->
 <div class="auth-screen" id="profileSetup" style="display:none">
-  <div class="auth-box" style="max-width:460px">
+
+  <!-- Screen 1: Name -->
+  <div id="wz-0" class="wz-screen" style="display:none">
+    <div style="height:8px"></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+      <div class="wz-question">What should we call you?</div>
+      <div class="wz-input-wrap">
+        <input type="text" class="wz-input-bare" id="profileName" placeholder="Your name" autocomplete="given-name" oninput="wzCheckName(this.value)"/>
+        <div class="wz-input-line"></div>
+      </div>
+    </div>
+    <button class="wz-continue" id="wzNameBtn" onclick="wizardNext(0)">Continue</button>
     <div id="profileAlert"></div>
-    <div class="wizard-progress" id="wizardProgress">
-      <span class="wizard-dot active"></span>
-      <span class="wizard-dot"></span>
-      <span class="wizard-dot"></span>
-      <span class="wizard-dot"></span>
-      <span class="wizard-dot"></span>
-    </div>
-
-    <!-- Step 0: Name (required, no skip) -->
-    <div id="wz-0" class="wizard-step">
-      <div class="auth-logo">
-        <img src="favicon-96x96.png" alt="BeeBuildz" style="width:64px;height:64px;display:block"/>
-        <div class="auth-logo-text">BEEBUILDZ</div>
-      </div>
-      <div class="auth-title">Welcome</div>
-      <div class="auth-sub">What should we call you?</div>
-      <div class="auth-input-group">
-        <label class="auth-label">YOUR NAME</label>
-        <input type="text" class="auth-input" id="profileName" placeholder="e.g., Brandon" autocomplete="given-name"/>
-      </div>
-      <button class="auth-btn" onclick="wizardNext(0)">CONTINUE →</button>
-    </div>
-
-    <!-- Step 1: Stats -->
-    <div id="wz-1" class="wizard-step" style="display:none">
-      <div class="auth-title">Your Stats</div>
-      <div class="auth-sub">Used to track your progress. Editable any time from your profile.</div>
-      <div class="auth-input-group">
-        <label class="auth-label">STARTING WEIGHT (LB)</label>
-        <input type="number" class="auth-input" id="profileStart" placeholder="e.g., 243" step="0.1" inputmode="decimal"/>
-      </div>
-      <div class="auth-input-group">
-        <label class="auth-label">GOAL WEIGHT (LB)</label>
-        <input type="number" class="auth-input" id="profileGoal" placeholder="e.g., 210" step="0.1" inputmode="decimal"/>
-      </div>
-      <div class="auth-input-group">
-        <label class="auth-label">HEIGHT (INCHES)</label>
-        <input type="number" class="auth-input" id="profileHeight" placeholder="e.g., 69" inputmode="numeric"/>
-      </div>
-      <div class="wizard-nav">
-        <button class="wizard-back" onclick="wizardBack(1)">← BACK</button>
-        <button class="auth-btn" onclick="wizardNext(1)">CONTINUE →</button>
-      </div>
-      <button class="wizard-skip" onclick="wizardNext(1,true)">Skip for now</button>
-    </div>
-
-    <!-- Step 2: Modules -->
-    <div id="wz-2" class="wizard-step" style="display:none">
-      <div class="auth-title">What are you training?</div>
-      <div class="auth-sub">Pick everything that applies. Toggle modules in Settings any time.</div>
-      <div class="module-grid">
-        <div class="module-card active" id="mod-strength" onclick="toggleModule('strength')">
-          <div class="module-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:#000"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></div>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 5v14M18 5v14M3 9h3m12 0h3M3 15h3m12 0h3"/></svg>
-          <div class="module-card-name">STRENGTH</div>
-          <div class="module-card-sub">Lifting & strength training</div>
-        </div>
-        <div class="module-card" id="mod-running" onclick="toggleModule('running')">
-          <div class="module-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:#000"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></div>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 4a1 1 0 1 0 2 0 1 1 0 0 0-2 0m-3 4 1 3h4l1-3M7 20l3-4 2 2 3-5 2 3"/></svg>
-          <div class="module-card-name">RUNNING</div>
-          <div class="module-card-sub">Running & cardio training</div>
-        </div>
-        <div class="module-card disabled">
-          <div class="module-card-soon">SOON</div>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 17 7 9l4 4 3-6 5 10H3z"/></svg>
-          <div class="module-card-name">HIKING</div>
-          <div class="module-card-sub">Trails & outdoor activity</div>
-        </div>
-        <div class="module-card" id="mod-wellness" onclick="toggleModule('wellness')">
-          <div class="module-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:#000"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></div>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          <div class="module-card-name">WELLNESS</div>
-          <div class="module-card-sub">Energy check-ins & mobility</div>
-        </div>
-      </div>
-      <div style="margin-top:14px;padding:12px;background:var(--bg-card);border-radius:8px;border:1px solid var(--border)">
-        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">COMING SOON</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          <span style="font-size:10px;color:var(--text-faint);background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px"><svg style="width:10px;height:10px"><use href="#i-lock"/></svg>Cycle Tracking</span>
-          <span style="font-size:10px;color:var(--text-faint);background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px"><svg style="width:10px;height:10px"><use href="#i-lock"/></svg>Pilates Library</span>
-          <span style="font-size:10px;color:var(--text-faint);background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px"><svg style="width:10px;height:10px"><use href="#i-lock"/></svg>Dance Module</span>
-          <span style="font-size:10px;color:var(--text-faint);background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px"><svg style="width:10px;height:10px"><use href="#i-lock"/></svg>Hiking Log</span>
-        </div>
-      </div>
-      <div class="wizard-nav">
-        <button class="wizard-back" onclick="wizardBack(2)">← BACK</button>
-        <button class="auth-btn" onclick="wizardNext(2)">CONTINUE →</button>
-      </div>
-      <button class="wizard-skip" onclick="wizardNext(2,true)">Just strength for now</button>
-    </div>
-
-    <!-- Step 3: Starter Program -->
-    <div id="wz-3" class="wizard-step" style="display:none">
-      <div class="auth-title">Pick a Starter Program</div>
-      <div class="auth-sub" id="wzProgramSub">Choose a strength program to start with.</div>
-      <div class="wz-program-cards" id="wzProgramCards"></div>
-      <div class="wizard-nav">
-        <button class="wizard-back" onclick="wizardBack(3)">← BACK</button>
-        <button class="auth-btn" onclick="wizardNext(3)">CONTINUE →</button>
-      </div>
-      <button class="wizard-skip" onclick="wizardNext(3,true)">I'll decide later</button>
-    </div>
-
-    <!-- Step 4: Density / ui_mode -->
-    <div id="wz-4" class="wizard-step" style="display:none">
-      <div class="auth-title">How much do you want to see?</div>
-      <div class="auth-sub">You can change this any time in Settings.</div>
-      <div class="module-grid" style="grid-template-columns:1fr 1fr;margin:20px 0">
-        <div class="module-card active" id="wz-mode-basics" onclick="wzSelectMode('basics')">
-          <div class="module-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:#000"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></div>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M12 12h.01M12 16h.01"/></svg>
-          <div class="module-card-name">JUST THE BASICS</div>
-          <div class="module-card-sub">Log workouts, track weight, keep it simple</div>
-        </div>
-        <div class="module-card" id="wz-mode-advanced" onclick="wzSelectMode('advanced')">
-          <div class="module-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:#000"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></div>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>
-          <div class="module-card-name">ALL FEATURES</div>
-          <div class="module-card-sub">AI builder, Ask Coach, advanced stats — give me everything</div>
-        </div>
-      </div>
-      <div class="wizard-nav">
-        <button class="wizard-back" onclick="wizardBack(4)">← BACK</button>
-        <button class="auth-btn" id="wzFinishBtn" onclick="wizardFinish()">START TRAINING →</button>
-      </div>
-    </div>
   </div>
+
+  <!-- Screen 2: Stats -->
+  <div id="wz-1" class="wz-screen" style="display:none">
+    <button class="wz-back-btn" onclick="wizardBack(1)">← Back</button>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+      <div class="wz-question">Where are you starting from?</div>
+      <div class="wz-input-wrap">
+        <input type="number" class="wz-input-bare" style="font-size:28px" id="profileStart" placeholder="243" step="0.1" inputmode="decimal"/>
+        <div class="wz-input-line"></div>
+        <div class="wz-input-hint">CURRENT WEIGHT (LB)</div>
+      </div>
+      <div class="wz-input-wrap">
+        <input type="number" class="wz-input-bare" id="profileGoal" placeholder="210" step="0.1" inputmode="decimal"/>
+        <div class="wz-input-line"></div>
+        <div class="wz-input-hint">GOAL WEIGHT (LB)</div>
+      </div>
+      <div class="wz-input-wrap">
+        <input type="number" class="wz-input-bare" style="font-size:18px;color:#888" id="profileHeight" placeholder="69" inputmode="numeric"/>
+        <div class="wz-input-line"></div>
+        <div class="wz-input-hint">HEIGHT (INCHES)</div>
+      </div>
+    </div>
+    <button class="wz-continue ready" onclick="wizardNext(1)">Continue</button>
+    <button class="wz-skip-link" onclick="wizardNext(1,true)">Skip for now</button>
+  </div>
+
+  <!-- Screen 3: Training style -->
+  <div id="wz-2" class="wz-screen" style="display:none">
+    <button class="wz-back-btn" onclick="wizardBack(2)">← Back</button>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+      <div class="wz-question">How do you train?</div>
+      <div>
+        <button class="wz-tile active" id="mod-strength" onclick="toggleModule('strength')">
+          <div class="wz-tile-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 5v14M18 5v14M3 9h3m12 0h3M3 15h3m12 0h3"/></svg></div>
+          <div><div class="wz-tile-label">Strength</div><div class="wz-tile-sub">Lifting &amp; strength training</div></div>
+        </button>
+        <button class="wz-tile" id="mod-running" onclick="toggleModule('running')">
+          <div class="wz-tile-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 4a1 1 0 1 0 2 0 1 1 0 0 0-2 0m-3 4 1 3h4l1-3M7 20l3-4 2 2 3-5 2 3"/></svg></div>
+          <div><div class="wz-tile-label">Running</div><div class="wz-tile-sub">Cardio &amp; running training</div></div>
+        </button>
+        <button class="wz-tile" id="mod-wellness" onclick="toggleModule('wellness')">
+          <div class="wz-tile-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+          <div><div class="wz-tile-label">Wellness</div><div class="wz-tile-sub">Energy check-ins &amp; mobility</div></div>
+        </button>
+        <button class="wz-tile disabled">
+          <div class="wz-tile-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 17 7 9l4 4 3-6 5 10H3z"/></svg></div>
+          <div><div class="wz-tile-label">Hiking</div><div class="wz-tile-sub">Trails &amp; outdoor activity</div></div>
+          <span class="wz-tile-soon">SOON</span>
+        </button>
+      </div>
+    </div>
+    <button class="wz-continue ready" onclick="wizardNext(2)">Continue</button>
+    <button class="wz-skip-link" onclick="wizardNext(2,true)">Just strength for now</button>
+  </div>
+
+  <!-- Screen 4: Program -->
+  <div id="wz-3" class="wz-screen" style="display:none">
+    <button class="wz-back-btn" onclick="wizardBack(3)">← Back</button>
+    <div style="flex:1;overflow-y:auto">
+      <div class="wz-question" style="margin-bottom:24px">Pick where to start</div>
+      <div id="wzProgramCards"></div>
+    </div>
+    <button class="wz-continue ready" id="wzFinishBtn" onclick="wizardNext(3)">Continue</button>
+    <button class="wz-skip-link" onclick="wizardNext(3,true)">I'll decide later</button>
+  </div>
+
+  <!-- Transition moment -->
+  <div id="wz-transition" class="wz-transition-screen" style="display:none">
+    <img src="favicon-96x96.png" alt="BeeBuildz" class="wz-trans-logo"/>
+    <div class="wz-trans-name" id="wzTransName">You're ready.</div>
+    <div class="wz-trans-sub">Your training begins.</div>
+  </div>
+
 </div>
 
 <header class="app-header" id="mainHeader" style="display:none">
@@ -1999,13 +2026,103 @@ function showAuthAlert(msg, type='error') {
 }
 
 function toggleAuthMode() {
-  authMode = authMode === 'signin' ? 'signup' : 'signin';
-  document.getElementById('authTitle').textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
-  document.getElementById('authSub').textContent = authMode === 'signin' ? 'Welcome back. Log in to continue tracking.' : 'Create your BeeBuildz account. Takes 30 seconds.';
-  document.getElementById('authSubmitBtn').textContent = authMode === 'signin' ? 'SIGN IN' : 'CREATE ACCOUNT';
-  document.getElementById('authToggleText').textContent = authMode === 'signin' ? "Don't have an account?" : 'Already have an account?';
-  document.getElementById('authToggleBtn').textContent = authMode === 'signin' ? 'Sign up' : 'Sign in';
+  // Legacy stub — mode is now set via wzShowForm()
   document.getElementById('authAlert').innerHTML = '';
+}
+
+function wzShowForm(mode) {
+  authMode = mode;
+  const landing = document.getElementById('wz-landing-view');
+  const form = document.getElementById('wz-form-view');
+  const title = document.getElementById('authFormTitle');
+  const nameGroup = document.getElementById('nameGroup');
+  const submitBtn = document.getElementById('authSubmitBtn');
+  if (title) title.textContent = mode === 'signup' ? 'Create account' : 'Welcome back';
+  if (nameGroup) nameGroup.style.display = mode === 'signup' ? '' : 'none';
+  if (submitBtn) submitBtn.classList.remove('ready');
+  document.getElementById('authAlert').innerHTML = '';
+  if (landing) landing.style.display = 'none';
+  if (form) {
+    form.style.display = 'flex';
+    form.style.animation = 'wz-slide-in 0.3s ease both';
+  }
+  // Auto-focus first visible input
+  setTimeout(() => {
+    const first = form && form.querySelector('input:not([style*="display:none"])');
+    if (first) first.focus();
+  }, 320);
+  logEvent('onboarding_started', {mode});
+}
+
+function wzHideForm() {
+  const landing = document.getElementById('wz-landing-view');
+  const form = document.getElementById('wz-form-view');
+  if (form) {
+    form.style.animation = 'wz-slide-back 0.25s ease both';
+    setTimeout(() => { form.style.display = 'none'; }, 240);
+  }
+  if (landing) {
+    landing.style.display = 'flex';
+  }
+  document.getElementById('authAlert').innerHTML = '';
+}
+
+function wzCheckAuthReady() {
+  const email = (document.getElementById('authEmail')?.value || '').trim();
+  const password = document.getElementById('authPassword')?.value || '';
+  const name = (document.getElementById('authName')?.value || '').trim();
+  const btn = document.getElementById('authSubmitBtn');
+  if (!btn) return;
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const passOk = password.length >= 6;
+  const nameOk = authMode === 'signin' || name.length >= 2;
+  if (emailOk && passOk && nameOk) {
+    btn.classList.add('ready');
+  } else {
+    btn.classList.remove('ready');
+  }
+}
+
+function wzCheckName(val) {
+  const btn = document.getElementById('wzNameBtn');
+  if (!btn) return;
+  if (val.trim().length >= 2) {
+    btn.classList.add('ready');
+  } else {
+    btn.classList.remove('ready');
+  }
+}
+
+function wzTransition(hideId, showId, direction) {
+  const hideEl = document.getElementById(hideId);
+  const showEl = document.getElementById(showId);
+  if (hideEl) hideEl.style.display = 'none';
+  if (showEl) {
+    showEl.style.display = 'flex';
+    showEl.style.animation = direction === 'back'
+      ? 'wz-slide-back 0.3s ease both'
+      : 'wz-slide-in 0.3s ease both';
+  }
+}
+
+function startWizard() {
+  document.getElementById('authScreen').style.display = 'none';
+  const setup = document.getElementById('profileSetup');
+  setup.style.display = 'flex';
+  const savedStep = parseInt(localStorage.getItem('bb_wz_step') || '0', 10);
+  wizardState.step = (savedStep >= 0 && savedStep <= 3) ? savedStep : 0;
+  // Hide all screens first
+  [0,1,2,3].forEach(i => {
+    const el = document.getElementById('wz-' + i);
+    if (el) el.style.display = 'none';
+  });
+  const startEl = document.getElementById('wz-' + wizardState.step);
+  if (startEl) {
+    startEl.style.display = 'flex';
+    startEl.style.animation = 'wz-slide-in 0.35s ease both';
+  }
+  if (wizardState.step === 3) renderWizardPrograms();
+  logEvent('onboarding_step_view', {step: wizardState.step});
 }
 
 async function submitAuth() {
@@ -2015,21 +2132,30 @@ async function submitAuth() {
   if (password.length < 6) { showAuthAlert('Password must be at least 6 characters'); return; }
   const btn = document.getElementById('authSubmitBtn');
   btn.disabled = true;
-  btn.textContent = 'WORKING…';
+  btn.classList.remove('ready');
+  const origText = btn.textContent;
+  btn.textContent = 'Working…';
   try {
     if (authMode === 'signup') {
+      const name = (document.getElementById('authName')?.value || '').trim();
       const { data, error } = await supa.auth.signUp({ email, password });
       if (error) throw error;
       if (data.user && !data.session) {
         showAuthAlert('Check your email to confirm your account, then come back and sign in.', 'notice');
         btn.disabled = false;
-        btn.textContent = 'SIGN IN';
+        btn.textContent = origText;
         authMode = 'signin';
+        wzShowForm('signin');
         return;
       }
       currentUser = data.user;
-      document.getElementById('authScreen').style.display = 'none';
-      document.getElementById('profileSetup').style.display = 'flex';
+      // Pre-fill name from signup form into wizard screen 1
+      const nameInput = document.getElementById('profileName');
+      if (nameInput && name) {
+        nameInput.value = name;
+        wzCheckName(name);
+      }
+      startWizard();
     } else {
       const { data, error } = await supa.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -2039,7 +2165,8 @@ async function submitAuth() {
   } catch (err) {
     showAuthAlert(err.message || 'Authentication failed');
     btn.disabled = false;
-    btn.textContent = authMode === 'signin' ? 'SIGN IN' : 'CREATE ACCOUNT';
+    btn.classList.add('ready');
+    btn.textContent = origText;
   }
 }
 
@@ -2117,38 +2244,42 @@ function applyModuleVisibility() {
 /* ═══════════════════ ONBOARDING WIZARD ═══════════════════ */
 let wizardState = {step:0, modules:['strength'], program:'powerbuilding', uiMode:'basics'};
 
-function wizardUpdateDots() {
-  document.querySelectorAll('#wizardProgress .wizard-dot').forEach((dot,i) => {
-    dot.classList.toggle('active', i === wizardState.step);
-  });
-}
-
-function wzSelectMode(mode) {
-  wizardState.uiMode = mode;
-  document.getElementById('wz-mode-basics').classList.toggle('active', mode === 'basics');
-  document.getElementById('wz-mode-advanced').classList.toggle('active', mode === 'advanced');
-}
-
 function wizardNext(fromStep, skip=false) {
   if (fromStep === 0) {
     const name = document.getElementById('profileName').value.trim();
     if (!name) { document.getElementById('profileAlert').innerHTML = '<div class="auth-error">Enter your name to continue.</div>'; return; }
     document.getElementById('profileAlert').innerHTML = '';
+    logEvent('onboarding_step_completed', {step: 0});
   }
-  if (fromStep === 2 && skip) wizardState.modules = ['strength'];
-  if (fromStep === 3 && skip) wizardState.program = 'powerbuilding';
-  document.getElementById('wz-' + fromStep).style.display = 'none';
-  wizardState.step = fromStep + 1;
-  if (wizardState.step === 3) renderWizardPrograms();
-  document.getElementById('wz-' + wizardState.step).style.display = 'block';
-  wizardUpdateDots();
+  if (fromStep === 1) {
+    logEvent('onboarding_step_completed', {step: 1});
+  }
+  if (fromStep === 2) {
+    if (skip) wizardState.modules = ['strength'];
+    logEvent('modules_selected', {modules: wizardState.modules});
+    logEvent('onboarding_step_completed', {step: 2});
+  }
+  if (fromStep === 3) {
+    if (skip) wizardState.program = 'powerbuilding';
+    logEvent('program_selected', {program: wizardState.program});
+    logEvent('onboarding_step_completed', {step: 3});
+    wizardFinish(skip);
+    return;
+  }
+  const nextStep = fromStep + 1;
+  wizardState.step = nextStep;
+  localStorage.setItem('bb_wz_step', nextStep);
+  wzTransition('wz-' + fromStep, 'wz-' + nextStep, 'forward');
+  if (nextStep === 3) renderWizardPrograms();
+  logEvent('onboarding_step_view', {step: nextStep});
 }
 
 function wizardBack(fromStep) {
-  document.getElementById('wz-' + fromStep).style.display = 'none';
-  wizardState.step = fromStep - 1;
-  document.getElementById('wz-' + wizardState.step).style.display = 'block';
-  wizardUpdateDots();
+  if (fromStep === 0) { startWizard(); return; }
+  const prevStep = fromStep - 1;
+  wizardState.step = prevStep;
+  localStorage.setItem('bb_wz_step', prevStep);
+  wzTransition('wz-' + fromStep, 'wz-' + prevStep, 'back');
 }
 
 function toggleModule(mod) {
@@ -2166,31 +2297,33 @@ function toggleModule(mod) {
 function renderWizardPrograms() {
   const hasStrength = wizardState.modules.includes('strength');
   const container = document.getElementById('wzProgramCards');
-  const sub = document.getElementById('wzProgramSub');
+  if (!container) return;
   container.innerHTML = '';
   if (hasStrength) {
-    sub.innerHTML = 'Choose a starting program. <span style="color:var(--lime)">Not sure? Pick Hybrid — 4 days/week is a great starting point.</span>';
     [
-      {id:'powerbuilding', name:'Powerbuilding 5-Day', desc:'The default El Camino program. Heavy compounds + accessory work, Mon–Fri. Best if you can commit to 5 days every week.', tags:['5 DAYS/WK','STRENGTH','HYPERTROPHY']},
-      {id:'ppl', name:'Hypertrophy 6-Day PPL', desc:'Push / Pull / Legs × 2 per week. Volume-focused for muscle building. High commitment — for experienced lifters.', tags:['6 DAYS/WK','HYPERTROPHY','INTERMEDIATE']},
-      {id:'hybrid', name:'Hybrid Strength + Cardio', desc:'4-day upper/lower split. Heavy compounds + conditioning work. Flexible schedule — easy to stay consistent.', tags:['4 DAYS/WK','STRENGTH','CONDITIONING'], recommended:true},
-      {id:'empty', name:'Empty — Build My Own', desc:'Start with a blank 3-day template and build from scratch. You\'ll add exercises manually.', tags:['CUSTOM']}
+      {id:'powerbuilding', name:'Powerbuilding 5-Day', desc:'Heavy compounds + accessory work, Mon–Fri. Best if you can commit to 5 days every week.', tags:['5 DAYS/WK','STRENGTH','HYPERTROPHY']},
+      {id:'ppl', name:'Hypertrophy 6-Day PPL', desc:'Push / Pull / Legs × 2 per week. Volume-focused for muscle building. For experienced lifters.', tags:['6 DAYS/WK','HYPERTROPHY','INTERMEDIATE']},
+      {id:'hybrid', name:'Hybrid Strength + Cardio', desc:'4-day upper/lower split. Heavy compounds + conditioning. Flexible schedule — easy to stay consistent.', tags:['4 DAYS/WK','STRENGTH','CONDITIONING'], recommended:true},
+      {id:'empty', name:'Empty — Build My Own', desc:'Start with a blank 3-day template and build from scratch.', tags:['CUSTOM']}
     ].forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'wz-program-card' + (wizardState.program === p.id ? ' active' : '');
+      const card = document.createElement('button');
+      card.className = 'wz-prog-card' + (wizardState.program === p.id ? ' active' : '');
       card.onclick = () => { wizardState.program = p.id; renderWizardPrograms(); };
-      const badge = p.recommended ? `<span style="display:inline-block;background:var(--lime);color:#000;font-size:9px;font-weight:700;letter-spacing:.08em;padding:2px 6px;border-radius:3px;margin-bottom:6px">★ RECOMMENDED</span><br>` : '';
-      card.innerHTML = `${badge}<div class="wz-program-card-name">${p.name}</div><div class="wz-program-card-desc">${p.desc}</div><div class="wz-program-tags">${p.tags.map(t=>`<span class="wz-program-tag">${t}</span>`).join('')}</div>`;
+      const badge = p.recommended ? `<span class="wz-prog-badge">RECOMMENDED</span>` : '';
+      card.innerHTML = `${badge}<div class="wz-prog-name">${p.name}</div><div class="wz-prog-desc">${p.desc}</div><div class="wz-prog-tags">${p.tags.map(t=>`<span class="wz-prog-tag">${t}</span>`).join('')}</div>`;
       container.appendChild(card);
     });
   } else {
-    sub.textContent = 'No strength module selected — you can add programs later in Settings.';
     wizardState.program = 'empty';
+    const msg = document.createElement('div');
+    msg.style.cssText = 'font-size:13px;color:var(--text-dim);padding:16px 0';
+    msg.textContent = 'No strength module selected — you can add programs later in Settings.';
+    container.appendChild(msg);
   }
   if (wizardState.modules.includes('running')) {
     const note = document.createElement('div');
-    note.style.cssText = 'font-size:11px;color:var(--text-dim);padding:8px 0 4px';
-    note.innerHTML = '<b style="color:var(--lime)">✓ Run Plan</b> — your 16-week running program will be available in the Run tab.';
+    note.style.cssText = 'font-size:12px;color:var(--text-dim);padding:12px 0 0';
+    note.innerHTML = '<span style="color:var(--lime)">Run tab included</span> — your 16-week plan will be waiting.';
     container.appendChild(note);
   }
 }
@@ -2200,8 +2333,7 @@ async function wizardFinish(skip=false) {
   const startingWeight = parseFloat(document.getElementById('profileStart').value);
   const goalWeight = parseFloat(document.getElementById('profileGoal').value);
   const height = parseInt(document.getElementById('profileHeight').value);
-  const btn = document.getElementById('wzFinishBtn');
-  if (btn) { btn.textContent = 'SAVING…'; btn.disabled = true; }
+  wizardState.uiMode = 'basics';
   try {
     const { error } = await supa.from('bb_profiles').upsert({
       id: currentUser.id, display_name: name,
@@ -2209,13 +2341,14 @@ async function wizardFinish(skip=false) {
       goal_weight: isNaN(goalWeight) ? null : goalWeight,
       height_inches: isNaN(height) ? null : height,
       enabled_modules: wizardState.modules,
-      ui_mode: wizardState.uiMode
+      ui_mode: 'basics'
     });
     if (error) throw error;
-    currentProfile = { display_name: name, starting_weight: startingWeight, goal_weight: goalWeight, height_inches: height, enabled_modules: wizardState.modules, ui_mode: wizardState.uiMode };
-    logEvent('feature_shown',{ui_mode: wizardState.uiMode});
+    currentProfile = { display_name: name, starting_weight: startingWeight, goal_weight: goalWeight, height_inches: height, enabled_modules: wizardState.modules, ui_mode: 'basics' };
+    logEvent('onboarding_completed', {modules: wizardState.modules, program: wizardState.program});
     // Wipe all local state from any previous user on this device
     Object.keys(SK).forEach(k => localStorage.removeItem(SK[k]));
+    localStorage.removeItem('bb_wz_step');
     state.checklist={}; state.setLog={}; state.expanded={}; state.fatigue={};
     state.weights=[]; state.measurements=[]; state.sessionHistory=[];
     state.coachNotes={}; state.customProgram=null;
@@ -2223,7 +2356,7 @@ async function wizardFinish(skip=false) {
     state.block={num:1,week:1,startDate:new Date().toISOString().slice(0,10)};
     state.collapsed={};
     // Apply selected program
-    const progId = skip ? 'powerbuilding' : wizardState.program;
+    const progId = wizardState.program || 'powerbuilding';
     const tpl = PROGRAM_TEMPLATES[progId];
     Object.keys(WORKOUTS).forEach(k => delete WORKOUTS[k]);
     Object.assign(WORKOUTS, JSON.parse(JSON.stringify(tpl || DEFAULT_WORKOUTS)));
@@ -2232,12 +2365,27 @@ async function wizardFinish(skip=false) {
     // Seed starting weight
     if (!isNaN(startingWeight)) { state.startingWeight = startingWeight; state.weights=[{date:new Date().toISOString().slice(0,10),weight:startingWeight}]; }
     if (!isNaN(goalWeight)) state.goalWeight = goalWeight;
-    document.getElementById('profileSetup').style.display = 'none';
-    showAppShell();
     persist();
+    // Show transition screen, then enter app
+    const trans = document.getElementById('wz-transition');
+    const nameEl = document.getElementById('wzTransName');
+    if (nameEl) nameEl.textContent = 'You\'re ready' + (name ? ', ' + name.split(' ')[0] : '') + '.';
+    // Hide current wizard screen
+    [0,1,2,3].forEach(i => {
+      const el = document.getElementById('wz-' + i);
+      if (el) el.style.display = 'none';
+    });
+    if (trans) {
+      trans.style.display = 'flex';
+      trans.style.animation = 'wz-trans-in 0.5s ease both';
+    }
+    setTimeout(() => {
+      if (trans) trans.style.display = 'none';
+      document.getElementById('profileSetup').style.display = 'none';
+      showAppShell();
+    }, 2500);
   } catch(err) {
     document.getElementById('profileAlert').innerHTML = '<div class="auth-error">' + err.message + '</div>';
-    if (btn) { btn.textContent = 'START TRAINING →'; btn.disabled = false; }
   }
 }
 
@@ -2247,8 +2395,7 @@ async function loadProfileAndData() {
   if (!profile) {
     // No profile yet — wipe any leftover local state from a previous user on this device
     Object.keys(SK).forEach(k => localStorage.removeItem(SK[k]));
-    document.getElementById('authScreen').style.display = 'none';
-    document.getElementById('profileSetup').style.display = 'flex';
+    startWizard();
     return;
   }
   currentProfile = profile;
