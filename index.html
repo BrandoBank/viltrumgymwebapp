@@ -4590,6 +4590,37 @@ function renderWeightProjections() {
     </div>
     <div style="font-size:10px;color:var(--text-faint);line-height:1.5">Your lifts stay the same — but at ${goal} lb you carry them better.</div>
     ` : ''}
+    ${(() => {
+      const visFactor = {core:1.00,shoulders:0.90,chest:0.88,back:0.82,biceps:0.80,triceps:0.78,traps:0.76,quads:0.72,glutes:0.70,hamstrings:0.65,calves:0.55};
+      const vol = calculateWeeklyVolume();
+      const maxVol = Math.max(...Object.values(vol).filter(v=>v>0),1);
+      const scores = Object.entries(visFactor).map(([muscle,vis])=>{
+        const sets = vol[muscle]||0;
+        const score = (sets/maxVol*0.55 + vis*0.45)*100;
+        const why = sets>=(maxVol*0.7)?'High training volume':sets>=(maxVol*0.35)?'Moderate training volume':'Low training volume';
+        const visLabel = vis>=0.85?'fat loss reveals fast':vis>=0.72?'reveals with progress':'slower to show';
+        const label = muscle==='core'?'CORE / ABS':(muscle.charAt(0).toUpperCase()+muscle.slice(1)).toUpperCase();
+        return {muscle,label,score,sets,why,visLabel};
+      }).filter(x=>x.sets>0).sort((a,b)=>b.score-a.score).slice(0,5);
+      if(!scores.length) return '';
+      const barCol = i=>i===0?'var(--lime)':i===1?'#a8e063':i===2?'#7db87d':'var(--border-lit)';
+      return `<div style="margin-top:16px">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">WHAT WILL POP MOST</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px">
+          ${scores.map((s,i)=>`<div style="padding:11px 14px;${i<scores.length-1?'border-bottom:1px solid var(--border)':''}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+              <div style="font-size:12px;font-weight:700;color:${i===0?'var(--lime)':'var(--text)'}">${i===0?'#1 ':''}${s.label}</div>
+              <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'">${Math.round(s.score)}%</div>
+            </div>
+            <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:5px">
+              <div style="height:100%;width:${Math.round(s.score)}%;background:${barCol(i)};border-radius:2px"></div>
+            </div>
+            <div style="font-size:10px;color:var(--text-faint)">${s.why} · ${s.visLabel}</div>
+          </div>`).join('')}
+        </div>
+        <div style="font-size:10px;color:var(--text-faint);line-height:1.5">Scored by weekly training sets × fat-loss visibility. Higher = changes faster and more visibly.</div>
+      </div>`;
+    })()}
     `}
   </div>`;
 }
