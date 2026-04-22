@@ -392,6 +392,22 @@
   .home-mini-val{font-size:24px;font-weight:700;color:var(--lime);line-height:1;font-family:'JetBrains Mono'}
   .home-mini-label{font-size:9px;color:var(--text-faint);letter-spacing:0.15em;margin-top:6px;font-family:'JetBrains Mono';font-weight:600}
   .home-mini-sub{font-size:10px;color:var(--text-dim);margin-top:3px}
+  .home-first-hero{background:linear-gradient(135deg,var(--bg-raised) 0%,var(--bg-card) 100%);border:1px solid var(--border);border-left:3px solid var(--lime);border-radius:12px;padding:28px 24px;margin-bottom:18px;position:relative;overflow:hidden}
+  .home-first-hero::after{content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(182,255,60,0.05) 0%,transparent 70%);pointer-events:none}
+  .home-first-label{font-size:10px;color:var(--lime);letter-spacing:0.25em;font-family:'JetBrains Mono';font-weight:700;margin-bottom:10px}
+  .home-first-title{font-size:26px;font-weight:700;line-height:1.15;margin-bottom:6px}
+  .home-first-sub{font-size:13px;color:var(--text-dim);margin-bottom:22px;line-height:1.5}
+  .home-first-cta{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;background:var(--lime);color:#000;border:none;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:0.06em;cursor:pointer;font-family:inherit;transition:all 0.15s}
+  .home-first-cta:hover{background:var(--lime-dim);transform:translateY(-1px)}
+  .home-first-cta svg{width:14px;height:14px;stroke-width:2.5}
+  .home-orient-steps{display:flex;flex-direction:column;gap:0;margin-bottom:18px;background:var(--bg-raised);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .home-orient-step{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border)}
+  .home-orient-step:last-child{border-bottom:none}
+  .home-orient-num{width:28px;height:28px;border-radius:50%;background:rgba(182,255,60,0.08);border:1px solid rgba(182,255,60,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--lime);font-family:'JetBrains Mono';flex-shrink:0}
+  .home-orient-body{flex:1}
+  .home-orient-name{font-size:13px;font-weight:600;margin-bottom:2px}
+  .home-orient-desc{font-size:11px;color:var(--text-faint)}
+  .home-orient-tab{font-size:10px;font-family:'JetBrains Mono';color:var(--text-faint);letter-spacing:0.08em;white-space:nowrap}
   .home-cut-stat{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
   .home-cut-stat:last-child{border-bottom:none}
   .home-cut-stat span:first-child{color:var(--text-dim)}
@@ -3766,12 +3782,56 @@ function renderHome(){
   checkNudges();
   checkHomeEnergyCard();
 
-  // Greeting based on time of day
   const hour = new Date().getHours();
-  const timeOfDay = hour < 5 ? "Late night" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 22 ? "Good evening" : "Late night";
-  const name = currentProfile?.display_name || (localOnlyMode ? "there" : "Brandon");
-  greeting.innerHTML = `${timeOfDay}, <span>${name}</span>`;
+  const isNewUser = (state.sessionHistory || []).length === 0;
+  const name = currentProfile?.display_name || (localOnlyMode ? 'there' : '');
+  const timeOfDay = hour < 5 ? 'Late night' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : hour < 22 ? 'Good evening' : 'Late night';
+  greeting.innerHTML = `${timeOfDay}${name ? ', <span>' + name.split(' ')[0] + '</span>' : ''}.`;
 
+  if (isNewUser) {
+    const now = new Date();
+    dateEl.textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+    todayCard.className = 'home-first-hero';
+    todayCard.innerHTML = `
+      <div class="home-first-label mono">DAY ONE</div>
+      <div class="home-first-title">Your training begins.</div>
+      <div class="home-first-sub">Your program is loaded and ready. Hit the gym tab to log your first session.</div>
+      <button class="home-first-cta" onclick="showTab('checklist')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        START FIRST SESSION
+      </button>
+    `;
+    miniStats.className = '';
+    miniStats.innerHTML = `
+      <div class="home-orient-steps">
+        <div class="home-orient-step">
+          <div class="home-orient-num">1</div>
+          <div class="home-orient-body">
+            <div class="home-orient-name">Log your first session</div>
+            <div class="home-orient-desc">Track sets, reps, and weight in Gym Mode</div>
+          </div>
+          <div class="home-orient-tab mono">GYM</div>
+        </div>
+        <div class="home-orient-step">
+          <div class="home-orient-num">2</div>
+          <div class="home-orient-body">
+            <div class="home-orient-name">Log your weight</div>
+            <div class="home-orient-desc">Start tracking your cut from today</div>
+          </div>
+          <div class="home-orient-tab mono">WEIGHT</div>
+        </div>
+        <div class="home-orient-step">
+          <div class="home-orient-num">3</div>
+          <div class="home-orient-body">
+            <div class="home-orient-name">Meet your AI coach</div>
+            <div class="home-orient-desc">Get personalized guidance in War Room</div>
+          </div>
+          <div class="home-orient-tab mono">WAR ROOM</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
   // Date line
   const now = new Date();
   dateEl.textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase() + ` · WEEK ${state.block.week} OF 4`;
