@@ -1240,9 +1240,9 @@
   <section id="tab-weight" class="tab-content" style="display:none">
     <div class="grid-4">
       <div class="stat-card"><div class="stat-card-label mono">STARTING</div><div class="stat-card-value" style="color:var(--orange)" id="wtStarting">—</div><div class="stat-card-sub" id="wtStartingDate">—</div></div>
-      <div class="stat-card"><div class="stat-card-label mono">CURRENT</div><div class="stat-card-value" style="color:var(--lime)" id="wtCurrent">243 lb</div><div class="stat-card-sub" id="wtSub">Apr 20, 2026</div></div>
-      <div class="stat-card"><div class="stat-card-label mono">LOST</div><div class="stat-card-value" style="color:var(--lime)" id="wtLost">67 lb</div><div class="stat-card-sub" id="wtLostPct">21.6%</div></div>
-      <div class="stat-card"><div class="stat-card-label mono">GOAL</div><div class="stat-card-value" id="wtGoal">210 lb</div><div class="stat-card-sub" id="wtToGo">33 lb to go</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">CURRENT</div><div class="stat-card-value" style="color:var(--lime)" id="wtCurrent">—</div><div class="stat-card-sub" id="wtSub">—</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">LOST</div><div class="stat-card-value" style="color:var(--lime)" id="wtLost">—</div><div class="stat-card-sub" id="wtLostPct">—</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">GOAL</div><div class="stat-card-value" id="wtGoal">—</div><div class="stat-card-sub" id="wtToGo">—</div></div>
     </div>
 
     <div class="panel">
@@ -4751,6 +4751,10 @@ function addWeight(){
 function deleteWeight(date){state.weights=state.weights.filter(e=>e.date!==date);persist();drawWeightChart();renderWeightHistory();updateWeightStats()}
 function renderWeightHistory(){
   const recent=allWeights().slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
+  if(recent.length===0){
+    document.getElementById("weightHistory").innerHTML='<div style="padding:16px 0;text-align:center"><div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">Ready when you are</div><div style="font-size:12px;color:var(--text-faint);line-height:1.5">Log your first weight above to start tracking your cut.</div></div>';
+    return;
+  }
   document.getElementById("weightHistory").innerHTML=recent.map(e=>{
     const d=new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const badge=e.fromCut?`<span style="font-size:9px;color:#888;font-family:'JetBrains Mono';letter-spacing:.06em;margin-left:5px">THE CUT</span>`:'';
@@ -4760,7 +4764,13 @@ function renderWeightHistory(){
 }
 function updateWeightStats(){
   const sorted=allWeights().slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
-  if(sorted.length===0)return;
+  if(sorted.length===0){
+    ['wtStarting','wtStartingDate','wtCurrent','wtSub','wtLost','wtLostPct','wtGoal','wtToGo'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.textContent='—';
+    });
+    if(state.goalWeight){document.getElementById("wtGoal").textContent=state.goalWeight+" lb";document.getElementById("wtToGo").textContent="Log your first weight";}
+    return;
+  }
   const start=sorted[0],current=sorted[sorted.length-1];
   const lost=start.weight-current.weight;
   const pct=(lost/start.weight*100).toFixed(1);
