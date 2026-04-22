@@ -654,6 +654,10 @@
   .settings-toggle-row{margin-top:6px}
   .settings-toggle-btn{display:inline-flex;align-items:center;padding:8px 16px;border-radius:20px;background:var(--bg);border:1px solid var(--border);color:var(--text-dim);font-family:'JetBrains Mono';font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em}
   .settings-toggle-btn.active{background:rgba(182,255,60,0.12);border-color:var(--lime);color:var(--lime)}
+  /* SETTINGS COLLAPSIBLE SECTIONS */
+  .st-collapse-header{cursor:pointer;-webkit-user-select:none;user-select:none;justify-content:space-between !important}
+  .st-collapse-header:active{opacity:0.7}
+  .st-arrow{font-size:10px;color:var(--text-faint);letter-spacing:0;font-family:system-ui;flex-shrink:0}
 
   /* NUDGE CARDS */
   .nudge-card{background:linear-gradient(135deg,rgba(182,255,60,0.06) 0%,var(--bg-card) 100%);border:1px solid rgba(182,255,60,0.25);border-radius:12px;padding:16px;margin-bottom:14px;position:relative}
@@ -1426,118 +1430,153 @@
   <!-- SETTINGS TAB -->
   <section id="tab-settings" class="tab-content" style="display:none">
 
+    <!-- ACCOUNT — always visible -->
     <div class="panel">
-      <div class="panel-header"><div class="panel-title"><svg><use href="#i-settings"/></svg>DISPLAY</div></div>
-      <div class="settings-group">
-        <div class="settings-group-title">SHOW ADVANCED FEATURES</div>
-        <div class="settings-group-desc">Enable War Room AI builder, Ask Coach, Stats, and other advanced features. Turn off for a simpler, focused experience.</div>
-        <div class="settings-toggle-row">
-          <button class="settings-toggle-btn" id="uiModeToggle" onclick="toggleUiMode()">
-            <span id="uiModeLabel">—</span>
-          </button>
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-body"/></svg>ACCOUNT</div></div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:50%;background:var(--lime)1a;border:1px solid var(--lime)33;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg style="width:20px;height:20px;color:var(--lime)" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div id="settingsAccountName" style="font-size:15px;font-weight:600;margin-bottom:2px">—</div>
+          <div id="settingsAccountEmail" style="font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
         </div>
       </div>
-      <div class="settings-group">
-        <div class="settings-group-title">AMOLED MODE</div>
-        <div class="settings-group-desc">Pure black background. Saves battery on OLED screens and makes the lime pop harder.</div>
-        <button class="btn primary" onclick="toggleAmoled()"><svg><use href="#i-check"/></svg>TOGGLE AMOLED</button>
-        <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';margin-top:8px" id="amoledStatusSettings">—</div>
-      </div>
-      <div class="settings-group">
-        <div class="settings-group-title">ACCENT COLOR</div>
-        <div class="settings-group-desc">Changes the highlight color used throughout the app.</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px" id="accentColorPicker">
-          <button onclick="setAccentColor('#B6FF3C')" data-color="#B6FF3C" style="width:36px;height:36px;border-radius:50%;background:#B6FF3C;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Lime"></button>
-          <button onclick="setAccentColor('#60A5FA')" data-color="#60A5FA" style="width:36px;height:36px;border-radius:50%;background:#60A5FA;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Blue"></button>
-          <button onclick="setAccentColor('#FB923C')" data-color="#FB923C" style="width:36px;height:36px;border-radius:50%;background:#FB923C;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Orange"></button>
-          <button onclick="setAccentColor('#F472B6')" data-color="#F472B6" style="width:36px;height:36px;border-radius:50%;background:#F472B6;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Pink"></button>
-          <button onclick="setAccentColor('#A78BFA')" data-color="#A78BFA" style="width:36px;height:36px;border-radius:50%;background:#A78BFA;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Purple"></button>
-          <button onclick="setAccentColor('#2DD4BF')" data-color="#2DD4BF" style="width:36px;height:36px;border-radius:50%;background:#2DD4BF;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Teal"></button>
-        </div>
-      </div>
-      <div class="settings-group">
-        <div class="settings-group-title">PROJECTIONS</div>
-        <div class="settings-group-desc">Show or hide the Projections section on the Weight tab.</div>
-        <div class="settings-toggle-row">
-          <button class="settings-toggle-btn" id="showProjectionsBtn" onclick="toggleShowProjections()">ON</button>
-        </div>
-        <div style="margin-top:12px">
-          <div class="settings-group-title" style="font-size:11px">CONSERVATIVE MODE</div>
-          <div class="settings-group-desc" style="margin-top:2px">Assumes 20% slower progress for a more cautious estimate.</div>
-          <div class="settings-toggle-row">
-            <button class="settings-toggle-btn" id="conservativeModeBtn" onclick="toggleConservativeMode()">OFF</button>
-          </div>
-        </div>
-      </div>
-      <div class="settings-group">
-        <div class="settings-group-title">FOCUS MODE DEFAULT</div>
-        <div class="settings-group-desc">Start Gym Mode in focus mode automatically — hides nav and all non-workout UI.</div>
-        <button class="btn" onclick="toggleFocusModeDefault()" id="focusModeDefaultBtn">—</button>
-      </div>
-      <div class="settings-group" id="trainLightSettingsGroup" style="display:none">
-        <div class="settings-group-title">TRAIN LIGHT MODE</div>
-        <div class="settings-group-desc">Scale your session on tough days — 70% weight, half volume, longer rest. A banner appears in Gym Mode as a reminder.</div>
-        <div class="settings-toggle-row">
-          <button class="settings-toggle-btn" id="trainLightToggleBtn" onclick="toggleTrainLight()">OFF</button>
-        </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="openModal('editProfile')"><svg><use href="#i-edit"/></svg>Edit Profile</button>
+        <button class="btn" onclick="signOut()"><svg><use href="#i-x"/></svg>Sign Out</button>
       </div>
     </div>
 
+    <!-- MODULES — always visible -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-dumbbell"/></svg>MODULES</div></div>
       <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.5">Enable or disable training modules. Changes apply immediately.</div>
       <div id="settingsModuleList"></div>
     </div>
 
+    <!-- APPEARANCE — collapsible -->
     <div class="panel">
-      <div class="panel-header"><div class="panel-title"><svg><use href="#i-body"/></svg>ACCOUNT</div></div>
-      <div class="settings-group" id="settingsProfileSummary">
-        <div id="settingsAccountName" style="font-size:15px;font-weight:600;margin-bottom:4px">—</div>
-        <div id="settingsAccountEmail" style="font-size:11px;color:var(--text-dim)">—</div>
+      <div class="panel-header st-collapse-header" onclick="settingsToggle('appearance')">
+        <div class="panel-title"><svg><use href="#i-settings"/></svg>APPEARANCE</div>
+        <span id="starrow-appearance" class="st-arrow">▼</span>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn" onclick="openModal('editProfile')"><svg><use href="#i-edit"/></svg>Edit Profile</button>
-        <button class="btn" onclick="signOut()"><svg><use href="#i-x"/></svg>Sign Out</button>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title"><svg><use href="#i-key"/></svg>DATA</div></div>
-      <div class="settings-group">
-        <div class="settings-group-title">EXPORT</div>
-        <div class="settings-group-desc">Download all your BeeBuildz data as JSON. Save to iCloud, email, or Dropbox.</div>
-        <button class="btn primary" onclick="exportData()"><svg><use href="#i-arrow"/></svg>DOWNLOAD BACKUP</button>
-      </div>
-      <div class="settings-group">
-        <div class="settings-group-title">IMPORT</div>
-        <div class="settings-group-desc">Restore from a previous backup. Replaces all current data.</div>
-        <input type="file" id="importFileSettings" class="file-input-hidden" accept=".json" onchange="importData(event)"/>
-        <button class="btn" onclick="document.getElementById('importFileSettings').click()"><svg><use href="#i-arrow"/></svg>SELECT BACKUP FILE</button>
-      </div>
-      <div class="settings-group" data-advanced>
-        <div class="settings-group-title">MY USAGE — LAST 30 DAYS</div>
-        <div style="font-size:11px;color:var(--text-faint);margin-bottom:10px">What features you actually use. Data-driven decisions about what to keep.</div>
-        <div id="usageChart" style="min-height:60px"></div>
-        <div id="unusedFeatures" style="margin-top:10px"></div>
-        <button class="btn" style="margin-top:8px" onclick="loadUsageData()"><svg><use href="#i-history"/></svg>REFRESH USAGE</button>
-      </div>
-      <div class="settings-group">
-        <div class="settings-group-title" style="color:var(--red)">CLEAR ALL DATA</div>
-        <div class="settings-group-desc">Permanently delete all your training data. This cannot be undone.</div>
-        <button class="btn" style="border-color:var(--red);color:var(--red)" onclick="confirmClearData()"><svg style="width:14px;height:14px;margin-right:5px;vertical-align:-2px"><use href="#i-warning"/></svg>CLEAR ALL DATA</button>
-      </div>
-    </div>
-
-    <div class="panel" data-advanced>
-      <div class="panel-header"><div class="panel-title"><svg><use href="#i-key"/></svg>PRIVACY & API</div></div>
-      <div class="settings-group">
-        <div class="settings-group-title">ANTHROPIC API KEY</div>
-        <div class="settings-group-desc">Used by War Room and Ask Coach. Stored only in your browser — never sent to our servers.</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <input type="password" id="settingsApiKey" class="auth-input" style="margin:0;flex:1" placeholder="sk-ant-…"/>
-          <button class="btn primary" onclick="saveApiKeyFromSettings()">SAVE</button>
+      <div id="stbody-appearance" style="display:none">
+        <div class="settings-group">
+          <div class="settings-group-title">AMOLED MODE</div>
+          <div class="settings-group-desc">Pure black background. Saves battery on OLED screens and makes the lime pop harder.</div>
+          <button class="btn primary" onclick="toggleAmoled()"><svg><use href="#i-check"/></svg>TOGGLE AMOLED</button>
+          <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';margin-top:8px" id="amoledStatusSettings">—</div>
         </div>
-        <div style="font-size:11px;color:var(--text-faint);margin-top:6px" id="settingsApiKeyStatus">—</div>
+        <div class="settings-group" style="margin-bottom:0">
+          <div class="settings-group-title">ACCENT COLOR</div>
+          <div class="settings-group-desc">Changes the highlight color used throughout the app.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px" id="accentColorPicker">
+            <button onclick="setAccentColor('#B6FF3C')" data-color="#B6FF3C" style="width:36px;height:36px;border-radius:50%;background:#B6FF3C;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Lime"></button>
+            <button onclick="setAccentColor('#60A5FA')" data-color="#60A5FA" style="width:36px;height:36px;border-radius:50%;background:#60A5FA;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Blue"></button>
+            <button onclick="setAccentColor('#FB923C')" data-color="#FB923C" style="width:36px;height:36px;border-radius:50%;background:#FB923C;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Orange"></button>
+            <button onclick="setAccentColor('#F472B6')" data-color="#F472B6" style="width:36px;height:36px;border-radius:50%;background:#F472B6;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Pink"></button>
+            <button onclick="setAccentColor('#A78BFA')" data-color="#A78BFA" style="width:36px;height:36px;border-radius:50%;background:#A78BFA;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Purple"></button>
+            <button onclick="setAccentColor('#2DD4BF')" data-color="#2DD4BF" style="width:36px;height:36px;border-radius:50%;background:#2DD4BF;border:3px solid transparent;cursor:pointer;transition:border-color .15s" title="Teal"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRAINING — collapsible -->
+    <div class="panel">
+      <div class="panel-header st-collapse-header" onclick="settingsToggle('training')">
+        <div class="panel-title"><svg><use href="#i-dumbbell"/></svg>TRAINING</div>
+        <span id="starrow-training" class="st-arrow">▼</span>
+      </div>
+      <div id="stbody-training" style="display:none">
+        <div class="settings-group">
+          <div class="settings-group-title">SHOW ADVANCED FEATURES</div>
+          <div class="settings-group-desc">Enable War Room AI builder, Ask Coach, Stats, and other advanced features.</div>
+          <div class="settings-toggle-row">
+            <button class="settings-toggle-btn" id="uiModeToggle" onclick="toggleUiMode()">
+              <span id="uiModeLabel">—</span>
+            </button>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">FOCUS MODE DEFAULT</div>
+          <div class="settings-group-desc">Start Gym Mode in focus mode automatically — hides nav and all non-workout UI.</div>
+          <button class="btn" onclick="toggleFocusModeDefault()" id="focusModeDefaultBtn">—</button>
+        </div>
+        <div class="settings-group" id="trainLightSettingsGroup" style="display:none;margin-bottom:0">
+          <div class="settings-group-title">TRAIN LIGHT MODE</div>
+          <div class="settings-group-desc">Scale your session on tough days — 70% weight, half volume, longer rest.</div>
+          <div class="settings-toggle-row">
+            <button class="settings-toggle-btn" id="trainLightToggleBtn" onclick="toggleTrainLight()">OFF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEIGHT & PROJECTIONS — collapsible -->
+    <div class="panel">
+      <div class="panel-header st-collapse-header" onclick="settingsToggle('projections')">
+        <div class="panel-title"><svg><use href="#i-target"/></svg>WEIGHT &amp; PROJECTIONS</div>
+        <span id="starrow-projections" class="st-arrow">▼</span>
+      </div>
+      <div id="stbody-projections" style="display:none">
+        <div class="settings-group">
+          <div class="settings-group-title">SHOW PROJECTIONS</div>
+          <div class="settings-group-desc">Show or hide the Projections section on the Weight tab.</div>
+          <div class="settings-toggle-row">
+            <button class="settings-toggle-btn" id="showProjectionsBtn" onclick="toggleShowProjections()">ON</button>
+          </div>
+        </div>
+        <div class="settings-group" style="margin-bottom:0">
+          <div class="settings-group-title">CONSERVATIVE MODE</div>
+          <div class="settings-group-desc">Assumes 20% slower progress for more cautious estimates.</div>
+          <div class="settings-toggle-row">
+            <button class="settings-toggle-btn" id="conservativeModeBtn" onclick="toggleConservativeMode()">OFF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA & PRIVACY — collapsible -->
+    <div class="panel">
+      <div class="panel-header st-collapse-header" onclick="settingsToggle('data')">
+        <div class="panel-title"><svg><use href="#i-key"/></svg>DATA &amp; PRIVACY</div>
+        <span id="starrow-data" class="st-arrow">▼</span>
+      </div>
+      <div id="stbody-data" style="display:none">
+        <div class="settings-group">
+          <div class="settings-group-title">EXPORT</div>
+          <div class="settings-group-desc">Download all your BeeBuildz data as JSON. Save to iCloud, email, or Dropbox.</div>
+          <button class="btn primary" onclick="exportData()"><svg><use href="#i-arrow"/></svg>DOWNLOAD BACKUP</button>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">IMPORT</div>
+          <div class="settings-group-desc">Restore from a previous backup. Replaces all current data.</div>
+          <input type="file" id="importFileSettings" class="file-input-hidden" accept=".json" onchange="importData(event)"/>
+          <button class="btn" onclick="document.getElementById('importFileSettings').click()"><svg><use href="#i-arrow"/></svg>SELECT BACKUP FILE</button>
+        </div>
+        <div class="settings-group" data-advanced>
+          <div class="settings-group-title">ANTHROPIC API KEY</div>
+          <div class="settings-group-desc">Used by War Room and Ask Coach. Stored only in your browser — never sent to our servers.</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input type="password" id="settingsApiKey" class="auth-input" style="margin:0;flex:1" placeholder="sk-ant-…"/>
+            <button class="btn primary" onclick="saveApiKeyFromSettings()">SAVE</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-faint);margin-top:6px" id="settingsApiKeyStatus">—</div>
+        </div>
+        <div class="settings-group" data-advanced>
+          <div class="settings-group-title">MY USAGE — LAST 30 DAYS</div>
+          <div style="font-size:11px;color:var(--text-faint);margin-bottom:10px">What features you actually use.</div>
+          <div id="usageChart" style="min-height:60px"></div>
+          <div id="unusedFeatures" style="margin-top:10px"></div>
+          <button class="btn" style="margin-top:8px" onclick="loadUsageData()"><svg><use href="#i-history"/></svg>REFRESH USAGE</button>
+        </div>
+        <div class="settings-group" style="margin-bottom:0">
+          <div class="settings-group-title" style="color:var(--red)">CLEAR ALL DATA</div>
+          <div class="settings-group-desc">Permanently delete all your training data. This cannot be undone.</div>
+          <button class="btn" style="border-color:var(--red);color:var(--red)" onclick="confirmClearData()"><svg style="width:14px;height:14px;margin-right:5px;vertical-align:-2px"><use href="#i-warning"/></svg>CLEAR ALL DATA</button>
+        </div>
       </div>
     </div>
 
@@ -3062,6 +3101,31 @@ function renderSettings() {
   // Usage data
   loadUsageData();
   applyUiMode();
+  initSettingsCollapse();
+}
+
+function settingsToggle(id) {
+  const body = document.getElementById('stbody-' + id);
+  const arrow = document.getElementById('starrow-' + id);
+  if (!body) return;
+  const willOpen = body.style.display === 'none';
+  body.style.display = willOpen ? '' : 'none';
+  if (arrow) arrow.textContent = willOpen ? '▲' : '▼';
+  const open = load('bb_settings_open', {});
+  open[id] = willOpen;
+  save('bb_settings_open', open);
+}
+
+function initSettingsCollapse() {
+  const open = load('bb_settings_open', {});
+  ['appearance', 'training', 'projections', 'data'].forEach(id => {
+    const body = document.getElementById('stbody-' + id);
+    const arrow = document.getElementById('starrow-' + id);
+    if (!body) return;
+    const isOpen = !!open[id];
+    body.style.display = isOpen ? '' : 'none';
+    if (arrow) arrow.textContent = isOpen ? '▲' : '▼';
+  });
 }
 
 async function toggleUiMode() {
