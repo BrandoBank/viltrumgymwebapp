@@ -1456,6 +1456,20 @@
         </div>
       </div>
       <div class="settings-group">
+        <div class="settings-group-title">PROJECTIONS</div>
+        <div class="settings-group-desc">Show or hide the Projections section on the Weight tab.</div>
+        <div class="settings-toggle-row">
+          <button class="settings-toggle-btn" id="showProjectionsBtn" onclick="toggleShowProjections()">ON</button>
+        </div>
+        <div style="margin-top:12px">
+          <div class="settings-group-title" style="font-size:11px">CONSERVATIVE MODE</div>
+          <div class="settings-group-desc" style="margin-top:2px">Assumes 20% slower progress for a more cautious estimate.</div>
+          <div class="settings-toggle-row">
+            <button class="settings-toggle-btn" id="conservativeModeBtn" onclick="toggleConservativeMode()">OFF</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-group">
         <div class="settings-group-title">FOCUS MODE DEFAULT</div>
         <div class="settings-group-desc">Start Gym Mode in focus mode automatically — hides nav and all non-workout UI.</div>
         <button class="btn" onclick="toggleFocusModeDefault()" id="focusModeDefaultBtn">—</button>
@@ -2880,7 +2894,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -2911,9 +2925,15 @@ let state={
   runStartDate:load(SK.runStartDate,null),
   runLog:load(SK.runLog,[]),
   accentColor:load(SK.accentColor,'#B6FF3C'),
+  projSnapshot:load(SK.projSnapshot,null),
+  goalJournal:load(SK.goalJournal,''),
+  postGoalPlan:load(SK.postGoalPlan,''),
+  conservativeMode:load(SK.conservativeMode,false),
+  showProjections:load(SK.showProjections,true),
+  projNudgesSeen:load(SK.projNudgesSeen,[]),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
 async function logEvent(name, data={}) {
@@ -3032,6 +3052,12 @@ function renderSettings() {
     tlBtn.textContent = state.trainLightMode ? 'ON' : 'OFF';
     tlBtn.classList.toggle('active', state.trainLightMode);
   }
+
+  // Projections toggles
+  const spBtn = document.getElementById('showProjectionsBtn');
+  if (spBtn) { spBtn.textContent = state.showProjections ? 'ON' : 'OFF'; spBtn.classList.toggle('active', !!state.showProjections); }
+  const cmBtn = document.getElementById('conservativeModeBtn');
+  if (cmBtn) { cmBtn.textContent = state.conservativeMode ? 'ON' : 'OFF'; cmBtn.classList.toggle('active', !!state.conservativeMode); }
 
   // Usage data
   loadUsageData();
@@ -4465,42 +4491,137 @@ function updateWeightStats(){
 function renderWeightProjections() {
   const el = document.getElementById('weightProjections');
   if (!el) return;
+
+  if (!state.showProjections) {
+    el.innerHTML = `<div class="panel"><div class="panel-header"><div class="panel-title"><svg><use href="#i-target"/></svg>PROJECTIONS</div></div><div style="font-size:12px;color:var(--text-faint);padding:4px 0">Projections are hidden. Re-enable under <strong>Settings → Projections</strong>.</div></div>`;
+    return;
+  }
+
   const weights = allWeights().slice().sort((a,b) => new Date(a.date) - new Date(b.date));
-  if (weights.length < 2 || !state.goalWeight) { el.innerHTML = ''; return; }
+  if (!state.goalWeight) { el.innerHTML = ''; return; }
+  if (weights.length < 2) {
+    el.innerHTML = `<div class="panel"><div class="panel-header"><div class="panel-title"><svg><use href="#i-target"/></svg>PROJECTIONS</div></div><div style="font-size:12px;color:var(--text-faint);padding:4px 0">Log at least 2 weight entries to unlock projections.</div></div>`;
+    return;
+  }
+
   const current = weights[weights.length - 1];
   const goal = state.goalWeight;
   const losing = current.weight > goal;
+  const lbsToGoal = Math.abs(current.weight - goal);
+  const startW = state.startingWeight || weights[0].weight;
+  const lbsFromStart = Math.abs(startW - current.weight);
+  const totalJourney = Math.abs(startW - goal);
+  const pctDone = totalJourney > 0 ? Math.min(100, Math.round(lbsFromStart / totalJourney * 100)) : 0;
 
   // Rate of change
   const fourWeeksAgo = new Date(); fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
-  const fourWeeksAgoStr = fourWeeksAgo.toISOString().slice(0, 10);
-  const recent = weights.filter(w => w.date >= fourWeeksAgoStr);
+  const recent = weights.filter(w => w.date >= fourWeeksAgo.toISOString().slice(0,10));
   const ds = recent.length >= 3 ? recent : weights;
   const days = Math.max(1, Math.floor((new Date(ds[ds.length-1].date) - new Date(ds[0].date)) / 86400000));
-  const ratePerDay = (ds[ds.length-1].weight - ds[0].weight) / days;
+  const rawRatePerDay = (ds[ds.length-1].weight - ds[0].weight) / days;
+  const ratePerDay = state.conservativeMode ? rawRatePerDay * 0.8 : rawRatePerDay;
   const ratePerWeek = ratePerDay * 7;
+  const rawRPW = rawRatePerDay * 7;
   const moving = Math.abs(ratePerWeek) >= 0.1;
-  const inRightDirection = moving && (losing ? ratePerWeek < 0 : ratePerWeek > 0);
+  const inRightDir = moving && (losing ? ratePerWeek < 0 : ratePerWeek > 0);
 
-  // Goal date
-  let goalDate = null, daysToGoal = null;
-  if (inRightDirection) {
+  // Goal date + confidence range (±15%)
+  let goalDate = null, daysToGoal = null, goalDateEarly = null, goalDateLate = null;
+  if (inRightDir) {
     daysToGoal = Math.ceil((goal - current.weight) / ratePerDay);
-    if (daysToGoal > 0 && daysToGoal < 3650) { goalDate = new Date(); goalDate.setDate(goalDate.getDate() + daysToGoal); }
+    if (daysToGoal > 0 && daysToGoal < 3650) {
+      goalDate = new Date(); goalDate.setDate(goalDate.getDate() + daysToGoal);
+      goalDateEarly = new Date(); goalDateEarly.setDate(goalDateEarly.getDate() + Math.round(daysToGoal * 0.85));
+      goalDateLate = new Date(); goalDateLate.setDate(goalDateLate.getDate() + Math.round(daysToGoal * 1.15));
+    }
   }
 
-  // 30/60/90
-  const proj = [30,60,90].map(d => Math.max(80, current.weight + ratePerDay * d).toFixed(1));
+  // Snapshot drift check (Tier A)
+  const today = new Date().toISOString().slice(0,10);
+  let driftHtml = '';
+  if (state.projSnapshot && state.projSnapshot.ratePerWeek !== undefined) {
+    const prevRate = state.projSnapshot.ratePerWeek;
+    const drift = ratePerWeek - prevRate;
+    if (Math.abs(drift) >= 0.5 && moving) {
+      const faster = (losing && drift < 0) || (!losing && drift > 0);
+      driftHtml = `<div style="background:var(--bg);border:1px solid ${faster ? 'var(--lime)' : '#FB923C'}33;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:10px;color:${faster ? 'var(--lime)' : '#FB923C'};font-family:'JetBrains Mono';margin-bottom:4px">TRAJECTORY SHIFT</div>
+        <div style="font-size:12px;color:var(--text)">${faster ? 'Picking up speed' : 'Slowing down'} — pace shifted <strong style="color:${faster ? 'var(--lime)' : '#FB923C'}">${faster ? '+' : ''}${(drift > 0 ? '+' : '') + Math.abs(drift).toFixed(1)} lb/wk</strong> since your last snapshot.</div>
+      </div>`;
+    }
+    if (!state.projSnapshot.date || state.projSnapshot.date < today) {
+      state.projSnapshot = { ratePerWeek, date: today }; persist();
+    }
+  } else {
+    state.projSnapshot = { ratePerWeek, date: today }; persist();
+  }
 
-  // Milestones (nearest 10lb markers between current and goal)
+  // Health guardrails + velocity warnings (Tier A + D)
+  let guardrailHtml = '';
+  if (Math.abs(rawRPW) > 2.5) {
+    guardrailHtml = `<div style="background:#fb923c11;border:1px solid #FB923C55;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:10px;color:#FB923C;font-family:'JetBrains Mono';margin-bottom:4px">PACE CHECK</div>
+      <div style="font-size:12px;color:var(--text)">At ${Math.abs(rawRPW).toFixed(1)} lb/week you're moving fast. Above 2 lb/week increases muscle loss risk. Consider 1–1.5 lb/week for better body composition.</div>
+    </div>`;
+  } else if (Math.abs(rawRPW) > 2.0) {
+    guardrailHtml = `<div style="background:#fbbf2411;border:1px solid #FBBF2455;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:10px;color:#FBBF24;font-family:'JetBrains Mono';margin-bottom:4px">MOVING FAST</div>
+      <div style="font-size:12px;color:var(--text)">Hitting ${Math.abs(rawRPW).toFixed(1)} lb/week — great momentum. Make sure protein is high enough to protect your gains.</div>
+    </div>`;
+  }
+
+  // Plateau reframe (Tier D)
+  let plateauHtml = '';
+  if (recent.length >= 3 && moving && Math.abs(ratePerWeek) < 0.25) {
+    plateauHtml = `<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:4px">PLATEAU WINDOW</div>
+      <div style="font-size:12px;color:var(--text)">Scale is barely moving this month — totally normal. Plateaus usually break in 2–3 weeks. Your training is still compounding even when the number stalls.</div>
+    </div>`;
+  }
+
+  // Adaptive nudge (Tier D)
+  let nudgeHtml = '';
+  const daysSinceEntry = Math.floor((new Date() - new Date(current.date)) / 86400000);
+  const nudgeKey = 'weight_entry_' + current.date;
+  if (daysSinceEntry >= 5 && !(state.projNudgesSeen || []).includes(nudgeKey)) {
+    nudgeHtml = `<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px">
+      <div style="flex:1">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:3px">LOG YOUR WEIGHT</div>
+        <div style="font-size:12px;color:var(--text)">Last entry was ${daysSinceEntry} days ago. Fresh data keeps projections accurate.</div>
+      </div>
+      <button onclick="dismissProjNudge('${nudgeKey}')" style="background:transparent;border:none;color:var(--text-faint);font-size:20px;cursor:pointer;line-height:1;padding:0 6px">×</button>
+    </div>`;
+  }
+
+  // Past-self card (Tier C) — show if 30+ days of data
+  let pastSelfHtml = '';
+  const thirtyAgo = new Date(); thirtyAgo.setDate(thirtyAgo.getDate() - 30);
+  const pastEntry = weights.find(w => w.date <= thirtyAgo.toISOString().slice(0,10));
+  if (pastEntry) {
+    const delta = current.weight - pastEntry.weight;
+    const absDelta = Math.abs(delta).toFixed(1);
+    const dir = delta < 0 ? 'down' : 'up';
+    const actualDays = Math.round((new Date(current.date) - new Date(pastEntry.date)) / 86400000);
+    pastSelfHtml = `<div style="background:var(--lime)0d;border:1px solid var(--lime)33;border-radius:10px;padding:14px 16px;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--lime);font-family:'JetBrains Mono';letter-spacing:.08em;margin-bottom:5px">THE LONG GAME</div>
+      <div style="font-size:14px;color:var(--text)"><strong>${actualDays} days ago</strong> you weighed <strong>${pastEntry.weight} lb</strong>. You're <strong style="color:var(--lime)">${absDelta} lb ${dir}</strong> from that day.</div>
+    </div>`;
+  }
+
+  // 30/60/90 projections
+  const proj = [30,60,90].map(d => Math.max(80, current.weight + ratePerDay * d).toFixed(1));
+  const fmtDate = d => d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  const sign = losing ? '-' : '+';
+
+  // Milestone timeline
   const milestones = [];
-  if (inRightDirection) {
+  if (inRightDir) {
     const step = losing ? -10 : 10;
     let m = losing ? Math.floor((current.weight - 0.01) / 10) * 10 : Math.ceil((current.weight + 0.01) / 10) * 10;
     while (milestones.length < 6 && (losing ? m >= goal : m <= goal)) {
       const d2 = Math.ceil((m - current.weight) / ratePerDay);
-      const date = new Date(); date.setDate(date.getDate() + d2);
-      milestones.push({ weight: m, date, isGoal: m === goal });
+      const dt = new Date(); dt.setDate(dt.getDate() + d2);
+      milestones.push({ weight: m, date: dt, isGoal: m === goal });
       m += step;
     }
     if (goalDate && !milestones.find(x => x.weight === goal)) milestones.push({ weight: goal, date: goalDate, isGoal: true });
@@ -4513,21 +4634,15 @@ function renderWeightProjections() {
   const typicalRates = { chest:0.08, waist:0.12, hips:0.09, arm:0.03, thigh:0.06, neck:0.02 };
   let measProj = null;
   if (meas.length > 0) {
-    const latest = meas[0];
-    const lbsToGoal = Math.abs(current.weight - goal);
-    measProj = {};
+    const latest = meas[0]; measProj = {};
     if (meas.length >= 2) {
       const oldest = meas[meas.length - 1];
-      const closestOld = weights.reduce((a, b) => Math.abs(new Date(b.date) - new Date(oldest.date)) < Math.abs(new Date(a.date) - new Date(oldest.date)) ? b : a);
+      const closestOld = weights.reduce((a,b) => Math.abs(new Date(b.date)-new Date(oldest.date)) < Math.abs(new Date(a.date)-new Date(oldest.date)) ? b : a);
       const lbsChanged = Math.abs(closestOld.weight - current.weight);
       measKeys.forEach(k => {
         if (!latest[k]) return;
-        if (oldest[k] && lbsChanged > 2) {
-          const rateK = Math.abs(oldest[k] - latest[k]) / lbsChanged;
-          measProj[k] = { cur: latest[k], proj: Math.max(0, losing ? latest[k] - rateK * lbsToGoal : latest[k] + rateK * lbsToGoal).toFixed(1) };
-        } else {
-          measProj[k] = { cur: latest[k], proj: Math.max(0, losing ? latest[k] - typicalRates[k] * lbsToGoal : latest[k] + typicalRates[k] * lbsToGoal).toFixed(1) };
-        }
+        const rK = (oldest[k] && lbsChanged > 2) ? Math.abs(oldest[k] - latest[k]) / lbsChanged : typicalRates[k];
+        measProj[k] = { cur: latest[k], proj: Math.max(0, losing ? latest[k] - rK * lbsToGoal : latest[k] + rK * lbsToGoal).toFixed(1) };
       });
     } else {
       measKeys.forEach(k => {
@@ -4537,106 +4652,249 @@ function renderWeightProjections() {
     }
   }
 
-  // Strength-to-weight
+  // Strength & capability (Tier B enhanced)
   const pbs = state.personalBests || {};
   const bigLifts = [
     { key:'Bench Press', label:'BENCH' },
     { key:'Trap Bar Deadlift', label:'DEADLIFT' },
     { key:'Pulse Squats 5:1', label:'SQUAT' }
   ];
+  const progressionRates = { 'Bench Press': 2.5, 'Trap Bar Deadlift': 5, 'Pulse Squats 5:1': 5 };
   const strData = bigLifts.map(l => {
     const pr = pbs[l.key]; if (!pr || !pr.weight) return null;
-    return { ...l, w: pr.weight, nowRatio: (pr.weight / current.weight).toFixed(2), goalRatio: (pr.weight / goal).toFixed(2) };
+    const nowR = pr.weight / current.weight;
+    const goalR = pr.weight / goal;
+    const capLabel = goalR >= 2.0 ? 'Elite' : goalR >= 1.5 ? 'Advanced' : goalR >= 1.0 ? 'Solid' : 'Building';
+    const wkRate = progressionRates[l.key] || 2.5;
+    return { ...l, w: pr.weight, nowRatio: nowR.toFixed(2), goalRatio: goalR.toFixed(2), capLabel,
+      p30: Math.round(pr.weight + wkRate * 4), p60: Math.round(pr.weight + wkRate * 8), p90: Math.round(pr.weight + wkRate * 12) };
   }).filter(Boolean);
 
-  const fmtDate = d => d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-  const sign = losing ? '-' : '+';
+  // Body composition estimate (Tier B)
+  let bodyCompHtml = '';
+  if (state.startingWeight && state.startingWeight > current.weight && lbsFromStart >= 5) {
+    const fatLost = (lbsFromStart * 0.85).toFixed(1);
+    const lbmHeld = (lbsFromStart * 0.15).toFixed(1);
+    bodyCompHtml = `<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+      <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:10px">BODY COMPOSITION ESTIMATE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="background:var(--card);border-radius:8px;padding:10px">
+          <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:4px">FAT LOST EST.</div>
+          <div style="font-size:18px;font-weight:700;color:var(--lime)">${fatLost} lb</div>
+          <div style="font-size:10px;color:var(--text-faint)">~85% of lost weight</div>
+        </div>
+        <div style="background:var(--card);border-radius:8px;padding:10px">
+          <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:4px">LEAN MASS HELD</div>
+          <div style="font-size:18px;font-weight:700;color:var(--lime)">${lbmHeld} lb</div>
+          <div style="font-size:10px;color:var(--text-faint)">~15% of lost weight</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text-faint);line-height:1.5">Assumes consistent strength training. Actual split varies by diet and intensity.</div>
+    </div>`;
+  }
+
+  // What Will Pop (existing, moved into always-visible section)
+  const visFactor = {core:1.00,shoulders:0.90,chest:0.88,back:0.82,biceps:0.80,triceps:0.78,traps:0.76,quads:0.72,glutes:0.70,hamstrings:0.65,calves:0.55};
+  const vol = calculateWeeklyVolume();
+  const maxVol = Math.max(...Object.values(vol).filter(v=>v>0),1);
+  const popScores = Object.entries(visFactor).map(([muscle,vis])=>{
+    const sets = vol[muscle]||0;
+    const score = (sets/maxVol*0.55 + vis*0.45)*100;
+    const why = sets>=(maxVol*0.7)?'High volume':sets>=(maxVol*0.35)?'Moderate volume':'Low volume';
+    const visLabel = vis>=0.85?'fast reveal':vis>=0.72?'reveals with progress':'slower reveal';
+    const label = muscle==='core'?'CORE / ABS':(muscle.charAt(0).toUpperCase()+muscle.slice(1)).toUpperCase();
+    return {muscle,label,score,sets,why,visLabel};
+  }).filter(x=>x.sets>0).sort((a,b)=>b.score-a.score).slice(0,5);
+
+  // Habit identity (Tier C)
+  const sessLast30 = (state.sessionHistory||[]).filter(s=>{const d=new Date(s.date),c=new Date();c.setDate(c.getDate()-30);return d>=c;});
+  const sc = sessLast30.length;
+  const identityMsg = sc>=20 ? "You train like it's non-negotiable. That's not habit — that's identity."
+    : sc>=12 ? "You show up more often than not. That's the whole game."
+    : sc>=6 ? "You're building the habit. Every session reinforces who you're becoming."
+    : "Every session is a vote for the person you're becoming.";
+
+  // Section open state (Tier C/B expandables — collapsed by default)
+  const projSecs = load('bb_proj_sections', {});
+  const secOpen = id => !!projSecs[id];
+
+  // Beyond-goal (Tier C — only within 5 lb)
+  const nearGoal = lbsToGoal <= 5;
 
   el.innerHTML = `<div class="panel">
-    <div class="panel-header"><div class="panel-title"><svg><use href="#i-target"/></svg>PROJECTIONS</div></div>
-    ${!moving ? `<div style="font-size:12px;color:var(--text-faint);padding:8px 0">Log more weight entries to unlock projections.</div>` : `
-    <div style="font-size:11px;color:var(--text-dim);margin-bottom:16px">
-      Based on your recent pace of <strong style="color:var(--lime)">${sign}${Math.abs(ratePerWeek).toFixed(1)} lb/week</strong>${recent.length >= 3 ? ' (last 4 weeks)' : ' (all-time avg)'}
-    </div>
-    ${goalDate ? `
-    <div style="background:var(--bg);border:1px solid var(--lime)44;border-radius:10px;padding:14px 16px;margin-bottom:16px">
+    <div class="panel-header"><div class="panel-title"><svg><use href="#i-target"/></svg>PROJECTIONS${state.conservativeMode ? '<span style="font-size:9px;color:var(--text-faint);margin-left:8px;font-family:JetBrains Mono;font-weight:400">CONSERVATIVE</span>' : ''}</div></div>
+    ${!moving ? `<div style="font-size:12px;color:var(--text-faint);padding:4px 0">Log more weight entries to unlock projections.</div>` : `
+
+    ${pastSelfHtml}
+
+    ${goalDate ? `<div style="background:var(--bg);border:1px solid var(--lime)44;border-radius:10px;padding:14px 16px;margin-bottom:12px">
       <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:5px">GOAL DATE</div>
       <div style="font-size:22px;font-weight:700;color:var(--lime)">${fmtDate(goalDate)}</div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:3px">${goal} lb · ${Math.round(daysToGoal / 7)} weeks from today · ${Math.abs(current.weight - goal).toFixed(1)} lb to go</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:3px">${goal} lb · ~${Math.round(daysToGoal/7)} weeks away · ${lbsToGoal.toFixed(1)} lb to go</div>
+      <div style="font-size:10px;color:var(--text-faint);margin-top:6px;font-family:'JetBrains Mono'">RANGE: ${fmtDate(goalDateEarly)} – ${fmtDate(goalDateLate)}</div>
     </div>` : ''}
-    <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">AT THIS PACE</div>
+
+    ${totalJourney > 0 ? `<div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--text-dim)">${lbsFromStart.toFixed(1)} lb ${losing?'lost':'gained'} · <strong style="color:var(--lime)">${pctDone}%</strong> of the way there</div>
+        <div style="font-size:11px;color:var(--text-faint)">${lbsToGoal.toFixed(1)} lb to go</div>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pctDone}%;background:var(--lime);border-radius:3px;transition:width .4s"></div>
+      </div>
+    </div>` : ''}
+
+    ${driftHtml}${guardrailHtml}${plateauHtml}${nudgeHtml}
+
+    <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">AT THIS PACE · <span style="color:var(--text-dim)">${sign}${Math.abs(ratePerWeek).toFixed(1)} lb/wk${state.conservativeMode?' (conservative)':recent.length>=3?' (4-wk avg)':' (all-time avg)'}</span></div>
     <div class="grid-3" style="margin-bottom:16px">
       <div class="stat-card"><div class="stat-card-label mono">30 DAYS</div><div class="stat-card-value" style="color:var(--lime);font-size:18px">${proj[0]}</div><div class="stat-card-sub">lb</div></div>
       <div class="stat-card"><div class="stat-card-label mono">60 DAYS</div><div class="stat-card-value" style="color:var(--lime);font-size:18px">${proj[1]}</div><div class="stat-card-sub">lb</div></div>
       <div class="stat-card"><div class="stat-card-label mono">90 DAYS</div><div class="stat-card-value" style="color:var(--lime);font-size:18px">${proj[2]}</div><div class="stat-card-sub">lb</div></div>
     </div>
-    ${milestones.length > 0 ? `
-    <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">MILESTONE TIMELINE</div>
-    <div style="margin-bottom:16px">
-      ${milestones.map((m, i) => `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;${i<milestones.length-1?'border-bottom:1px solid var(--border)':''}">
-        <div style="width:8px;height:8px;border-radius:50%;background:${m.isGoal?'var(--lime)':'var(--border-lit)'};flex-shrink:0"></div>
-        <div style="flex:1;font-size:13px;font-weight:${m.isGoal?700:500};color:${m.isGoal?'var(--lime)':'var(--text)'}">${m.weight} lb${m.isGoal?' — GOAL':''}</div>
-        <div style="font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono'">${fmtDate(m.date)}</div>
+
+    ${popScores.length > 0 ? `<div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">WHAT WILL POP MOST</div>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px">
+      ${popScores.map((s,i)=>`<div style="padding:11px 14px;${i<popScores.length-1?'border-bottom:1px solid var(--border)':''}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <div style="font-size:12px;font-weight:700;color:${i===0?'var(--lime)':'var(--text)'}">${i===0?'#1 ':''}${s.label}</div>
+          <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'">${Math.round(s.score)}%</div>
+        </div>
+        <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:5px">
+          <div style="height:100%;width:${Math.round(s.score)}%;background:${['var(--lime)','#a8e063','#7db87d','var(--border-lit)','var(--border-lit)'][i]};border-radius:2px"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text-faint)">${s.why} · ${s.visLabel}</div>
       </div>`).join('')}
+    </div>
+    <div style="font-size:10px;color:var(--text-faint);line-height:1.5;margin-bottom:16px">Scored by weekly training sets × fat-loss visibility.</div>` : ''}
+
+    ${milestones.length > 0 ? `<div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:0">
+      <div onclick="projToggle('milestones')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 ${secOpen('milestones')?'10px':'0'}">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em">MILESTONE TIMELINE</div>
+        <div style="font-size:11px;color:var(--text-faint)">${secOpen('milestones')?'▲':'▼'}</div>
+      </div>
+      ${secOpen('milestones') ? `<div style="margin-bottom:12px">
+        ${milestones.map((m,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:9px 0;${i<milestones.length-1?'border-bottom:1px solid var(--border)':''}">
+          <div style="width:8px;height:8px;border-radius:50%;background:${m.isGoal?'var(--lime)':'var(--border-lit)'};flex-shrink:0"></div>
+          <div style="flex:1;font-size:13px;font-weight:${m.isGoal?700:500};color:${m.isGoal?'var(--lime)':'var(--text)'}">${m.weight} lb${m.isGoal?' — GOAL':''}</div>
+          <div style="font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono'">${fmtDate(m.date)}</div>
+        </div>`).join('')}
+      </div>` : ''}
     </div>` : ''}
-    ${measProj && Object.keys(measProj).length > 0 ? `
-    <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">MEASUREMENTS AT ${goal} LB</div>
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px">
-      ${measKeys.filter(k => measProj[k]).map((k, i, arr) => `
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 14px;${i<arr.length-1?'border-bottom:1px solid var(--border)':''}">
-        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;align-self:center">${measLabels[k]}</div>
-        <div style="font-size:12px;color:var(--text-dim);text-align:center;align-self:center">${measProj[k].cur}" →</div>
-        <div style="font-size:13px;font-weight:700;color:var(--lime);text-align:right">${measProj[k].proj}"</div>
-      </div>`).join('')}
-    </div>
-    <div style="font-size:10px;color:var(--text-faint);line-height:1.5;margin-bottom:16px">${meas.length >= 2 ? 'Projected from your personal measurement history.' : 'Estimated from typical body composition change rates. Logs more measurements over time to improve accuracy.'}</div>
-    ` : meas.length === 0 ? `
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-faint)">Log body measurements above to unlock projected measurements at ${goal} lb.</div>
-    ` : ''}
-    ${strData.length > 0 ? `
-    <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">STRENGTH-TO-WEIGHT AT ${goal} LB</div>
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px">
-      ${strData.map((l, i) => `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 14px;${i<strData.length-1?'border-bottom:1px solid var(--border)':''}">
-        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';align-self:center">${l.label}<br><span style="color:var(--text-dim)">${l.w} lb</span></div>
-        <div style="font-size:11px;color:var(--text-dim);text-align:center;align-self:center">${l.nowRatio}× now</div>
-        <div style="font-size:14px;font-weight:700;color:var(--lime);text-align:right">${l.goalRatio}×</div>
-      </div>`).join('')}
-    </div>
-    <div style="font-size:10px;color:var(--text-faint);line-height:1.5">Your lifts stay the same — but at ${goal} lb you carry them better.</div>
-    ` : ''}
-    ${(() => {
-      const visFactor = {core:1.00,shoulders:0.90,chest:0.88,back:0.82,biceps:0.80,triceps:0.78,traps:0.76,quads:0.72,glutes:0.70,hamstrings:0.65,calves:0.55};
-      const vol = calculateWeeklyVolume();
-      const maxVol = Math.max(...Object.values(vol).filter(v=>v>0),1);
-      const scores = Object.entries(visFactor).map(([muscle,vis])=>{
-        const sets = vol[muscle]||0;
-        const score = (sets/maxVol*0.55 + vis*0.45)*100;
-        const why = sets>=(maxVol*0.7)?'High training volume':sets>=(maxVol*0.35)?'Moderate training volume':'Low training volume';
-        const visLabel = vis>=0.85?'fat loss reveals fast':vis>=0.72?'reveals with progress':'slower to show';
-        const label = muscle==='core'?'CORE / ABS':(muscle.charAt(0).toUpperCase()+muscle.slice(1)).toUpperCase();
-        return {muscle,label,score,sets,why,visLabel};
-      }).filter(x=>x.sets>0).sort((a,b)=>b.score-a.score).slice(0,5);
-      if(!scores.length) return '';
-      const barCol = i=>i===0?'var(--lime)':i===1?'#a8e063':i===2?'#7db87d':'var(--border-lit)';
-      return `<div style="margin-top:16px">
-        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">WHAT WILL POP MOST</div>
+
+    ${measProj && Object.keys(measProj).length > 0 ? `<div style="border-top:1px solid var(--border);padding-top:10px">
+      <div onclick="projToggle('measurements')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 ${secOpen('measurements')?'10px':'0'}">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em">MEASUREMENTS AT ${goal} LB</div>
+        <div style="font-size:11px;color:var(--text-faint)">${secOpen('measurements')?'▲':'▼'}</div>
+      </div>
+      ${secOpen('measurements') ? `<div style="margin-bottom:12px">
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px">
-          ${scores.map((s,i)=>`<div style="padding:11px 14px;${i<scores.length-1?'border-bottom:1px solid var(--border)':''}">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-              <div style="font-size:12px;font-weight:700;color:${i===0?'var(--lime)':'var(--text)'}">${i===0?'#1 ':''}${s.label}</div>
-              <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'">${Math.round(s.score)}%</div>
-            </div>
-            <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:5px">
-              <div style="height:100%;width:${Math.round(s.score)}%;background:${barCol(i)};border-radius:2px"></div>
-            </div>
-            <div style="font-size:10px;color:var(--text-faint)">${s.why} · ${s.visLabel}</div>
+          ${measKeys.filter(k=>measProj[k]).map((k,i,arr)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 14px;${i<arr.length-1?'border-bottom:1px solid var(--border)':''}">
+            <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;align-self:center">${measLabels[k]}</div>
+            <div style="font-size:12px;color:var(--text-dim);text-align:center;align-self:center">${measProj[k].cur}" →</div>
+            <div style="font-size:13px;font-weight:700;color:var(--lime);text-align:right">${measProj[k].proj}"</div>
           </div>`).join('')}
         </div>
-        <div style="font-size:10px;color:var(--text-faint);line-height:1.5">Scored by weekly training sets × fat-loss visibility. Higher = changes faster and more visibly.</div>
-      </div>`;
-    })()}
+        <div style="font-size:10px;color:var(--text-faint);line-height:1.5">${meas.length>=2?'Projected from your personal measurement history.':'Estimated from typical rates — log more measurements to improve accuracy.'}</div>
+      </div>` : ''}
+    </div>` : meas.length===0 ? `<div style="border-top:1px solid var(--border);padding-top:10px;font-size:10px;color:var(--text-faint);padding-bottom:6px">Log body measurements to unlock projected measurements at ${goal} lb.</div>` : ''}
+
+    ${strData.length > 0 ? `<div style="border-top:1px solid var(--border);padding-top:10px">
+      <div onclick="projToggle('strength')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 ${secOpen('strength')?'10px':'0'}">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em">STRENGTH &amp; CAPABILITY</div>
+        <div style="font-size:11px;color:var(--text-faint)">${secOpen('strength')?'▲':'▼'}</div>
+      </div>
+      ${secOpen('strength') ? `<div style="margin-bottom:12px">
+        <div style="font-size:10px;color:var(--text-faint);margin-bottom:8px">STRENGTH-TO-WEIGHT AT ${goal} LB</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px">
+          ${strData.map((l,i)=>`<div style="padding:11px 14px;${i<strData.length-1?'border-bottom:1px solid var(--border)':''}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+              <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono'">${l.label} <span style="color:var(--text-dim)">${l.w} lb</span></div>
+              <div style="font-size:13px;color:var(--lime);font-weight:700">${l.goalRatio}× <span style="font-size:9px;color:var(--text-faint);font-weight:400">${l.capLabel}</span></div>
+            </div>
+            <div style="font-size:10px;color:var(--text-faint)">${l.nowRatio}× now → ${l.goalRatio}× at goal</div>
+          </div>`).join('')}
+        </div>
+        <div style="font-size:10px;color:var(--text-faint);margin-bottom:12px">Same lifts, lighter body — you carry them better at ${goal} lb.</div>
+        <div style="font-size:10px;color:var(--text-faint);margin-bottom:6px">LIFT PROJECTIONS (90 DAYS)</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:4px">
+          ${strData.map((l,i)=>`<div style="display:grid;grid-template-columns:3fr 2fr 2fr 2fr;gap:6px;padding:10px 14px;${i<strData.length-1?'border-bottom:1px solid var(--border)':''}">
+            <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';align-self:center">${l.label}</div>
+            <div style="font-size:11px;color:var(--text-dim);text-align:center;align-self:center">${l.p30}</div>
+            <div style="font-size:11px;color:var(--text-dim);text-align:center;align-self:center">${l.p60}</div>
+            <div style="font-size:14px;font-weight:700;color:var(--lime);text-align:right">${l.p90}</div>
+          </div>`).join('')}
+        </div>
+        <div style="display:grid;grid-template-columns:3fr 2fr 2fr 2fr;gap:6px;padding:0 14px;margin-bottom:8px">
+          <div></div>
+          <div style="font-size:9px;color:var(--text-faint);font-family:'JetBrains Mono';text-align:center">30D</div>
+          <div style="font-size:9px;color:var(--text-faint);font-family:'JetBrains Mono';text-align:center">60D</div>
+          <div style="font-size:9px;color:var(--lime);font-family:'JetBrains Mono';text-align:right">90D</div>
+        </div>
+        <div style="font-size:10px;color:var(--text-faint);line-height:1.5">Based on standard intermediate progression. Actual gains depend on recovery and consistency.</div>
+      </div>` : ''}
+    </div>` : ''}
+
+    ${bodyCompHtml ? `<div style="border-top:1px solid var(--border);padding-top:10px">
+      <div onclick="projToggle('bodycomp')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 ${secOpen('bodycomp')?'10px':'0'}">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em">BODY COMPOSITION</div>
+        <div style="font-size:11px;color:var(--text-faint)">${secOpen('bodycomp')?'▲':'▼'}</div>
+      </div>
+      ${secOpen('bodycomp') ? `<div style="margin-bottom:12px">${bodyCompHtml}</div>` : ''}
+    </div>` : ''}
+
+    <div style="border-top:1px solid var(--border);padding-top:10px">
+      <div onclick="projToggle('identity')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 ${secOpen('identity')?'10px':'0'}">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em">WHO YOU'RE BECOMING</div>
+        <div style="font-size:11px;color:var(--text-faint)">${secOpen('identity')?'▲':'▼'}</div>
+      </div>
+      ${secOpen('identity') ? `<div style="margin-bottom:12px">
+        <div style="background:var(--lime)0d;border:1px solid var(--lime)22;border-radius:10px;padding:14px 16px;margin-bottom:12px">
+          <div style="font-size:13px;color:var(--text);line-height:1.6;font-style:italic">"${identityMsg}"</div>
+          <div style="font-size:10px;color:var(--text-faint);margin-top:8px">${sc} sessions in the last 30 days</div>
+        </div>
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;margin-bottom:6px">WHY THIS GOAL MATTERS</div>
+        <textarea id="goalJournalInput" placeholder="Write your reason here — you'll see it every time you check projections..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;resize:vertical;min-height:70px;box-sizing:border-box;line-height:1.5" oninput="saveGoalJournal(this.value)">${state.goalJournal||''}</textarea>
+      </div>` : ''}
+    </div>
+
+    ${nearGoal ? `<div style="border-top:1px solid var(--lime)44;padding-top:10px">
+      <div onclick="projToggle('beyond')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 ${secOpen('beyond')?'10px':'0'}">
+        <div style="font-size:10px;color:var(--lime);font-family:'JetBrains Mono';letter-spacing:.1em">BEYOND THE GOAL</div>
+        <div style="font-size:11px;color:var(--text-faint)">${secOpen('beyond')?'▲':'▼'}</div>
+      </div>
+      ${secOpen('beyond') ? `<div style="margin-bottom:12px">
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">You're ${lbsToGoal.toFixed(1)} lb away. What comes after?</div>
+        <textarea id="postGoalInput" placeholder="Maintain? New goal? Bulk? Start a new challenge? Write it here..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;resize:vertical;min-height:60px;box-sizing:border-box" oninput="savePostGoalPlan(this.value)">${state.postGoalPlan||''}</textarea>
+      </div>` : ''}
+    </div>` : ''}
+
     `}
   </div>`;
+}
+
+function projToggle(id) {
+  const secs = load('bb_proj_sections', {});
+  secs[id] = !secs[id];
+  save('bb_proj_sections', secs);
+  renderWeightProjections();
+}
+function saveGoalJournal(v) { state.goalJournal = v; persist(); }
+function savePostGoalPlan(v) { state.postGoalPlan = v; persist(); }
+function dismissProjNudge(id) {
+  if (!(state.projNudgesSeen||[]).includes(id)) { state.projNudgesSeen = [...(state.projNudgesSeen||[]), id]; persist(); renderWeightProjections(); }
+}
+function toggleConservativeMode() {
+  state.conservativeMode = !state.conservativeMode; persist();
+  renderWeightProjections();
+  const btn = document.getElementById('conservativeModeBtn');
+  if (btn) btn.textContent = state.conservativeMode ? 'ON' : 'OFF';
+}
+function toggleShowProjections() {
+  state.showProjections = !state.showProjections; persist();
+  renderWeightProjections();
+  const btn = document.getElementById('showProjectionsBtn');
+  if (btn) btn.textContent = state.showProjections ? 'ON' : 'OFF';
 }
 
 /* ═════════════════ STATS TAB ═════════════════ */
