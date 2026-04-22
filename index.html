@@ -3924,11 +3924,7 @@ function renderRunCards(){
           <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
             <div style="height:100%;width:${pct}%;background:var(--lime);border-radius:2px;transition:width 0.4s"></div>
           </div>
-          <div style="font-size:10px;color:var(--text-faint);margin-top:5px">Started ${started}</div>
-          ${(() => {
-            const logged = hasLoggedRunToday();
-            return `<button onclick="${logged ? '' : 'logRunSession()'}" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:none;cursor:${logged?'default':'pointer'};font-family:'JetBrains Mono';font-size:12px;font-weight:700;letter-spacing:.08em;background:${logged?'var(--border)':'var(--lime)'};color:${logged?'var(--text-dim)':'#000'};transition:all 0.2s">${logged ? '✓ RUN LOGGED TODAY' : '+ LOG TODAY\'S RUN'}</button>`;
-          })()}
+          <div style="font-size:10px;color:var(--text-faint);margin-top:5px">Started ${started}${hasLoggedRunToday() ? ' · <span style="color:var(--lime)">run logged today</span>' : ''}</div>
         </div>`;
     }
   }
@@ -4112,12 +4108,14 @@ function markAllSetsDone(exIdx, nSets){
   // Check PR against the heaviest set in this bulk-complete
   if(bestData) detectPR(exIdx, bestData);
   state.checklist[key(state.activeDay, exIdx)] = true;
+  const _csExName=(WORKOUTS[state.activeDay]?.exercises[exIdx]||{}).name||'';
+  if(_csExName.includes('Treadmill'))logRunSession();
   haptic([60, 40, 60]);
   persist();
   renderChecklist();
 }
 
-function toggleExercise(i){const k=key(state.activeDay,i);if(state.checklist[k])delete state.checklist[k];else{state.checklist[k]=true;haptic(40);}persist();renderChecklist()}
+function toggleExercise(i){const k=key(state.activeDay,i);if(state.checklist[k])delete state.checklist[k];else{state.checklist[k]=true;haptic(40);const exName=(WORKOUTS[state.activeDay]?.exercises[i]||{}).name||'';if(exName.includes('Treadmill'))logRunSession();}persist();renderChecklist()}
 function toggleExpand(i){const k=key(state.activeDay,i);if(state.expanded[k])delete state.expanded[k];else state.expanded[k]=true;persist();renderChecklist()}
 function toggleSet(exIdx,s){
   const k=setKey(state.activeDay,exIdx,s);
@@ -4139,7 +4137,7 @@ function toggleSet(exIdx,s){
     const nS=numSets(WORKOUTS[state.activeDay].exercises[exIdx].sets);
     let all=true;
     for(let i=1;i<=nS;i++) if(!(state.setLog[setKey(state.activeDay,exIdx,i)]||{}).done) all=false;
-    if(all) state.checklist[key(state.activeDay,exIdx)]=true;
+    if(all){state.checklist[key(state.activeDay,exIdx)]=true;if(exName.includes('Treadmill'))logRunSession();}
   }
   state.setLog[k]=d;
   persist();
