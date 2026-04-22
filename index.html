@@ -1293,7 +1293,7 @@
 
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-scale"/></svg>BODYWEIGHT — JAN 2025 → NOW</div></div>
-      <div id="cycleOverlayToggleRow" style="display:none;margin-bottom:10px;display:none">
+      <div id="cycleOverlayToggleRow" style="display:none;margin-bottom:10px">
         <div style="display:flex;align-items:center;justify-content:space-between">
           <span style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em">CYCLE OVERLAY</span>
           <button class="settings-toggle-btn" id="cycleOverlayBtn" onclick="toggleCycleOverlay()">OFF</button>
@@ -1713,9 +1713,9 @@
       <div class="panel">
         <div class="panel-header st-collapse-header" onclick="settingsToggle('wellnessCycle')">
           <div class="panel-title"><svg><use href="#i-cycle"/></svg>MENSTRUAL CYCLE</div>
-          <span id="starrow-wellnessCycle" class="st-arrow">▼</span>
+          <span id="starrow-wellnessCycle" class="st-arrow">▲</span>
         </div>
-        <div id="stbody-wellnessCycle" style="display:none">
+        <div id="stbody-wellnessCycle">
           <div id="wellnessCycleContent" style="padding-top:4px"></div>
         </div>
       </div>
@@ -3353,11 +3353,11 @@ const numSets=(s)=>{const m=s.toString().match(/\d+/g);if(!m)return 1;return m.l
 function showTab(id){
   state.activeTab=id;
   logEvent('tab_viewed',{tab:id});
-  ["home","chart","workouts","checklist","weight","running","stats","warroom","tools","settings","wellness"].forEach(t=>{
+  ["home","chart","workouts","checklist","weight","running","stats","warroom","tools","settings","wellness","cycle"].forEach(t=>{
     const el=document.getElementById("tab-"+t);if(el)el.style.display=t===id?"block":"none";
   });
   // Highlight "More" nav btn when a secondary tab is active
-  const secondaryTabs=["stats","chart","running","warroom","tools","settings"];
+  const secondaryTabs=["stats","chart","running","warroom","tools","settings","cycle"];
   document.querySelectorAll(".tab, .bottom-nav-tab").forEach(btn=>{
     if(btn.dataset.tab==="more") btn.classList.toggle("active",secondaryTabs.includes(id));
     else btn.classList.toggle("active",btn.dataset.tab===id);
@@ -3460,11 +3460,12 @@ function settingsToggle(id) {
 
 function initSettingsCollapse() {
   const open = load('bb_settings_open', {});
-  ['appearance', 'training', 'projections', 'data', 'privacy'].forEach(id => {
+  const defaultOpen = {wellnessCycle: true};
+  ['appearance', 'training', 'projections', 'data', 'privacy', 'wellnessCycle'].forEach(id => {
     const body = document.getElementById('stbody-' + id);
     const arrow = document.getElementById('starrow-' + id);
     if (!body) return;
-    const isOpen = !!open[id];
+    const isOpen = id in open ? !!open[id] : !!(defaultOpen[id]);
     body.style.display = isOpen ? '' : 'none';
     if (arrow) arrow.textContent = isOpen ? '▲' : '▼';
   });
@@ -3877,6 +3878,7 @@ function renderWellnessTab() {
   // Train Light buttons
   const wb = document.getElementById('trainLightWellnessBtn');
   if (wb) { wb.textContent = state.trainLightMode ? 'ON' : 'OFF'; wb.classList.toggle('active', state.trainLightMode); }
+  initSettingsCollapse();
 }
 
 function renderEnergyChart() {
