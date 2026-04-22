@@ -1230,6 +1230,19 @@
       <button class="btn danger" id="resetBtn" onclick="resetDay()" style="display:none"><svg><use href="#i-reset"/></svg>Reset</button>
     </div>
     <div class="prog-bar-track"><div class="prog-bar-fill" id="progBarFill"></div></div>
+
+    <!-- FIRST-SESSION HINTS — shown once, dismissed by action or tap -->
+    <div id="gymHint1" style="display:none;margin:10px 0 4px;background:rgba(182,255,60,0.05);border:1px solid rgba(182,255,60,0.18);border-radius:8px;padding:11px 14px;display:none;align-items:center;gap:10px">
+      <svg width="16" height="16" fill="none" stroke="#b6ff3c" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <div style="flex:1;font-size:12px;color:#8a8a8a;line-height:1.4">Tap an exercise to expand and log your sets</div>
+      <button onclick="dismissGymHint(1)" style="background:none;border:none;color:#444;font-size:16px;cursor:pointer;padding:0;min-width:24px">✕</button>
+    </div>
+    <div id="gymHint2" style="display:none;margin:10px 0 4px;background:rgba(182,255,60,0.05);border:1px solid rgba(182,255,60,0.18);border-radius:8px;padding:11px 14px;align-items:center;gap:10px">
+      <svg width="16" height="16" fill="none" stroke="#b6ff3c" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <div style="flex:1;font-size:12px;color:#8a8a8a;line-height:1.4">Tap the circle to mark a set complete — rest timer starts automatically</div>
+      <button onclick="dismissGymHint(2)" style="background:none;border:none;color:#444;font-size:16px;cursor:pointer;padding:0;min-width:24px">✕</button>
+    </div>
+
     <div class="check-list" id="checkList"></div>
 
     <!-- COACH NOTES — quick journal per session day -->
@@ -4573,12 +4586,58 @@ function toggleSet(exIdx,s){
 function setSetField(exIdx,s,field,val){const k=setKey(state.activeDay,exIdx,s);state.setLog[k]={...(state.setLog[k]||{}),[field]:val};persist()}
 function resetDay(){WORKOUTS[state.activeDay].exercises.forEach((_,i)=>{delete state.checklist[key(state.activeDay,i)];const nS=numSets(WORKOUTS[state.activeDay].exercises[i].sets);for(let s=1;s<=nS;s++)delete state.setLog[setKey(state.activeDay,i,s)]});persist();renderChecklist()}
 
+function updateGymHints() {
+  const seen = load(SK.nudgesSeen, []);
+  const d = state.activeDay;
+  const anyExpanded = Object.keys(state.expanded).some(k => k.startsWith(d));
+  const anySetDone = Object.keys(state.setLog).some(k => k.startsWith(d) && state.setLog[k].done);
+  const h1 = document.getElementById('gymHint1');
+  const h2 = document.getElementById('gymHint2');
+
+  if (h1) {
+    const show1 = !seen.includes('first_gym_hint_1') && !anyExpanded;
+    h1.style.display = show1 ? 'flex' : 'none';
+    if (show1 && !seen.includes('first_gym_hint_1_shown')) {
+      seen.push('first_gym_hint_1_shown'); save(SK.nudgesSeen, seen);
+      logEvent('first_gym_hint_shown', {hint: 1});
+    }
+    // Auto-dismiss hint 1 when user expands an exercise
+    if (anyExpanded && !seen.includes('first_gym_hint_1')) {
+      seen.push('first_gym_hint_1'); save(SK.nudgesSeen, seen);
+      logEvent('first_gym_hint_completed', {hint: 1});
+    }
+  }
+  if (h2) {
+    const show2 = !seen.includes('first_gym_hint_2') && anyExpanded && !anySetDone;
+    h2.style.display = show2 ? 'flex' : 'none';
+    if (show2 && !seen.includes('first_gym_hint_2_shown')) {
+      seen.push('first_gym_hint_2_shown'); save(SK.nudgesSeen, seen);
+      logEvent('first_gym_hint_shown', {hint: 2});
+    }
+    // Auto-dismiss hint 2 when user marks first set done
+    if (anySetDone && !seen.includes('first_gym_hint_2')) {
+      seen.push('first_gym_hint_2'); save(SK.nudgesSeen, seen);
+      logEvent('first_gym_hint_completed', {hint: 2});
+    }
+  }
+}
+
+function dismissGymHint(n) {
+  const seen = load(SK.nudgesSeen, []);
+  const key = 'first_gym_hint_' + n;
+  if (!seen.includes(key)) { seen.push(key); save(SK.nudgesSeen, seen); }
+  const el = document.getElementById('gymHint' + n);
+  if (el) el.style.display = 'none';
+  logEvent('first_gym_hint_dismissed', {hint: n});
+}
+
 function renderChecklist(){
   renderRings();const d=state.activeDay,p=pct(d);
   document.getElementById("checkDayTitle").innerHTML=`<div class="day-title-text">${WORKOUTS[d].label}</div><div class="day-title-meta mono" id="checkDayMeta">${buildDayMeta(d)}</div>`;
   document.getElementById("resetBtn").style.display=doneCount(d)>0?"inline-flex":"none";
   document.getElementById("progBarFill").style.width=p+"%";
   renderCheckItems();
+  updateGymHints();
   loadCoachNoteForToday();
   const banner=document.getElementById("completeBanner");
   const wasComplete=banner.style.display==="block";
