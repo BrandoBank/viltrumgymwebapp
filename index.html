@@ -2434,10 +2434,10 @@ async function wizardFinish(skip=false) {
       starting_weight: isNaN(startingWeight) ? null : startingWeight,
       goal_weight: isNaN(goalWeight) ? null : goalWeight,
       height_inches: isNaN(height) ? null : height,
+      enabled_modules: wizardState.modules,
       ui_mode: 'basics'
     });
     if (error) throw error;
-    // Save modules locally — enabled_modules column may not exist yet in all deployments
     save(SK.enabledModules, wizardState.modules);
     currentProfile = { display_name: name, starting_weight: startingWeight, goal_weight: goalWeight, height_inches: height, enabled_modules: wizardState.modules, ui_mode: 'basics' };
     logEvent('onboarding_completed', {modules: wizardState.modules, program: wizardState.program});
