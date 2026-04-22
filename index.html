@@ -3924,7 +3924,13 @@ function renderRunCards(){
           <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
             <div style="height:100%;width:${pct}%;background:var(--lime);border-radius:2px;transition:width 0.4s"></div>
           </div>
-          <div style="font-size:10px;color:var(--text-faint);margin-top:5px">Started ${started}${hasLoggedRunToday() ? ' · <span style="color:var(--lime)">run logged today</span>' : ''}</div>
+          <div style="font-size:10px;color:var(--text-faint);margin-top:5px">Started ${started}</div>
+          ${(() => {
+            const logged = hasLoggedRunToday();
+            return logged
+              ? `<div style="margin-top:10px;width:100%;padding:10px;border-radius:8px;background:var(--border);font-family:'JetBrains Mono';font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--lime);text-align:center">✓ RUN LOGGED TODAY</div>`
+              : `<button onclick="logRunSession()" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-family:'JetBrains Mono';font-size:12px;font-weight:700;letter-spacing:.08em;background:transparent;color:var(--text);transition:all 0.2s">+ LOG SOLO RUN</button>`;
+          })()}
         </div>`;
     }
   }
