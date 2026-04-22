@@ -1223,6 +1223,9 @@
     <!-- WELLNESS: Train Light banner (rendered by checkTrainLightBanner) -->
     <div id="trainLightBanner" style="display:none"></div>
 
+    <!-- CYCLE: Phase note (dismissible per-day) -->
+    <div id="gymCycleNote" style="display:none"></div>
+
     <div id="gymNudgeArea"></div>
 
     <!-- Today's muscle map (collapsible) -->
@@ -1290,6 +1293,12 @@
 
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-scale"/></svg>BODYWEIGHT — JAN 2025 → NOW</div></div>
+      <div id="cycleOverlayToggleRow" style="display:none;margin-bottom:10px;display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em">CYCLE OVERLAY</span>
+          <button class="settings-toggle-btn" id="cycleOverlayBtn" onclick="toggleCycleOverlay()">OFF</button>
+        </div>
+      </div>
       <svg id="weightChart" class="svg-chart" height="260"></svg>
     </div>
 
@@ -1655,6 +1664,21 @@
       </div>
     </div>
 
+    <!-- PRIVACY — collapsible -->
+    <div class="panel">
+      <div class="panel-header st-collapse-header" onclick="settingsToggle('privacy')">
+        <div class="panel-title"><svg><use href="#i-lock"/></svg>PRIVACY</div>
+        <span id="starrow-privacy" class="st-arrow">▼</span>
+      </div>
+      <div id="stbody-privacy" style="display:none">
+        <div class="settings-group" id="privacyCycleGroup" style="margin-bottom:0">
+          <div class="settings-group-title">CYCLE TRACKING DATA</div>
+          <div class="settings-group-desc">Your cycle data syncs privately to your account only — never included in backups, never sent to analytics, never shared. Only you can access it.</div>
+          <button onclick="deleteCycleData()" style="margin-top:10px;width:100%;background:none;border:1px solid rgba(239,68,68,0.4);border-radius:8px;padding:9px 14px;color:#EF4444;font-size:11px;font-family:'JetBrains Mono';letter-spacing:.06em;cursor:pointer">DELETE ALL CYCLE DATA</button>
+        </div>
+      </div>
+    </div>
+
   </section>
 
   <!-- WELLNESS TAB -->
@@ -1684,6 +1708,19 @@
         <svg style="width:15px;height:15px"><use href="#i-warmup"/></svg>Start 15-min Mobility Flow
       </button>
     </div>
+    <!-- CYCLE section in Wellness — populated by renderWellnessCycleSection() -->
+    <div id="wellnessCycleSection" style="display:none">
+      <div class="panel">
+        <div class="panel-header st-collapse-header" onclick="settingsToggle('wellnessCycle')">
+          <div class="panel-title"><svg><use href="#i-cycle"/></svg>MENSTRUAL CYCLE</div>
+          <span id="starrow-wellnessCycle" class="st-arrow">▼</span>
+        </div>
+        <div id="stbody-wellnessCycle" style="display:none">
+          <div id="wellnessCycleContent" style="padding-top:4px"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel">
       <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:12px">COMING SOON</div>
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -2018,6 +2055,45 @@
 
       <p style="color:var(--text-faint);font-size:11px;font-style:italic">Changing exercises every week is counterproductive — you can't apply progressive overload and can't measure whether you're actually improving.</p>
     </div>
+  </div>
+</div>
+
+<!-- CYCLE SETUP MODAL -->
+<div class="modal-backdrop" id="modal-cycleSetup">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><div class="modal-title">CYCLE SETUP</div><button class="modal-close" onclick="closeModal('cycleSetup')"><svg><use href="#i-x"/></svg></button></div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:20px;line-height:1.6">BeeBuildz uses your cycle to suggest training approaches for each phase. Your data syncs privately to your account only — never shared, never in backups.</div>
+    <div class="auth-input-group">
+      <label class="auth-label">TYPICAL CYCLE LENGTH (DAYS)</label>
+      <input type="number" class="auth-input" id="setupCycleLength" min="21" max="40" value="28"/>
+      <div style="font-size:11px;color:var(--text-faint);margin-top:4px">Most cycles are 21–40 days. 28 is typical.</div>
+    </div>
+    <div class="auth-input-group">
+      <label class="auth-label">TYPICAL PERIOD DURATION (DAYS)</label>
+      <input type="number" class="auth-input" id="setupPeriodLength" min="2" max="10" value="5"/>
+    </div>
+    <div class="auth-input-group">
+      <label class="auth-label">WHEN DID YOUR LAST PERIOD START?</label>
+      <input type="date" class="auth-input" id="setupLastStart"/>
+    </div>
+    <button onclick="setupCycleSkipDate()" style="background:none;border:none;color:var(--text-faint);font-size:11px;font-family:'JetBrains Mono';letter-spacing:.06em;cursor:pointer;padding:0;margin-bottom:16px;text-decoration:underline;text-underline-offset:3px">I don't remember — I'll log my next one</button>
+    <button class="auth-btn" onclick="saveCycleSetup()">SAVE &amp; START TRACKING</button>
+  </div>
+</div>
+
+<!-- LOG PERIOD MODAL -->
+<div class="modal-backdrop" id="modal-logPeriod">
+  <div class="modal" style="max-width:340px;text-align:center">
+    <div class="modal-header"><div class="modal-title">LOG PERIOD START</div><button class="modal-close" onclick="closeModal('logPeriod')"><svg><use href="#i-x"/></svg></button></div>
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.6">When did your period start?</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+      <button class="btn primary" onclick="confirmLogPeriod(null)" style="min-height:48px;font-size:13px">TODAY</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="date" id="logPeriodDateInput" class="auth-input" style="margin:0;flex:1;text-align:left"/>
+        <button class="btn" onclick="confirmLogPeriod('pick')" style="flex-shrink:0;min-height:44px">USE DATE</button>
+      </div>
+    </div>
+    <button class="btn" onclick="closeModal('logPeriod')" style="width:100%;color:var(--text-faint)">CANCEL</button>
   </div>
 </div>
 
@@ -3202,7 +3278,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -3219,7 +3295,8 @@ let state={
   startingWeight:load(SK.startingWeight,null),
   collapsed:load(SK.collapsed,{}),
   customProgram:load(SK.customProgram,null),
-  cycleData:load(SK.cycleData,{lastPeriodStart:null,cycleLength:28,periodLength:5,history:[]}),
+  cycleData:load(SK.cycleData,{lastPeriodStart:null,cycleLength:28,periodLength:5,history:[],configured:false,gymNoteDismissed:null}),
+  showCycleOverlay:load(SK.showCycleOverlay,false),
   measurements:load(SK.measurements,[]),
   sessionHistory:load(SK.sessionHistory,[]),
   amoled:load(SK.amoled,false),
@@ -3241,7 +3318,7 @@ let state={
   projNudgesSeen:load(SK.projNudgesSeen,[]),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);save(SK.showCycleOverlay,state.showCycleOverlay);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
 async function logEvent(name, data={}) {
@@ -3288,8 +3365,8 @@ function showTab(id){
   if(id==="home")renderHome();
   if(id==="chart")drawStrengthChart();
   if(id==="workouts"){renderProgramTab();logEvent('program_tab_viewed');applyUiMode();}
-  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();applyUiMode();checkGymNudge();checkTrainLightBanner();} else {stopSessionClock();releaseWakeLock();}
-  if(id==="weight"){loadCutWeights();drawWeightChart();renderWeightHistory();updateWeightStats();renderMeasurementHistory();}
+  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();applyUiMode();checkGymNudge();checkTrainLightBanner();renderGymCycleNote();} else {stopSessionClock();releaseWakeLock();}
+  if(id==="weight"){loadCutWeights();drawWeightChart();renderWeightHistory();updateWeightStats();renderMeasurementHistory();updateCycleOverlayToggle();}
   if(id==="running"){renderRunCards();renderIncline();drawRunChart();}
   if(id==="stats"){renderStats();renderAchievements();}
   if(id==="warroom")renderWarRoom();
@@ -3383,7 +3460,7 @@ function settingsToggle(id) {
 
 function initSettingsCollapse() {
   const open = load('bb_settings_open', {});
-  ['appearance', 'training', 'projections', 'data'].forEach(id => {
+  ['appearance', 'training', 'projections', 'data', 'privacy'].forEach(id => {
     const body = document.getElementById('stbody-' + id);
     const arrow = document.getElementById('starrow-' + id);
     if (!body) return;
@@ -3443,6 +3520,10 @@ async function toggleModuleFromSettings(modId) {
   logEvent(idx >= 0 ? 'module_disabled' : 'module_enabled', {module: modId});
   applyModuleVisibility();
   renderSettings();
+  // First-time cycle enable → open setup modal
+  if (modId === 'cycle' && idx < 0 && !state.cycleData.configured) {
+    setTimeout(() => openCycleSetup(), 350);
+  }
 }
 
 async function loadUsageData() {
@@ -3834,6 +3915,7 @@ function renderEnergyChart() {
       <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#5b8fff;border-radius:2px;display:inline-block"></span>Moderate</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#ff6b35;border-radius:2px;display:inline-block"></span>Low</span>`;
   }
+  renderWellnessCycleSection();
 }
 
 /* ═════════════════ HOME LANDING ═════════════════ */
@@ -4173,6 +4255,33 @@ function drawWeightChart(){
   const goalY=yPos(state.goalWeight);html+=`<line x1="${pad.left}" y1="${goalY}" x2="${pad.left+cW}" y2="${goalY}" stroke="var(--lime)" stroke-dasharray="4 4" opacity="0.5"/><text x="${pad.left+cW-4}" y="${goalY-5}" fill="var(--lime)" font-size="9" font-family="JetBrains Mono" text-anchor="end">GOAL · ${state.goalWeight}</text>`;
   // date labels (just first, middle, last)
   [0,Math.floor(data.length/2),data.length-1].forEach(i=>{const d=data[i];const lbl=new Date(d.date).toLocaleDateString('en-US',{month:'short',year:'2-digit'});html+=`<text x="${xPos(d.date)}" y="${H-16}" fill="#666" font-size="10" font-family="JetBrains Mono" text-anchor="middle">${lbl}</text>`});
+  // cycle overlay bands
+  if(state.showCycleOverlay && hasModule('cycle') && state.cycleData && state.cycleData.configured && state.cycleData.lastPeriodStart){
+    const c=state.cycleData,cl=c.cycleLength||28,pl=c.periodLength||5,ovDay=Math.round(cl/2);
+    const cyStart=new Date(c.lastPeriodStart+'T00:00:00');
+    const ONE_DAY=86400000;
+    let bandStart=null,bandPhase=null;
+    const flushBand=(bEnd)=>{
+      if(!bandPhase||bandPhase==='unknown')return;
+      const ph=CYCLE_PHASES[bandPhase];if(!ph)return;
+      const x1=Math.max(pad.left,pad.left+((bandStart-d0)/(dL-d0))*cW);
+      const x2=Math.min(pad.left+cW,pad.left+((bEnd-d0)/(dL-d0))*cW);
+      if(x2>x1)html+=`<rect x="${x1}" y="${pad.top}" width="${x2-x1}" height="${cH}" fill="${ph.color}" opacity="0.1"/>`;
+    };
+    for(let cur=d0;cur<=dL+ONE_DAY;cur+=ONE_DAY){
+      const daysSince=Math.floor((cur-cyStart.getTime())/ONE_DAY);
+      let phase='unknown';
+      if(daysSince>=0){
+        const cd=(daysSince%cl)+1;
+        if(cd<=pl+1)phase='menstrual';
+        else if(cd<ovDay-1)phase='follicular';
+        else if(cd<=ovDay+2)phase='ovulation';
+        else phase='luteal';
+      }
+      if(phase!==bandPhase){flushBand(cur);bandPhase=phase;bandStart=cur;}
+    }
+    flushBand(dL);
+  }
   // area fill
   let areaPath=`M ${xPos(data[0].date)},${yPos(data[0].weight)}`;
   data.forEach(d=>areaPath+=` L ${xPos(d.date)},${yPos(d.weight)}`);
@@ -6480,12 +6589,13 @@ function resetAllFatigue(){state.fatigue={};persist();renderMuscleFatigue()}
 
 /* ═════════════════ CYCLE TRACKING ═════════════════ */
 const CYCLE_PHASES = {
-  menstrual:  { label:'Menstrual',  color:'#EF4444', bg:'rgba(239,68,68,0.1)',   dot:'🔴', training:'Low energy is normal. Prioritize lighter loads, mobility, or rest. Honor how your body feels.',     tip:'Lighter sessions still count — consistency matters more than intensity right now.' },
-  follicular: { label:'Follicular', color:'#22C55E', bg:'rgba(34,197,94,0.1)',  dot:'📈', training:'Energy is rising. This is a great phase for adding volume and pushing progressive overload.',         tip:'Your growth window — lean into it.' },
-  ovulation:  { label:'Ovulation',  color:'#B6FF3C', bg:'rgba(182,255,60,0.1)', dot:'⚡', training:'Peak strength and coordination. Ideal for heavy compound work and testing new maxes.',               tip:'Best time to go for PRs.' },
-  luteal:     { label:'Luteal',     color:'#F59E0B', bg:'rgba(245,158,11,0.1)', dot:'🌙', training:'Fatigue builds toward the end of this phase. Maintain consistency but scale intensity as needed.',   tip:'Consistency over intensity — protect your streak.' }
+  menstrual:  { label:'Menstrual',  color:'#EF4444', bg:'rgba(239,68,68,0.07)',  gymNote:"Your body is working hard already. Consider a lighter session or Train Light mode today.", intensityLabel:'Rest or train light' },
+  follicular: { label:'Follicular', color:'#B6FF3C', bg:'rgba(182,255,60,0.07)', gymNote:"Recovery capacity may be peaking. This may be a good time for pushing heavier compounds.", intensityLabel:'Push volume' },
+  ovulation:  { label:'Ovulation',  color:'#ffffff', bg:'rgba(255,255,255,0.05)', gymNote:"Peak strength window. If you've been building toward a PR, consider going for it today.", intensityLabel:'Max effort' },
+  luteal:     { label:'Luteal',     color:'#F59E0B', bg:'rgba(245,158,11,0.07)', gymNote:"Lower energy and higher core temp are common now. Volume over intensity may feel better — consider capping RPE at 8.", intensityLabel:'Train moderate' }
 };
 
+/* Phase calculation — ±2 day tolerance at boundaries */
 function getCycleInfo() {
   const c = state.cycleData;
   if (!c || !c.lastPeriodStart) return null;
@@ -6493,135 +6603,288 @@ function getCycleInfo() {
   const today = new Date(); today.setHours(0,0,0,0);
   const daysSince = Math.floor((today - start) / 86400000);
   if (daysSince < 0) return null;
-  const cycleDay = (daysSince % c.cycleLength) + 1;
-  const ovDay = Math.round(c.cycleLength / 2);
+  const cl = c.cycleLength || 28;
+  const pl = c.periodLength || 5;
+  const cycleDay = (daysSince % cl) + 1;
+  const ovDay = Math.round(cl / 2);
   let phase;
-  if (cycleDay <= c.periodLength) phase = 'menstrual';
-  else if (cycleDay < ovDay - 1) phase = 'follicular';
-  else if (cycleDay <= ovDay + 1) phase = 'ovulation';
-  else phase = 'luteal';
-  const daysLeft = c.cycleLength - cycleDay + 1;
-  const nextPeriod = new Date(start.getTime() + (Math.floor(daysSince / c.cycleLength) + 1) * c.cycleLength * 86400000);
-  const daysToNext = Math.ceil((nextPeriod - today) / 86400000);
-  return { phase, cycleDay, cycleLength: c.cycleLength, daysLeft, daysToNext };
+  if (cycleDay <= pl + 1)         phase = 'menstrual';
+  else if (cycleDay < ovDay - 1)  phase = 'follicular';
+  else if (cycleDay <= ovDay + 2) phase = 'ovulation';
+  else                            phase = 'luteal';
+  const cycleNum    = Math.floor(daysSince / cl);
+  const daysToNext  = Math.ceil((start.getTime() + (cycleNum + 1) * cl * 86400000 - today.getTime()) / 86400000);
+  return { phase, cycleDay, cycleLength: cl, daysToNext };
 }
 
+/* ── F1: Setup modal ── */
+function openCycleSetup() {
+  const c = state.cycleData;
+  const clInput = document.getElementById('setupCycleLength');
+  const plInput = document.getElementById('setupPeriodLength');
+  const lsInput = document.getElementById('setupLastStart');
+  if (clInput) clInput.value = c.cycleLength || 28;
+  if (plInput) plInput.value = c.periodLength || 5;
+  if (lsInput) {
+    if (c.lastPeriodStart) { lsInput.value = c.lastPeriodStart; }
+    else { const d = new Date(); d.setDate(d.getDate() - 14); lsInput.value = d.toISOString().slice(0,10); }
+  }
+  openModal('cycleSetup');
+}
+function setupCycleSkipDate() {
+  const lsInput = document.getElementById('setupLastStart');
+  if (lsInput) { lsInput.value = ''; lsInput.placeholder = 'Skipped — will track from next period'; }
+}
+function saveCycleSetup() {
+  const cl = parseInt(document.getElementById('setupCycleLength')?.value);
+  const pl = parseInt(document.getElementById('setupPeriodLength')?.value);
+  const ls = document.getElementById('setupLastStart')?.value;
+  if (!cl || cl < 21 || cl > 40) { alert('Cycle length must be 21–40 days.'); return; }
+  if (!pl || pl < 2  || pl > 10) { alert('Period duration must be 2–10 days.'); return; }
+  state.cycleData.cycleLength  = cl;
+  state.cycleData.periodLength = pl;
+  state.cycleData.configured   = true;
+  if (ls) {
+    state.cycleData.lastPeriodStart = ls;
+    if (!state.cycleData.history) state.cycleData.history = [];
+    if (!state.cycleData.history.find(h => h.start === ls)) state.cycleData.history.push({ start: ls });
+  }
+  persist(); syncToCloud();
+  closeModal('cycleSetup');
+  renderHomeCycleCard();
+  if (state.activeTab === 'cycle')    renderCycleTab();
+  if (state.activeTab === 'wellness') renderWellnessTab();
+  if (state.activeTab === 'weight')   { drawWeightChart(); updateCycleOverlayToggle(); }
+}
+
+/* ── F2: Home card — unobtrusive pill ── */
+function renderHomeCycleCard() {
+  const card = document.getElementById('homeCycleCard');
+  if (!card) return;
+  if (!hasModule('cycle')) { card.style.display = 'none'; return; }
+  card.style.display = '';
+  const info = getCycleInfo();
+  if (!info) {
+    card.innerHTML = `<div style="margin-bottom:10px"><button onclick="openCycleSetup()" style="background:none;border:1px solid var(--border);border-radius:20px;padding:6px 14px;color:var(--text-faint);font-size:11px;font-family:'JetBrains Mono';letter-spacing:.06em;cursor:pointer;display:inline-flex;align-items:center;gap:6px"><svg style="width:11px;height:11px"><use href="#i-cycle"/></svg>SET UP CYCLE TRACKING</button></div>`;
+    return;
+  }
+  const p = CYCLE_PHASES[info.phase];
+  card.innerHTML = `<div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;padding:0 2px">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="width:3px;height:34px;background:${p.color};border-radius:2px;flex-shrink:0;opacity:0.7"></div>
+      <div>
+        <div style="font-size:11px;color:${p.color};font-family:'JetBrains Mono';letter-spacing:.05em;font-weight:600">Day ${info.cycleDay} \u00b7 ${p.label}</div>
+        <div style="font-size:11px;color:var(--text-faint);margin-top:1px">${p.intensityLabel}</div>
+      </div>
+    </div>
+    <button onclick="openLogPeriodModal()" style="background:none;border:1px solid var(--border);border-radius:16px;padding:5px 11px;color:var(--text-faint);font-size:10px;font-family:'JetBrains Mono';letter-spacing:.04em;cursor:pointer">LOG</button>
+  </div>`;
+}
+
+/* ── F3: Gym mode phase note (dismissible per-day) ── */
+function renderGymCycleNote() {
+  const el = document.getElementById('gymCycleNote');
+  if (!el) return;
+  if (!hasModule('cycle')) { el.style.display = 'none'; return; }
+  const info = getCycleInfo();
+  if (!info) { el.style.display = 'none'; return; }
+  const today = new Date().toISOString().slice(0,10);
+  if (state.cycleData.gymNoteDismissed === today) { el.style.display = 'none'; return; }
+  const p = CYCLE_PHASES[info.phase];
+  el.style.display = '';
+  el.innerHTML = `<div style="margin:0 0 10px;background:${p.bg};border:1px solid ${p.color}22;border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px">
+    <div style="flex:1">
+      <div style="font-size:10px;color:${p.color};font-family:'JetBrains Mono';letter-spacing:.08em;margin-bottom:3px">${p.label.toUpperCase()} \u00b7 DAY ${info.cycleDay}</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.5">${p.gymNote}</div>
+    </div>
+    <button onclick="dismissGymCycleNote()" style="background:none;border:none;color:var(--text-faint);font-size:15px;cursor:pointer;padding:0;line-height:1;flex-shrink:0">\u2715</button>
+  </div>`;
+}
+function dismissGymCycleNote() {
+  state.cycleData.gymNoteDismissed = new Date().toISOString().slice(0,10);
+  persist();
+  const el = document.getElementById('gymCycleNote');
+  if (el) el.style.display = 'none';
+}
+
+/* ── F4: Log period modal ── */
+function openLogPeriodModal() {
+  const inp = document.getElementById('logPeriodDateInput');
+  if (inp) inp.value = new Date().toISOString().slice(0,10);
+  openModal('logPeriod');
+}
+function confirmLogPeriod(mode) {
+  let dateStr;
+  if (mode === 'pick') {
+    dateStr = document.getElementById('logPeriodDateInput')?.value;
+    if (!dateStr) { alert('Please select a date.'); return; }
+  } else {
+    dateStr = new Date().toISOString().slice(0,10);
+  }
+  const c = state.cycleData;
+  if (!c.history) c.history = [];
+  if (!c.history.find(h => h.start === dateStr)) c.history.push({ start: dateStr });
+  c.lastPeriodStart = dateStr;
+  persist(); syncToCloud();
+  closeModal('logPeriod');
+  renderHomeCycleCard();
+  if (state.activeTab === 'cycle')    renderCycleTab();
+  if (state.activeTab === 'wellness') renderWellnessTab();
+  if (state.activeTab === 'weight')   { drawWeightChart(); updateCycleOverlayToggle(); }
+}
+
+/* ── F5: Weight chart overlay helpers ── */
+function toggleCycleOverlay() {
+  state.showCycleOverlay = !state.showCycleOverlay;
+  persist();
+  updateCycleOverlayToggle();
+  drawWeightChart();
+}
+function updateCycleOverlayToggle() {
+  const row = document.getElementById('cycleOverlayToggleRow');
+  const btn = document.getElementById('cycleOverlayBtn');
+  if (!row) return;
+  const show = hasModule('cycle') && !!state.cycleData?.lastPeriodStart;
+  row.style.display = show ? '' : 'none';
+  if (btn) { btn.textContent = state.showCycleOverlay ? 'ON' : 'OFF'; btn.classList.toggle('active', !!state.showCycleOverlay); }
+}
+
+/* ── F6: Wellness tab cycle hub ── */
+function renderWellnessCycleSection() {
+  const section = document.getElementById('wellnessCycleSection');
+  if (!section) return;
+  if (!hasModule('cycle')) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  const content = document.getElementById('wellnessCycleContent');
+  if (!content) return;
+  const info = getCycleInfo();
+  const c    = state.cycleData;
+  const cl   = c.cycleLength || 28;
+  const pl   = c.periodLength || 5;
+  const ovDay = Math.round(cl / 2);
+  if (!info) {
+    content.innerHTML = `<div style="text-align:center;padding:16px 0"><div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.5">Set up your cycle to get phase-aware training guidance.</div><button class="btn primary" onclick="openCycleSetup()" style="min-height:44px">SET UP CYCLE TRACKING</button></div>`;
+    return;
+  }
+  const p = CYCLE_PHASES[info.phase];
+  let html = `<div style="background:${p.bg};border-radius:10px;padding:14px 16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:13px;font-weight:700;color:${p.color}">${p.label} Phase</div>
+      <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono'">Day ${info.cycleDay} / ${cl}</div>
+    </div>
+    <div style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:10px">${p.gymNote}</div>
+    <div style="display:flex;gap:10px">
+      <div style="flex:1;background:var(--bg);border-radius:7px;padding:8px;text-align:center"><div style="font-size:17px;font-weight:700;color:${p.color}">${info.cycleDay}</div><div style="font-size:9px;color:var(--text-faint);font-family:'JetBrains Mono';margin-top:2px">CYCLE DAY</div></div>
+      <div style="flex:1;background:var(--bg);border-radius:7px;padding:8px;text-align:center"><div style="font-size:17px;font-weight:700;color:var(--text)">${info.daysToNext}</div><div style="font-size:9px;color:var(--text-faint);font-family:'JetBrains Mono';margin-top:2px">DAYS TO NEXT</div></div>
+    </div>
+  </div>`;
+  // Calendar grid
+  if (c.lastPeriodStart) {
+    const periodStart = new Date(c.lastPeriodStart + 'T00:00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    html += `<div style="margin-bottom:16px"><div style="font-size:10px;color:var(--text-faint);letter-spacing:.1em;font-family:'JetBrains Mono';margin-bottom:8px">CURRENT CYCLE</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">`;
+    for (let d = 1; d <= cl; d++) {
+      const dayDate = new Date(periodStart.getTime() + (d-1)*86400000);
+      const isToday  = dayDate.getTime() === today.getTime();
+      const isFuture = dayDate.getTime() > today.getTime();
+      let ph;
+      if (d <= pl+1)         ph='menstrual';
+      else if (d < ovDay-1)  ph='follicular';
+      else if (d <= ovDay+2) ph='ovulation';
+      else                   ph='luteal';
+      const pp = CYCLE_PHASES[ph];
+      const bg     = isFuture ? 'transparent' : pp.bg;
+      const border = isToday  ? `2px solid ${pp.color}` : isFuture ? '1px dashed var(--border)' : '1px solid transparent';
+      const clr    = isToday  ? pp.color : isFuture ? 'var(--border)' : 'var(--text-dim)';
+      html += `<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:${bg};border:${border};border-radius:5px;font-size:10px;font-family:'JetBrains Mono';color:${clr};font-weight:${isToday?'700':'400'}">${d}</div>`;
+    }
+    html += `</div><div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">${Object.entries(CYCLE_PHASES).map(([,v])=>`<div style="display:flex;align-items:center;gap:4px"><div style="width:7px;height:7px;border-radius:2px;background:${v.color};opacity:0.65"></div><span style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'">${v.label}</span></div>`).join('')}</div></div>`;
+  }
+  // Irregular cycle warning
+  if (c.history && c.history.length >= 3) {
+    const sorted = [...c.history].sort((a,b)=>a.start.localeCompare(b.start));
+    const gaps = [];
+    for (let i=1;i<sorted.length;i++) gaps.push(Math.round((new Date(sorted[i].start+'T00:00:00')-new Date(sorted[i-1].start+'T00:00:00'))/86400000));
+    const [minG,maxG] = [Math.min(...gaps),Math.max(...gaps)];
+    if (maxG-minG > 6) html += `<div style="margin-bottom:14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text-dim);line-height:1.5">Cycles logged vary ${minG}\u2013${maxG} days. Phase predictions may be less accurate \u2014 logging consistently improves estimates over time.</div>`;
+  }
+  html += `<div style="display:flex;gap:8px;margin-bottom:16px">
+    <button class="btn" onclick="openLogPeriodModal()" style="flex:1;min-height:40px;font-size:11px;display:flex;align-items:center;justify-content:center;gap:6px"><svg style="width:12px;height:12px"><use href="#i-cycle"/></svg>Log Period</button>
+    <button class="btn" onclick="openCycleSetup()" style="flex:1;min-height:40px;font-size:11px;display:flex;align-items:center;justify-content:center;gap:6px"><svg style="width:12px;height:12px"><use href="#i-settings"/></svg>Edit Config</button>
+  </div>`;
+  html += `<div style="border-top:1px solid var(--border);padding-top:14px"><button onclick="deleteCycleData()" style="width:100%;background:none;border:1px solid rgba(239,68,68,0.35);border-radius:8px;padding:10px;color:#EF4444;font-size:11px;font-family:'JetBrains Mono';letter-spacing:.06em;cursor:pointer">FORGET ALL CYCLE DATA</button></div>`;
+  content.innerHTML = html;
+}
+
+/* ── F7: Delete cycle data (triple-confirm, clears localStorage + Supabase) ── */
+async function deleteCycleData() {
+  if (!confirm('Delete all cycle tracking data?\n\nThis removes your history, configuration, and phase data.')) return;
+  if (!confirm('Are you sure? This cannot be undone.')) return;
+  if (!confirm('Final confirmation: permanently delete all cycle data?')) return;
+  state.cycleData = { lastPeriodStart:null, cycleLength:28, periodLength:5, history:[], configured:false, gymNoteDismissed:null };
+  persist();
+  syncToCloud();
+  renderHomeCycleCard();
+  if (state.activeTab === 'wellness') renderWellnessTab();
+  if (state.activeTab === 'cycle')    renderCycleTab();
+  if (state.activeTab === 'settings') renderSettings();
+  if (state.activeTab === 'weight')   { drawWeightChart(); updateCycleOverlayToggle(); }
+}
+
+/* ── Cycle tab (quick-action view) ── */
 function renderCycleTab() {
   const c = state.cycleData;
-  // Populate settings inputs
   const clInput = document.getElementById('cycleLengthInput');
   const plInput = document.getElementById('periodLengthInput');
-  if (clInput) clInput.value = c.cycleLength;
-  if (plInput) plInput.value = c.periodLength;
-
-  // Phase card
+  if (clInput) clInput.value = c.cycleLength || 28;
+  if (plInput) plInput.value = c.periodLength || 5;
   const info = getCycleInfo();
   const phaseCard = document.getElementById('cyclePhaseCard');
   if (phaseCard) {
     if (!info) {
-      phaseCard.innerHTML = `<div class="panel" style="border-left:3px solid var(--lime)">
-        <div style="font-size:13px;color:var(--text-dim);line-height:1.6">Log your first period to start tracking your cycle and get phase-based training guidance.</div>
-      </div>`;
+      phaseCard.innerHTML = `<div class="panel" style="border-left:3px solid var(--lime)"><div style="font-size:12px;color:var(--text-dim);line-height:1.6">Log your first period below to start tracking. Phase guidance will appear here.</div></div>`;
     } else {
       const p = CYCLE_PHASES[info.phase];
       phaseCard.innerHTML = `<div class="panel" style="border-left:3px solid ${p.color};background:${p.bg}">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:11px;letter-spacing:.12em;font-family:'JetBrains Mono';color:${p.color};font-weight:700">${p.dot} ${p.label.toUpperCase()} PHASE</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;letter-spacing:.1em;font-family:'JetBrains Mono';color:${p.color};font-weight:700">${p.label.toUpperCase()} PHASE</div>
           <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono'">DAY ${info.cycleDay} / ${info.cycleLength}</div>
         </div>
-        <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px">${p.training}</div>
-        <div style="font-size:11px;color:${p.color};font-style:italic">${p.tip}</div>
-        <div style="margin-top:12px;display:flex;gap:12px">
-          <div style="flex:1;background:var(--bg);border-radius:8px;padding:10px;text-align:center">
-            <div style="font-size:18px;font-weight:700;color:${p.color}">${info.cycleDay}</div>
-            <div style="font-size:10px;color:var(--text-faint);letter-spacing:.08em;font-family:'JetBrains Mono'">CYCLE DAY</div>
-          </div>
-          <div style="flex:1;background:var(--bg);border-radius:8px;padding:10px;text-align:center">
-            <div style="font-size:18px;font-weight:700;color:var(--text)">${info.daysToNext}</div>
-            <div style="font-size:10px;color:var(--text-faint);letter-spacing:.08em;font-family:'JetBrains Mono'">DAYS TO NEXT</div>
-          </div>
+        <div style="font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:10px">${p.gymNote}</div>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;background:var(--bg);border-radius:7px;padding:9px;text-align:center"><div style="font-size:17px;font-weight:700;color:${p.color}">${info.cycleDay}</div><div style="font-size:9px;color:var(--text-faint);font-family:'JetBrains Mono';margin-top:2px">CYCLE DAY</div></div>
+          <div style="flex:1;background:var(--bg);border-radius:7px;padding:9px;text-align:center"><div style="font-size:17px;font-weight:700;color:var(--text)">${info.daysToNext}</div><div style="font-size:9px;color:var(--text-faint);font-family:'JetBrains Mono';margin-top:2px">DAYS TO NEXT</div></div>
         </div>
       </div>`;
     }
   }
-
-  // Log status
   const statusEl = document.getElementById('cycleLogStatus');
   if (statusEl && c.lastPeriodStart) {
-    const d = new Date(c.lastPeriodStart + 'T00:00:00');
-    statusEl.textContent = `Last logged: ${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+    const d = new Date(c.lastPeriodStart+'T00:00:00');
+    statusEl.textContent = 'Last logged: ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   }
-
-  // History
   const histEl = document.getElementById('cycleHistory');
   if (histEl) {
     if (!c.history || c.history.length === 0) {
       histEl.textContent = 'No periods logged yet.';
     } else {
-      histEl.innerHTML = [...c.history].reverse().slice(0, 12).map(entry => {
-        const d = new Date(entry.start + 'T00:00:00');
-        return `<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
-          <span>${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
-          <span style="color:var(--text-faint);font-family:'JetBrains Mono';font-size:11px">Period start</span>
-        </div>`;
+      histEl.innerHTML = [...c.history].reverse().slice(0,12).map(entry=>{
+        const d = new Date(entry.start+'T00:00:00');
+        return `<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span style="font-size:12px">${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span><span style="color:var(--text-faint);font-family:'JetBrains Mono';font-size:10px">PERIOD START</span></div>`;
       }).join('');
     }
   }
-
   renderHomeCycleCard();
 }
-
-function renderHomeCycleCard() {
-  const card = document.getElementById('homeCycleCard');
-  if (!card) return;
-  if (!hasModule('cycle')) { card.style.display = 'none'; return; }
-  const info = getCycleInfo();
-  card.style.display = '';
-  if (!info) {
-    card.innerHTML = `<div class="panel" style="cursor:pointer" onclick="showTab('cycle')">
-      <div style="display:flex;align-items:center;gap:10px">
-        <svg style="width:16px;height:16px;color:var(--lime)"><use href="#i-cycle"/></svg>
-        <div style="font-size:12px;color:var(--text-dim)">Tap to set up cycle tracking</div>
-      </div>
-    </div>`;
-    return;
-  }
-  const p = CYCLE_PHASES[info.phase];
-  card.innerHTML = `<div class="panel" style="border-left:3px solid ${p.color};cursor:pointer" onclick="showTab('cycle')">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:16px">${p.dot}</span>
-        <div>
-          <div style="font-size:12px;font-weight:600;color:${p.color}">${p.label} Phase · Day ${info.cycleDay}</div>
-          <div style="font-size:11px;color:var(--text-faint);margin-top:2px">${p.tip}</div>
-        </div>
-      </div>
-      <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'">CYCLE</div>
-    </div>
-  </div>`;
-}
-
-function logPeriodStart() {
-  const today = new Date().toISOString().slice(0, 10);
-  const c = state.cycleData;
-  // Add to history
-  if (!c.history) c.history = [];
-  c.history.push({ start: today });
-  c.lastPeriodStart = today;
-  state.cycleData = c;
-  persist();
-  logEvent('cycle_period_logged', { date: today });
-  renderCycleTab();
-}
-
 function saveCycleSettings() {
   const cl = parseInt(document.getElementById('cycleLengthInput')?.value);
   const pl = parseInt(document.getElementById('periodLengthInput')?.value);
   if (cl >= 21 && cl <= 40) state.cycleData.cycleLength = cl;
-  if (pl >= 2 && pl <= 10) state.cycleData.periodLength = pl;
-  persist();
-  renderCycleTab();
+  if (pl >= 2  && pl <= 10) state.cycleData.periodLength = pl;
+  persist(); renderCycleTab();
 }
+function logPeriodStart() { openLogPeriodModal(); }
+
 function renderMuscleFatigue(){
   const c=document.getElementById("muscleList");
   const levels=[["fresh","Fresh","active-fresh"],["light","Light","active-light"],["mod","Moderate","active-mod"],["heavy","Heavy","active-heavy"]];
@@ -6652,7 +6915,7 @@ function renderMoreModal(){
   if(!grid)return;
   grid.innerHTML=items.filter(i=>i.show).map(i=>`<button class="more-btn${activeTab===i.tab?' active':''}" onclick="showTab('${i.tab}');closeModal('moreTabs')"><svg><use href="#${i.icon}"/></svg>${i.label}</button>`).join('');
 }
-function openModal(id){document.getElementById("modal-"+id).classList.add("open");if(id==="plates")calcPlates();if(id==="onerm")calcOneRM();if(id==="warmup")renderWarmup();if(id==="history")renderHistory();if(id==="moreTabs")renderMoreModal();}
+function openModal(id){const el=document.getElementById("modal-"+id);if(!el)return;el.classList.add("open");if(id==="plates")calcPlates();if(id==="onerm")calcOneRM();if(id==="warmup")renderWarmup();if(id==="history")renderHistory();if(id==="moreTabs")renderMoreModal();}
 function closeModal(id){document.getElementById("modal-"+id).classList.remove("open")}
 document.querySelectorAll(".modal-backdrop").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open")}));
 
