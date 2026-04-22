@@ -844,6 +844,7 @@
     <symbol id="i-battery-low" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="18" height="10" rx="2"/><path d="M23 11v3"/><rect x="3" y="9" width="4" height="6" rx="1" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-wellness" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-cycle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M12 6v6l4 2"/></symbol>
   </defs>
 </svg>
 
@@ -1108,6 +1109,9 @@
 
     <!-- NUDGE AREA — populated by checkNudges() -->
     <div id="homeNudgeArea"></div>
+
+    <!-- CYCLE: Phase indicator (hidden for non-cycle users) -->
+    <div id="homeCycleCard" style="display:none"></div>
 
     <!-- WELLNESS: Energy check-in (hidden for non-wellness users) -->
     <div id="homeEnergyCard" style="display:none"></div>
@@ -1413,23 +1417,8 @@
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-sparkle"/></svg>AI WORKOUT BUILDER</div></div>
       <div class="war-info">
-        Build a new 5-day training block powered by Claude AI. Describe your goals, equipment, focus areas, and injuries. The AI returns a complete structured program that replaces your current one.
+        Build a new training block powered by Claude AI. Describe your goals, equipment, focus areas, and injuries. The AI returns a complete structured program that replaces your current one.
       </div>
-      <div class="war-info" style="margin-top:4px">
-        Need an API key? Get one at <code>console.anthropic.com</code> — the first $5 of credit is free. Your key is stored only in this browser.
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title"><svg><use href="#i-key"/></svg>API KEY</div>
-        <span class="war-status idle" id="apiKeyStatus">NOT SET</span>
-      </div>
-      <div class="war-input-row">
-        <input type="password" id="apiKeyInput" class="api-key-input" placeholder="sk-ant-api03-..."/>
-        <button class="btn primary" onclick="saveApiKey()"><svg><use href="#i-check"/></svg>SAVE</button>
-      </div>
-      <div class="war-info">Your key stays in your browser and is sent only to Anthropic's API directly. Never transmitted elsewhere.</div>
     </div>
 
     <div class="panel">
@@ -1461,7 +1450,7 @@
   <section id="tab-tools" class="tab-content" style="display:none">
     <div class="panel" data-advanced>
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-warroom"/></svg>ASK COACH</div></div>
-      <div style="font-size:12px;color:var(--text-faint);margin-bottom:12px;line-height:1.5">Got a question? Form, programming, recovery, pain, nutrition — ask anything. Uses your Anthropic API key from War Room.</div>
+      <div style="font-size:12px;color:var(--text-faint);margin-bottom:12px;line-height:1.5">Got a question? Form, programming, recovery, pain, nutrition — ask anything.</div>
       <textarea id="askCoachInput" placeholder="e.g., Why do I feel pain in my left shoulder when benching? Or: How do I know if I'm progressing fast enough?" style="width:100%;min-height:80px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;line-height:1.6;resize:vertical;margin-bottom:10px"></textarea>
       <button class="btn primary" onclick="askCoach()" id="askCoachBtn"><svg><use href="#i-target"/></svg>ASK COACH</button>
       <div id="askCoachAnswer" style="margin-top:14px"></div>
@@ -1652,15 +1641,6 @@
           <button class="btn" onclick="document.getElementById('importFileSettings').click()"><svg><use href="#i-arrow"/></svg>SELECT BACKUP FILE</button>
         </div>
         <div class="settings-group" data-advanced>
-          <div class="settings-group-title">ANTHROPIC API KEY</div>
-          <div class="settings-group-desc">Used by War Room and Ask Coach. Stored only in your browser — never sent to our servers.</div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <input type="password" id="settingsApiKey" class="auth-input" style="margin:0;flex:1" placeholder="sk-ant-…"/>
-            <button class="btn primary" onclick="saveApiKeyFromSettings()">SAVE</button>
-          </div>
-          <div style="font-size:11px;color:var(--text-faint);margin-top:6px" id="settingsApiKeyStatus">—</div>
-        </div>
-        <div class="settings-group" data-advanced>
           <div class="settings-group-title">MY USAGE — LAST 30 DAYS</div>
           <div style="font-size:11px;color:var(--text-faint);margin-bottom:10px">What features you actually use.</div>
           <div id="usageChart" style="min-height:60px"></div>
@@ -1709,10 +1689,6 @@
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;align-items:flex-start;gap:10px;opacity:0.55">
           <svg style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:var(--text-faint)"><use href="#i-lock"/></svg>
-          <div><div style="font-size:12px;font-weight:600;color:var(--text-dim)">Cycle Tracking</div><div style="font-size:11px;color:var(--text-faint)">Phase-aware training and energy guidance</div></div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;opacity:0.55">
-          <svg style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:var(--text-faint)"><use href="#i-lock"/></svg>
           <div><div style="font-size:12px;font-weight:600;color:var(--text-dim)">Pilates Library</div><div style="font-size:11px;color:var(--text-faint)">Guided flows and exercise sequences</div></div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:10px;opacity:0.55">
@@ -1724,6 +1700,40 @@
           <div><div style="font-size:12px;font-weight:600;color:var(--text-dim)">Hiking Log</div><div style="font-size:11px;color:var(--text-faint)">Trail sessions, elevation, and distance</div></div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- CYCLE TAB -->
+  <section id="tab-cycle" class="tab-content" style="display:none">
+    <div id="cyclePhaseCard"></div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-cycle"/></svg>LOG PERIOD</div></div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.5">Log the first day of your period to track your cycle and get phase-based training guidance.</div>
+      <button class="btn primary" onclick="logPeriodStart()" style="min-height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px"><svg style="width:15px;height:15px"><use href="#i-cycle"/></svg>PERIOD STARTED TODAY</button>
+      <div id="cycleLogStatus" style="margin-top:10px;font-size:12px;color:var(--text-faint)"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-settings"/></svg>CYCLE SETTINGS</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px">
+        <div>
+          <div style="font-size:11px;color:var(--text-faint);letter-spacing:.08em;font-family:'JetBrains Mono';margin-bottom:6px">CYCLE LENGTH (DAYS)</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="number" id="cycleLengthInput" min="21" max="40" style="width:80px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;text-align:center" oninput="saveCycleSettings()"/>
+            <span style="font-size:12px;color:var(--text-faint)">typical: 28</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-faint);letter-spacing:.08em;font-family:'JetBrains Mono';margin-bottom:6px">PERIOD LENGTH (DAYS)</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="number" id="periodLengthInput" min="2" max="10" style="width:80px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;text-align:center" oninput="saveCycleSettings()"/>
+            <span style="font-size:12px;color:var(--text-faint)">typical: 5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-history"/></svg>CYCLE HISTORY</div></div>
+      <div id="cycleHistory" style="font-size:12px;color:var(--text-faint)">No periods logged yet.</div>
     </div>
   </section>
 
@@ -2629,7 +2639,7 @@ function syncToCloud() {
     showSync('syncing');
     try {
       const blob = {};
-      Object.keys(SK).forEach(k => { if (k !== 'apiKey') blob[k] = state[k]; });
+      Object.keys(SK).forEach(k => { blob[k] = state[k]; });
       const { error } = await supa.from('bb_user_data').upsert({ user_id: currentUser.id, data: blob, updated_at: new Date().toISOString() });
       if (error) throw error;
       showSync('synced');
@@ -3192,7 +3202,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -3208,8 +3218,8 @@ let state={
   goalWeight:load(SK.goalWeight,null),
   startingWeight:load(SK.startingWeight,null),
   collapsed:load(SK.collapsed,{}),
-  apiKey:load(SK.apiKey,""),
   customProgram:load(SK.customProgram,null),
+  cycleData:load(SK.cycleData,{lastPeriodStart:null,cycleLength:28,periodLength:5,history:[]}),
   measurements:load(SK.measurements,[]),
   sessionHistory:load(SK.sessionHistory,[]),
   amoled:load(SK.amoled,false),
@@ -3231,7 +3241,7 @@ let state={
   projNudgesSeen:load(SK.projNudgesSeen,[]),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.apiKey,state.apiKey);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
 async function logEvent(name, data={}) {
@@ -3286,6 +3296,7 @@ function showTab(id){
   if(id==="tools"){renderBag();renderMuscleFatigue();}
   if(id==="settings")renderSettings();
   if(id==="wellness")renderWellnessTab();
+  if(id==="cycle")renderCycleTab();
   updateReadinessDisplay();
   updateStreakDisplay();
   // Scroll to top of content when changing tabs on mobile
@@ -3317,12 +3328,6 @@ function renderSettings() {
   if (uiLbl) uiLbl.textContent = basics ? 'BASICS MODE — tap to unlock all features' : 'ALL FEATURES — tap to simplify';
   if (uiBtn) uiBtn.classList.toggle('active', !basics);
 
-  // API key
-  const apiEl = document.getElementById('settingsApiKey');
-  const apiSt = document.getElementById('settingsApiKeyStatus');
-  if (apiEl) apiEl.value = state.apiKey ? '••••••••••••••••' : '';
-  if (apiSt) apiSt.textContent = state.apiKey ? '✓ API key saved' : 'No key saved';
-
   // Modules
   const modList = document.getElementById('settingsModuleList');
   if (modList) {
@@ -3331,6 +3336,7 @@ function renderSettings() {
       {id:'strength', label:'Strength Training', desc:'Gym Mode, Programs, PR tracking'},
       {id:'running', label:'Running', desc:'Run plan, treadmill sync, cardio tracking'},
       {id:'wellness', label:'Wellness', desc:'Energy check-ins, mobility flows, and low-capacity day tools'},
+      {id:'cycle', label:'Cycle Tracking', desc:'Phase-aware training guidance based on your menstrual cycle'},
     ];
     modList.innerHTML = allMods.map(m => {
       const on = modules.includes(m.id);
@@ -3404,15 +3410,6 @@ function toggleFocusModeDefault() {
   state.focusMode = !state.focusMode;
   persist();
   renderSettings();
-}
-
-function saveApiKeyFromSettings() {
-  const val = document.getElementById('settingsApiKey').value.trim();
-  if (!val || val.startsWith('•')) return;
-  state.apiKey = val;
-  persist();
-  const st = document.getElementById('settingsApiKeyStatus');
-  if (st) st.textContent = '✓ Saved';
 }
 
 function confirmClearData() {
@@ -3877,6 +3874,7 @@ function renderHome(){
   if(!greeting) return;
   checkNudges();
   checkHomeEnergyCard();
+  renderHomeCycleCard();
 
   const hour = new Date().getHours();
   const isNewUser = (state.sessionHistory || []).length === 0;
@@ -5604,7 +5602,6 @@ function exportData(){
     goalWeight: state.goalWeight,
     collapsed: state.collapsed,
     customProgram: state.customProgram
-    // Note: apiKey intentionally NOT exported
   };
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: "application/json" });
@@ -5993,10 +5990,6 @@ async function handlePdfUpload(event){
     alert("Please upload a PDF file");
     return;
   }
-  if(!state.apiKey){
-    document.getElementById("pdfUploadStatus").innerHTML = '<div style="color:var(--orange);background:rgba(255,217,60,0.08);border:1px solid rgba(255,217,60,0.25);padding:10px;border-radius:8px;line-height:1.5">No API key set. Go to <strong>War Room</strong> first and paste your Anthropic API key. Get one at console.anthropic.com — about $5 covers 50+ PDF parses.</div>';
-    return;
-  }
   if(!window.pdfjsLib){
     document.getElementById("pdfUploadStatus").innerHTML = '<div style="color:var(--red)">PDF library failed to load. Refresh the page and try again.</div>';
     return;
@@ -6052,13 +6045,10 @@ CRITICAL RULES:
 
     const userPrompt = `Parse this trainer's workout PDF into JSON:\n\n${fullText}`;
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("/.netlify/functions/claude", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "x-api-key": state.apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
@@ -6184,11 +6174,6 @@ async function askCoach(){
   const btn = document.getElementById("askCoachBtn");
   const question = inputEl.value.trim();
   if(!question){ answerEl.innerHTML = '<div style="color:var(--orange);font-size:12px">Type a question first.</div>'; return; }
-  if(!state.apiKey){
-    answerEl.innerHTML = '<div style="background:rgba(255,217,60,0.08);border:1px solid rgba(255,217,60,0.25);color:var(--orange);padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.5">No API key set. Go to <strong>War Room</strong> and paste your Anthropic API key first. Get one at console.anthropic.com.</div>';
-    return;
-  }
-
   logEvent('ai_coach_asked');
   btn.disabled = true;
   const oldLabel = btn.innerHTML;
@@ -6217,13 +6202,10 @@ Context about this lifter:
 - Currently active program structure: ${Object.keys(WORKOUTS).map(d=>`${d}: ${WORKOUTS[d].label}`).join("; ")}`;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("/.netlify/functions/claude", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "x-api-key": state.apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
@@ -6265,17 +6247,6 @@ const PRESETS = {
 };
 
 function renderWarRoom(){
-  // Update API key status
-  const hasKey = state.apiKey && state.apiKey.length > 20;
-  const status = document.getElementById("apiKeyStatus");
-  if(status){
-    status.textContent = hasKey ? "SAVED" : "NOT SET";
-    status.className = "war-status " + (hasKey ? "success" : "idle");
-  }
-  // Set input to masked version if key exists
-  const inp = document.getElementById("apiKeyInput");
-  if(inp && hasKey) inp.placeholder = "sk-ant-***" + state.apiKey.slice(-6);
-
   // Show current program summary
   const custom = state.customProgram ? " (Custom)" : " (Default)";
   const summary = DAYS.map(d => {
@@ -6287,24 +6258,6 @@ function renderWarRoom(){
     </div>`;
   }).join("");
   document.getElementById("currentProgSummary").innerHTML = `<div style="font-size:10px;color:var(--text-faint);margin-bottom:8px;letter-spacing:0.08em;font-family:'JetBrains Mono'">PROGRAM STATUS:${custom}</div>${summary}`;
-}
-
-function saveApiKey(){
-  const inp = document.getElementById("apiKeyInput");
-  const key = inp.value.trim();
-  if(!key){
-    setWarStatus("API key cannot be empty", "error");
-    return;
-  }
-  if(!key.startsWith("sk-ant-")){
-    setWarStatus("Anthropic API keys start with 'sk-ant-'", "error");
-    return;
-  }
-  state.apiKey = key;
-  persist();
-  inp.value = "";
-  renderWarRoom();
-  setWarStatus("API key saved — you're ready to generate workouts", "success");
 }
 
 function usePreset(id){
@@ -6319,10 +6272,6 @@ function setWarStatus(msg, type){
 }
 
 async function generateWorkout(){
-  if(!state.apiKey){
-    setWarStatus("Save your API key above first", "error");
-    return;
-  }
   const prompt = document.getElementById("warPrompt").value.trim();
   if(!prompt){
     setWarStatus("Describe what you want your workout to look like", "error");
@@ -6357,13 +6306,10 @@ Rules:
 - 9-12 exercises per day including warm-up and treadmill`;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("/.netlify/functions/claude", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "x-api-key": state.apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
@@ -6531,6 +6477,151 @@ function renderBag(){const c=document.getElementById("bagList");c.innerHTML=stat
 
 function setFatigue(muscle,level){state.fatigue[muscle]=level;persist();renderMuscleFatigue()}
 function resetAllFatigue(){state.fatigue={};persist();renderMuscleFatigue()}
+
+/* ═════════════════ CYCLE TRACKING ═════════════════ */
+const CYCLE_PHASES = {
+  menstrual:  { label:'Menstrual',  color:'#EF4444', bg:'rgba(239,68,68,0.1)',   dot:'🔴', training:'Low energy is normal. Prioritize lighter loads, mobility, or rest. Honor how your body feels.',     tip:'Lighter sessions still count — consistency matters more than intensity right now.' },
+  follicular: { label:'Follicular', color:'#22C55E', bg:'rgba(34,197,94,0.1)',  dot:'📈', training:'Energy is rising. This is a great phase for adding volume and pushing progressive overload.',         tip:'Your growth window — lean into it.' },
+  ovulation:  { label:'Ovulation',  color:'#B6FF3C', bg:'rgba(182,255,60,0.1)', dot:'⚡', training:'Peak strength and coordination. Ideal for heavy compound work and testing new maxes.',               tip:'Best time to go for PRs.' },
+  luteal:     { label:'Luteal',     color:'#F59E0B', bg:'rgba(245,158,11,0.1)', dot:'🌙', training:'Fatigue builds toward the end of this phase. Maintain consistency but scale intensity as needed.',   tip:'Consistency over intensity — protect your streak.' }
+};
+
+function getCycleInfo() {
+  const c = state.cycleData;
+  if (!c || !c.lastPeriodStart) return null;
+  const start = new Date(c.lastPeriodStart + 'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const daysSince = Math.floor((today - start) / 86400000);
+  if (daysSince < 0) return null;
+  const cycleDay = (daysSince % c.cycleLength) + 1;
+  const ovDay = Math.round(c.cycleLength / 2);
+  let phase;
+  if (cycleDay <= c.periodLength) phase = 'menstrual';
+  else if (cycleDay < ovDay - 1) phase = 'follicular';
+  else if (cycleDay <= ovDay + 1) phase = 'ovulation';
+  else phase = 'luteal';
+  const daysLeft = c.cycleLength - cycleDay + 1;
+  const nextPeriod = new Date(start.getTime() + (Math.floor(daysSince / c.cycleLength) + 1) * c.cycleLength * 86400000);
+  const daysToNext = Math.ceil((nextPeriod - today) / 86400000);
+  return { phase, cycleDay, cycleLength: c.cycleLength, daysLeft, daysToNext };
+}
+
+function renderCycleTab() {
+  const c = state.cycleData;
+  // Populate settings inputs
+  const clInput = document.getElementById('cycleLengthInput');
+  const plInput = document.getElementById('periodLengthInput');
+  if (clInput) clInput.value = c.cycleLength;
+  if (plInput) plInput.value = c.periodLength;
+
+  // Phase card
+  const info = getCycleInfo();
+  const phaseCard = document.getElementById('cyclePhaseCard');
+  if (phaseCard) {
+    if (!info) {
+      phaseCard.innerHTML = `<div class="panel" style="border-left:3px solid var(--lime)">
+        <div style="font-size:13px;color:var(--text-dim);line-height:1.6">Log your first period to start tracking your cycle and get phase-based training guidance.</div>
+      </div>`;
+    } else {
+      const p = CYCLE_PHASES[info.phase];
+      phaseCard.innerHTML = `<div class="panel" style="border-left:3px solid ${p.color};background:${p.bg}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:11px;letter-spacing:.12em;font-family:'JetBrains Mono';color:${p.color};font-weight:700">${p.dot} ${p.label.toUpperCase()} PHASE</div>
+          <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono'">DAY ${info.cycleDay} / ${info.cycleLength}</div>
+        </div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px">${p.training}</div>
+        <div style="font-size:11px;color:${p.color};font-style:italic">${p.tip}</div>
+        <div style="margin-top:12px;display:flex;gap:12px">
+          <div style="flex:1;background:var(--bg);border-radius:8px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:${p.color}">${info.cycleDay}</div>
+            <div style="font-size:10px;color:var(--text-faint);letter-spacing:.08em;font-family:'JetBrains Mono'">CYCLE DAY</div>
+          </div>
+          <div style="flex:1;background:var(--bg);border-radius:8px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:var(--text)">${info.daysToNext}</div>
+            <div style="font-size:10px;color:var(--text-faint);letter-spacing:.08em;font-family:'JetBrains Mono'">DAYS TO NEXT</div>
+          </div>
+        </div>
+      </div>`;
+    }
+  }
+
+  // Log status
+  const statusEl = document.getElementById('cycleLogStatus');
+  if (statusEl && c.lastPeriodStart) {
+    const d = new Date(c.lastPeriodStart + 'T00:00:00');
+    statusEl.textContent = `Last logged: ${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+  }
+
+  // History
+  const histEl = document.getElementById('cycleHistory');
+  if (histEl) {
+    if (!c.history || c.history.length === 0) {
+      histEl.textContent = 'No periods logged yet.';
+    } else {
+      histEl.innerHTML = [...c.history].reverse().slice(0, 12).map(entry => {
+        const d = new Date(entry.start + 'T00:00:00');
+        return `<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+          <span>${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+          <span style="color:var(--text-faint);font-family:'JetBrains Mono';font-size:11px">Period start</span>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  renderHomeCycleCard();
+}
+
+function renderHomeCycleCard() {
+  const card = document.getElementById('homeCycleCard');
+  if (!card) return;
+  if (!hasModule('cycle')) { card.style.display = 'none'; return; }
+  const info = getCycleInfo();
+  card.style.display = '';
+  if (!info) {
+    card.innerHTML = `<div class="panel" style="cursor:pointer" onclick="showTab('cycle')">
+      <div style="display:flex;align-items:center;gap:10px">
+        <svg style="width:16px;height:16px;color:var(--lime)"><use href="#i-cycle"/></svg>
+        <div style="font-size:12px;color:var(--text-dim)">Tap to set up cycle tracking</div>
+      </div>
+    </div>`;
+    return;
+  }
+  const p = CYCLE_PHASES[info.phase];
+  card.innerHTML = `<div class="panel" style="border-left:3px solid ${p.color};cursor:pointer" onclick="showTab('cycle')">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:16px">${p.dot}</span>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:${p.color}">${p.label} Phase · Day ${info.cycleDay}</div>
+          <div style="font-size:11px;color:var(--text-faint);margin-top:2px">${p.tip}</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono'">CYCLE</div>
+    </div>
+  </div>`;
+}
+
+function logPeriodStart() {
+  const today = new Date().toISOString().slice(0, 10);
+  const c = state.cycleData;
+  // Add to history
+  if (!c.history) c.history = [];
+  c.history.push({ start: today });
+  c.lastPeriodStart = today;
+  state.cycleData = c;
+  persist();
+  logEvent('cycle_period_logged', { date: today });
+  renderCycleTab();
+}
+
+function saveCycleSettings() {
+  const cl = parseInt(document.getElementById('cycleLengthInput')?.value);
+  const pl = parseInt(document.getElementById('periodLengthInput')?.value);
+  if (cl >= 21 && cl <= 40) state.cycleData.cycleLength = cl;
+  if (pl >= 2 && pl <= 10) state.cycleData.periodLength = pl;
+  persist();
+  renderCycleTab();
+}
 function renderMuscleFatigue(){
   const c=document.getElementById("muscleList");
   const levels=[["fresh","Fresh","active-fresh"],["light","Light","active-light"],["mod","Moderate","active-mod"],["heavy","Heavy","active-heavy"]];
@@ -6549,6 +6640,7 @@ function renderMoreModal(){
   const items=[
     {tab:'tools',icon:'i-tools',label:'TOOLS',show:true},
     {tab:'wellness',icon:'i-wellness',label:'WELLNESS',show:hasWellness},
+    {tab:'cycle',icon:'i-cycle',label:'CYCLE',show:modules.includes('cycle')},
     {tab:'stats',icon:'i-stats',label:'STATS',show:!basics},
     {tab:'chart',icon:'i-chart',label:'STRENGTH',show:!basics},
     {tab:'running',icon:'i-run',label:'RUN PLAN',show:hasRun},
