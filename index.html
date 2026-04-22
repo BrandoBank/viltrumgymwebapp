@@ -480,7 +480,7 @@
 
   /* ── ONBOARDING REDESIGN ── */
   #authScreen{background:#050505;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto}
-  #profileSetup{background:#050505;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto}
+  #profileSetup{background:#050505;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto;overflow-x:hidden}
   .wz-landing-view{width:100%;max-width:400px;min-height:100vh;display:flex;flex-direction:column;padding:60px 32px 48px;box-sizing:border-box}
   .wz-form-view{width:100%;max-width:400px;min-height:100vh;display:flex;flex-direction:column;padding:60px 32px 48px;box-sizing:border-box}
   .wz-hero-logo{width:min(38vw,130px);height:min(38vw,130px);display:block;animation:wz-pulse 4s ease-in-out infinite}
@@ -2192,6 +2192,7 @@ function wzTransition(hideId, showId, direction) {
 }
 
 function startWizard() {
+  hideSplash();
   document.getElementById('authScreen').style.display = 'none';
   const setup = document.getElementById('profileSetup');
   setup.style.display = 'flex';
@@ -2368,6 +2369,11 @@ function wizardBack(fromStep) {
   wizardState.step = prevStep;
   localStorage.setItem('bb_wz_step', prevStep);
   wzTransition('wz-' + fromStep, 'wz-' + prevStep, 'back');
+  // Re-validate name button when returning to step 0
+  if (prevStep === 0) {
+    const nameVal = document.getElementById('profileName')?.value || '';
+    wzCheckName(nameVal);
+  }
 }
 
 function toggleModule(mod) {
