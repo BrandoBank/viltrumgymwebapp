@@ -2185,7 +2185,14 @@ async function loadProfileAndData() {
     return;
   }
   currentProfile = profile;
-  if (!Array.isArray(currentProfile.enabled_modules)) currentProfile.enabled_modules = ['strength'];
+  if (!Array.isArray(currentProfile.enabled_modules)) {
+    // Fall back to locally-cached modules before defaulting to strength-only
+    const cached = load(SK.enabledModules, null);
+    currentProfile.enabled_modules = Array.isArray(cached) ? cached : ['strength'];
+  } else {
+    // Keep local cache in sync with what Supabase returned
+    save(SK.enabledModules, currentProfile.enabled_modules);
+  }
   if (!currentProfile.ui_mode) currentProfile.ui_mode = 'advanced'; // existing users get all features
   // Fetch user data blob
   const { data: udata } = await supa.from('bb_user_data').select('data').eq('user_id', currentUser.id).maybeSingle();
@@ -2858,7 +2865,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",apiKey:"bb_apiKey",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -3065,8 +3072,11 @@ async function toggleModuleFromSettings(modId) {
     mods.push(modId);
   }
   currentProfile.enabled_modules = mods;
+  // Always save locally so modules survive offline or failed Supabase saves
+  save(SK.enabledModules, mods);
   if (supa && currentUser) {
-    await supa.from('bb_profiles').update({enabled_modules: mods}).eq('id', currentUser.id);
+    const { error } = await supa.from('bb_profiles').update({enabled_modules: mods}).eq('id', currentUser.id);
+    if (error) console.warn('Module save to Supabase failed:', error.message);
   }
   logEvent(idx >= 0 ? 'module_disabled' : 'module_enabled', {module: modId});
   applyModuleVisibility();
