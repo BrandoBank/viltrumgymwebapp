@@ -758,6 +758,14 @@
 </head>
 <body>
 
+<!-- LOAD SPLASH — visible immediately, hidden once app shell or auth screen shows -->
+<div id="loadSplash" style="position:fixed;inset:0;background:#050505;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;pointer-events:none">
+  <svg width="64" height="64" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:wz-pulse 3s ease-in-out infinite">
+    <polygon points="20,2 26,14 38,14 28,22 32,34 20,26 8,34 12,22 2,14 14,14" fill="#b6ff3c" opacity="0.9"/>
+  </svg>
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.2em;color:#555">BEEBUILDZ</div>
+</div>
+
 <!-- ICON LIBRARY -->
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -2012,9 +2020,17 @@ function useLocalOnly() {
   location.reload();
 }
 
+function hideSplash() {
+  const s = document.getElementById('loadSplash');
+  if (!s) return;
+  s.style.transition = 'opacity 0.3s ease';
+  s.style.opacity = '0';
+  setTimeout(() => s.remove(), 320);
+}
+
 async function initSupabase() {
   if (localOnlyMode) { showAppShell(); return; }
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) { document.getElementById('setupScreen').style.display = 'flex'; return; }
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) { hideSplash(); document.getElementById('setupScreen').style.display = 'flex'; return; }
   try {
     supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const { data: { session }, error } = await supa.auth.getSession();
@@ -2023,6 +2039,7 @@ async function initSupabase() {
       currentUser = session.user;
       await loadProfileAndData();
     } else {
+      hideSplash();
       document.getElementById('authScreen').style.display = 'flex';
     }
     // Listen for auth changes
@@ -2031,6 +2048,7 @@ async function initSupabase() {
     });
   } catch (err) {
     console.error('Supabase init failed:', err);
+    hideSplash();
     alert('Failed to connect to Supabase. Check your URL and key, or use Local Only mode.\n\n' + err.message);
     document.getElementById('setupScreen').style.display = 'flex';
   }
@@ -2458,6 +2476,7 @@ function dismissIosBanner() {
 }
 
 function showAppShell() {
+  hideSplash();
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('profileSetup').style.display = 'none';
   document.getElementById('setupScreen').style.display = 'none';
