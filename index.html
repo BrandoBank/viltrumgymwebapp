@@ -1220,6 +1220,8 @@
       <div id="measHistory" style="margin-top:14px"></div>
     </div>
 
+    <div id="weightProjections"></div>
+
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-history"/></svg>RECENT ENTRIES</div></div>
       <div id="weightHistory"></div>
@@ -4442,6 +4444,154 @@ function updateWeightStats(){
   if(state.goalWeight){document.getElementById("wtGoal").textContent=state.goalWeight+" lb";}
   document.getElementById("wtToGo").textContent=toGo>0?toGo.toFixed(1)+" lb to go":"Goal hit!";
   document.getElementById("currentWeight").textContent=current.weight;
+  renderWeightProjections();
+}
+
+/* ═════════════════ WEIGHT PROJECTIONS ═════════════════ */
+function renderWeightProjections() {
+  const el = document.getElementById('weightProjections');
+  if (!el) return;
+  const weights = allWeights().slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+  if (weights.length < 2 || !state.goalWeight) { el.innerHTML = ''; return; }
+  const current = weights[weights.length - 1];
+  const goal = state.goalWeight;
+  const losing = current.weight > goal;
+
+  // Rate of change
+  const fourWeeksAgo = new Date(); fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+  const fourWeeksAgoStr = fourWeeksAgo.toISOString().slice(0, 10);
+  const recent = weights.filter(w => w.date >= fourWeeksAgoStr);
+  const ds = recent.length >= 3 ? recent : weights;
+  const days = Math.max(1, Math.floor((new Date(ds[ds.length-1].date) - new Date(ds[0].date)) / 86400000));
+  const ratePerDay = (ds[ds.length-1].weight - ds[0].weight) / days;
+  const ratePerWeek = ratePerDay * 7;
+  const moving = Math.abs(ratePerWeek) >= 0.1;
+  const inRightDirection = moving && (losing ? ratePerWeek < 0 : ratePerWeek > 0);
+
+  // Goal date
+  let goalDate = null, daysToGoal = null;
+  if (inRightDirection) {
+    daysToGoal = Math.ceil((goal - current.weight) / ratePerDay);
+    if (daysToGoal > 0 && daysToGoal < 3650) { goalDate = new Date(); goalDate.setDate(goalDate.getDate() + daysToGoal); }
+  }
+
+  // 30/60/90
+  const proj = [30,60,90].map(d => Math.max(80, current.weight + ratePerDay * d).toFixed(1));
+
+  // Milestones (nearest 10lb markers between current and goal)
+  const milestones = [];
+  if (inRightDirection) {
+    const step = losing ? -10 : 10;
+    let m = losing ? Math.floor((current.weight - 0.01) / 10) * 10 : Math.ceil((current.weight + 0.01) / 10) * 10;
+    while (milestones.length < 6 && (losing ? m >= goal : m <= goal)) {
+      const d2 = Math.ceil((m - current.weight) / ratePerDay);
+      const date = new Date(); date.setDate(date.getDate() + d2);
+      milestones.push({ weight: m, date, isGoal: m === goal });
+      m += step;
+    }
+    if (goalDate && !milestones.find(x => x.weight === goal)) milestones.push({ weight: goal, date: goalDate, isGoal: true });
+  }
+
+  // Measurement projections
+  const meas = state.measurements || [];
+  const measKeys = ['chest','waist','hips','arm','thigh','neck'];
+  const measLabels = { chest:'CHEST', waist:'WAIST', hips:'HIPS', arm:'ARMS', thigh:'THIGH', neck:'NECK' };
+  const typicalRates = { chest:0.08, waist:0.12, hips:0.09, arm:0.03, thigh:0.06, neck:0.02 };
+  let measProj = null;
+  if (meas.length > 0) {
+    const latest = meas[0];
+    const lbsToGoal = Math.abs(current.weight - goal);
+    measProj = {};
+    if (meas.length >= 2) {
+      const oldest = meas[meas.length - 1];
+      const closestOld = weights.reduce((a, b) => Math.abs(new Date(b.date) - new Date(oldest.date)) < Math.abs(new Date(a.date) - new Date(oldest.date)) ? b : a);
+      const lbsChanged = Math.abs(closestOld.weight - current.weight);
+      measKeys.forEach(k => {
+        if (!latest[k]) return;
+        if (oldest[k] && lbsChanged > 2) {
+          const rateK = Math.abs(oldest[k] - latest[k]) / lbsChanged;
+          measProj[k] = { cur: latest[k], proj: Math.max(0, losing ? latest[k] - rateK * lbsToGoal : latest[k] + rateK * lbsToGoal).toFixed(1) };
+        } else {
+          measProj[k] = { cur: latest[k], proj: Math.max(0, losing ? latest[k] - typicalRates[k] * lbsToGoal : latest[k] + typicalRates[k] * lbsToGoal).toFixed(1) };
+        }
+      });
+    } else {
+      measKeys.forEach(k => {
+        if (!latest[k]) return;
+        measProj[k] = { cur: latest[k], proj: Math.max(0, losing ? latest[k] - typicalRates[k] * lbsToGoal : latest[k] + typicalRates[k] * lbsToGoal).toFixed(1) };
+      });
+    }
+  }
+
+  // Strength-to-weight
+  const pbs = state.personalBests || {};
+  const bigLifts = [
+    { key:'Bench Press', label:'BENCH' },
+    { key:'Trap Bar Deadlift', label:'DEADLIFT' },
+    { key:'Pulse Squats 5:1', label:'SQUAT' }
+  ];
+  const strData = bigLifts.map(l => {
+    const pr = pbs[l.key]; if (!pr || !pr.weight) return null;
+    return { ...l, w: pr.weight, nowRatio: (pr.weight / current.weight).toFixed(2), goalRatio: (pr.weight / goal).toFixed(2) };
+  }).filter(Boolean);
+
+  const fmtDate = d => d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  const sign = losing ? '-' : '+';
+
+  el.innerHTML = `<div class="panel">
+    <div class="panel-header"><div class="panel-title"><svg><use href="#i-target"/></svg>PROJECTIONS</div></div>
+    ${!moving ? `<div style="font-size:12px;color:var(--text-faint);padding:8px 0">Log more weight entries to unlock projections.</div>` : `
+    <div style="font-size:11px;color:var(--text-dim);margin-bottom:16px">
+      Based on your recent pace of <strong style="color:var(--lime)">${sign}${Math.abs(ratePerWeek).toFixed(1)} lb/week</strong>${recent.length >= 3 ? ' (last 4 weeks)' : ' (all-time avg)'}
+    </div>
+    ${goalDate ? `
+    <div style="background:var(--bg);border:1px solid var(--lime)44;border-radius:10px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:5px">GOAL DATE</div>
+      <div style="font-size:22px;font-weight:700;color:var(--lime)">${fmtDate(goalDate)}</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:3px">${goal} lb · ${Math.round(daysToGoal / 7)} weeks from today · ${Math.abs(current.weight - goal).toFixed(1)} lb to go</div>
+    </div>` : ''}
+    <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">AT THIS PACE</div>
+    <div class="grid-3" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-card-label mono">30 DAYS</div><div class="stat-card-value" style="color:var(--lime);font-size:18px">${proj[0]}</div><div class="stat-card-sub">lb</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">60 DAYS</div><div class="stat-card-value" style="color:var(--lime);font-size:18px">${proj[1]}</div><div class="stat-card-sub">lb</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">90 DAYS</div><div class="stat-card-value" style="color:var(--lime);font-size:18px">${proj[2]}</div><div class="stat-card-sub">lb</div></div>
+    </div>
+    ${milestones.length > 0 ? `
+    <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">MILESTONE TIMELINE</div>
+    <div style="margin-bottom:16px">
+      ${milestones.map((m, i) => `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;${i<milestones.length-1?'border-bottom:1px solid var(--border)':''}">
+        <div style="width:8px;height:8px;border-radius:50%;background:${m.isGoal?'var(--lime)':'var(--border-lit)'};flex-shrink:0"></div>
+        <div style="flex:1;font-size:13px;font-weight:${m.isGoal?700:500};color:${m.isGoal?'var(--lime)':'var(--text)'}">${m.weight} lb${m.isGoal?' — GOAL':''}</div>
+        <div style="font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono'">${fmtDate(m.date)}</div>
+      </div>`).join('')}
+    </div>` : ''}
+    ${measProj && Object.keys(measProj).length > 0 ? `
+    <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">MEASUREMENTS AT ${goal} LB</div>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px">
+      ${measKeys.filter(k => measProj[k]).map((k, i, arr) => `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 14px;${i<arr.length-1?'border-bottom:1px solid var(--border)':''}">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;align-self:center">${measLabels[k]}</div>
+        <div style="font-size:12px;color:var(--text-dim);text-align:center;align-self:center">${measProj[k].cur}" →</div>
+        <div style="font-size:13px;font-weight:700;color:var(--lime);text-align:right">${measProj[k].proj}"</div>
+      </div>`).join('')}
+    </div>
+    <div style="font-size:10px;color:var(--text-faint);line-height:1.5;margin-bottom:16px">${meas.length >= 2 ? 'Projected from your personal measurement history.' : 'Estimated from typical body composition change rates. Logs more measurements over time to improve accuracy.'}</div>
+    ` : meas.length === 0 ? `
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-faint)">Log body measurements above to unlock projected measurements at ${goal} lb.</div>
+    ` : ''}
+    ${strData.length > 0 ? `
+    <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:8px">STRENGTH-TO-WEIGHT AT ${goal} LB</div>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px">
+      ${strData.map((l, i) => `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 14px;${i<strData.length-1?'border-bottom:1px solid var(--border)':''}">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';align-self:center">${l.label}<br><span style="color:var(--text-dim)">${l.w} lb</span></div>
+        <div style="font-size:11px;color:var(--text-dim);text-align:center;align-self:center">${l.nowRatio}× now</div>
+        <div style="font-size:14px;font-weight:700;color:var(--lime);text-align:right">${l.goalRatio}×</div>
+      </div>`).join('')}
+    </div>
+    <div style="font-size:10px;color:var(--text-faint);line-height:1.5">Your lifts stay the same — but at ${goal} lb you carry them better.</div>
+    ` : ''}
+    `}
+  </div>`;
 }
 
 /* ═════════════════ STATS TAB ═════════════════ */
