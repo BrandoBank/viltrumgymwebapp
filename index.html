@@ -1012,7 +1012,7 @@
   <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end;position:relative">
     <div class="header-stat" style="text-align:right">
       <div class="header-stat-label mono">WEIGHT</div>
-      <div class="header-stat-val"><strong id="currentWeight">243</strong> lb</div>
+      <div class="header-stat-val"><strong id="currentWeight">—</strong> lb</div>
     </div>
     <button class="user-menu-btn" id="userMenuBtn" onclick="toggleUserMenu()">
       <div class="user-avatar" id="userAvatar">?</div>
@@ -1480,6 +1480,7 @@
         <div class="panel-header"><div class="panel-title"><svg><use href="#i-body"/></svg>MUSCLE FATIGUE</div></div>
         <div style="font-size:11px;color:var(--text-faint);margin-bottom:12px;line-height:1.5">Tap a level for each muscle group based on how it feels today. The readiness score uses this.</div>
         <div id="muscleList"></div>
+        <button class="btn" style="margin-top:12px;width:100%" onclick="resetAllFatigue()">Reset All to Fresh</button>
       </div>
     </div>
 
@@ -1537,7 +1538,7 @@
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn" onclick="openModal('editProfile')"><svg><use href="#i-edit"/></svg>Edit Profile</button>
+        <button class="btn" onclick="openModal('profileEdit')"><svg><use href="#i-edit"/></svg>Edit Profile</button>
         <button class="btn" onclick="signOut()"><svg><use href="#i-x"/></svg>Sign Out</button>
       </div>
     </div>
@@ -1944,7 +1945,7 @@
 
     <div class="auth-input-group">
       <label class="auth-label">SAVE CURRENT PROGRAM AS</label>
-      <input type="text" class="auth-input" id="newProgramName" placeholder="e.g., El Camino Block 1"/>
+      <input type="text" class="auth-input" id="newProgramName" placeholder="e.g., My Program Block 1"/>
     </div>
     <button class="auth-btn" onclick="saveCurrentAsProgram()">SAVE CURRENT WORKOUT AS NEW PROGRAM</button>
   </div>
@@ -1957,7 +1958,7 @@
     <div id="pdfParseSummary" style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px"></div>
     <div class="auth-input-group">
       <label class="auth-label">PROGRAM NAME</label>
-      <input type="text" class="auth-input" id="pdfProgramName" placeholder="e.g., El Camino April Wks 1-2"/>
+      <input type="text" class="auth-input" id="pdfProgramName" placeholder="e.g., My Program Apr Wks 1-2"/>
     </div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;font-size:12px;color:var(--text-dim)">
       <input type="checkbox" id="pdfActivateNow" checked style="width:16px;height:16px;accent-color:var(--lime)"/>
@@ -2843,7 +2844,7 @@ function renderProgramTab() {
       </div>
       <div style="border-top:1px solid var(--border);padding-top:14px">
         <label style="display:block;font-size:10px;color:var(--text-faint);letter-spacing:0.12em;font-family:'JetBrains Mono';font-weight:600;margin-bottom:6px">SAVE CURRENT PROGRAM AS</label>
-        <input type="text" class="auth-input" id="newProgramName" placeholder="e.g., El Camino Block 1" style="margin-bottom:10px"/>
+        <input type="text" class="auth-input" id="newProgramName" placeholder="e.g., My Program Block 1" style="margin-bottom:10px"/>
         <button class="btn" style="min-height:44px;width:100%" onclick="saveCurrentAsProgram()">+ SAVE CURRENT AS TEMPLATE</button>
       </div>
     </div>`;
@@ -3259,7 +3260,7 @@ const isDone=(d,i)=>!!state.checklist[key(d,i)];
 const doneCount=(d)=>WORKOUTS[d].exercises.filter((_,i)=>isDone(d,i)).length;
 const totalCount=(d)=>WORKOUTS[d].exercises.length;
 const pct=(d)=>Math.round(doneCount(d)/totalCount(d)*100);
-const numSets=(s)=>{const m=s.toString().match(/\d+/g);return m?m.length:parseInt(s)||1};
+const numSets=(s)=>{const m=s.toString().match(/\d+/g);if(!m)return 1;return m.length>1?m.length:parseInt(m[0])||1};
 
 /* ═════════════════ TAB SWITCHING ═════════════════ */
 function showTab(id){
@@ -4473,7 +4474,7 @@ function renderCheckItems(){
         <div class="detail-section"><div class="detail-section-title mono"><svg><use href="#i-check"/></svg>FORM CUES</div><div class="cue-list">${lib.cues.map(c=>`<div class="cue"><span class="cue-dot">→</span><span class="cue-text">${c}</span></div>`).join("")}</div></div>
         <div class="detail-section"><div class="detail-section-title mono"><svg><use href="#i-warning"/></svg>COMMON MISTAKES</div><div class="cue-list">${lib.mistakes.map(m=>`<div class="mistake"><svg><use href="#i-warning"/></svg><span class="mistake-text">${m}</span></div>`).join("")}</div></div>
         <div class="detail-section"><a class="video-link" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nameCleaned+' proper form')}"><svg style="width:12px;height:12px;stroke-width:2" fill="none" stroke="currentColor"><use href="#i-play"/></svg>WATCH FORM DEMO</a></div>
-        ${nSets>1&&ex.weight!=="—"?renderSetLog(i,nSets):""}
+        ${nSets>1?renderSetLog(i,nSets):""}
       </div>`;
     wrap.querySelector(".checkbox").addEventListener("click",e=>{e.stopPropagation();toggleExercise(i)});
     wrap.querySelectorAll('[data-expand]').forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();toggleExpand(i)}));
@@ -4521,7 +4522,7 @@ function parseProgramDefaults(ex, setNum){
   return {
     weight: isNaN(weightNum) ? null : weightNum,
     reps: isNaN(repsNum) ? null : repsNum,
-    weightPlaceholder: defaultWeight || 'lb',
+    weightPlaceholder: (defaultWeight && defaultWeight !== '—') ? defaultWeight : 'lb',
     repsPlaceholder: defaultReps || 'reps'
   };
 }
@@ -4942,7 +4943,7 @@ function renderWeightProjections() {
   }
 
   const weights = allWeights().slice().sort((a,b) => new Date(a.date) - new Date(b.date));
-  if (!state.goalWeight) { el.innerHTML = ''; return; }
+  if (!state.goalWeight) { el.innerHTML = `<div class="panel"><div class="panel-header"><div class="panel-title"><svg><use href="#i-target"/></svg>PROJECTIONS</div></div><div style="font-size:12px;color:var(--text-faint);padding:4px 0">Set a goal weight to unlock projections. Go to <strong>Settings → Edit Profile</strong>.</div></div>`; return; }
   if (weights.length < 2) {
     el.innerHTML = `<div class="panel"><div class="panel-header"><div class="panel-title"><svg><use href="#i-target"/></svg>PROJECTIONS</div></div><div style="font-size:12px;color:var(--text-faint);padding:4px 0">Log at least 2 weight entries to unlock projections.</div></div>`;
     return;
@@ -6421,77 +6422,77 @@ refreshDays(); // seed DAYS now that WORKOUTS is defined
 const PROGRAM_TEMPLATES = {
   ppl: {
     Monday:{label:"PUSH A — Chest & Triceps",muscleGroups:["chest","shoulders","triceps"],exercises:[
-      {name:"Barbell Bench Press",sets:"4",reps:"8/8/8/8",weight:"135/155/165/165lb",note:"Control the descent"},
-      {name:"Overhead Press",sets:"3",reps:"8/8/8",weight:"85/95/95lb",note:"Full lockout at top"},
-      {name:"Incline DB Press",sets:"3",reps:"10/10/10",weight:"60/65/65lb",note:""},
-      {name:"Cable Lateral Raise",sets:"3",reps:"15/15/15",weight:"15/15/15lb",note:"Slight forward lean"},
-      {name:"Tricep Pushdown",sets:"3",reps:"12/12/12",weight:"50/55/55lb",note:"Elbows pinned to sides"}
+      {name:"Barbell Bench Press",sets:"4",reps:"8/8/8/8",weight:"—",note:"Control the descent"},
+      {name:"Overhead Press",sets:"3",reps:"8/8/8",weight:"—",note:"Full lockout at top"},
+      {name:"Incline DB Press",sets:"3",reps:"10/10/10",weight:"—",note:""},
+      {name:"Cable Lateral Raise",sets:"3",reps:"15/15/15",weight:"—",note:"Slight forward lean"},
+      {name:"Tricep Pushdown",sets:"3",reps:"12/12/12",weight:"—",note:"Elbows pinned to sides"}
     ]},
     Tuesday:{label:"PULL A — Back & Biceps",muscleGroups:["back","biceps","shoulders"],exercises:[
-      {name:"Lat Pulldown",sets:"4",reps:"10/10/10/10",weight:"120/130/140/140lb",note:"Pull to upper chest"},
-      {name:"Seated Cable Row",sets:"3",reps:"10/10/10",weight:"130/140/140lb",note:"Full stretch at start"},
-      {name:"Face Pulls",sets:"3",reps:"15/15/15",weight:"40/45/45lb",note:"External rotation"},
-      {name:"Barbell Curl",sets:"3",reps:"10/10/10",weight:"65/70/70lb",note:""},
-      {name:"Hammer Curl",sets:"2",reps:"12/12",weight:"30/30lb",note:""}
+      {name:"Lat Pulldown",sets:"4",reps:"10/10/10/10",weight:"—",note:"Pull to upper chest"},
+      {name:"Seated Cable Row",sets:"3",reps:"10/10/10",weight:"—",note:"Full stretch at start"},
+      {name:"Face Pulls",sets:"3",reps:"15/15/15",weight:"—",note:"External rotation"},
+      {name:"Barbell Curl",sets:"3",reps:"10/10/10",weight:"—",note:""},
+      {name:"Hammer Curl",sets:"2",reps:"12/12",weight:"—",note:""}
     ]},
     Wednesday:{label:"LEGS A — Quad Focus",muscleGroups:["quads","glutes","calves","core"],exercises:[
-      {name:"Back Squat",sets:"4",reps:"6/6/6/6",weight:"155/175/185/185lb",note:"Depth below parallel"},
-      {name:"Leg Press",sets:"3",reps:"12/12/12",weight:"270/300/300lb",note:"Full range of motion"},
-      {name:"Walking Lunges",sets:"3",reps:"12/12/12",weight:"40/40/40lb",note:"DB each hand"},
-      {name:"Leg Extension",sets:"3",reps:"15/15/15",weight:"100/110/110lb",note:"Pause at top"},
+      {name:"Back Squat",sets:"4",reps:"6/6/6/6",weight:"—",note:"Depth below parallel"},
+      {name:"Leg Press",sets:"3",reps:"12/12/12",weight:"—",note:"Full range of motion"},
+      {name:"Walking Lunges",sets:"3",reps:"12/12/12",weight:"—",note:"DB each hand"},
+      {name:"Leg Extension",sets:"3",reps:"15/15/15",weight:"—",note:"Pause at top"},
       {name:"Standing Calf Raise",sets:"4",reps:"15/15/15/15",weight:"BW/BW/BW/BW",note:"Full range, slow descent"}
     ]},
     Thursday:{label:"PUSH B — Shoulders & Volume",muscleGroups:["shoulders","chest","triceps"],exercises:[
-      {name:"Overhead Press",sets:"4",reps:"6/6/6/6",weight:"95/105/110/110lb",note:"Strict press"},
-      {name:"DB Bench Press",sets:"4",reps:"10/10/10/10",weight:"65/70/75/75lb",note:""},
-      {name:"Arnold Press",sets:"3",reps:"12/12/12",weight:"35/40/40lb",note:"Full rotation"},
-      {name:"Cable Lateral Raise",sets:"4",reps:"15/15/15/15",weight:"15/15/15/15lb",note:"Drop set on last"},
-      {name:"Skull Crushers",sets:"3",reps:"12/12/12",weight:"65/70/70lb",note:"EZ bar"}
+      {name:"Overhead Press",sets:"4",reps:"6/6/6/6",weight:"—",note:"Strict press"},
+      {name:"DB Bench Press",sets:"4",reps:"10/10/10/10",weight:"—",note:""},
+      {name:"Arnold Press",sets:"3",reps:"12/12/12",weight:"—",note:"Full rotation"},
+      {name:"Cable Lateral Raise",sets:"4",reps:"15/15/15/15",weight:"—",note:"Drop set on last"},
+      {name:"Skull Crushers",sets:"3",reps:"12/12/12",weight:"—",note:"EZ bar"}
     ]},
     Friday:{label:"PULL B — Deadlift Focus",muscleGroups:["back","hamstrings","biceps","traps"],exercises:[
-      {name:"Conventional Deadlift",sets:"4",reps:"5/5/5/5",weight:"185/205/225/225lb",note:"Drive the floor away"},
+      {name:"Conventional Deadlift",sets:"4",reps:"5/5/5/5",weight:"—",note:"Drive the floor away"},
       {name:"Pull-ups",sets:"3",reps:"6/6/6",weight:"BW/BW/BW",note:"Full hang, chin over bar"},
-      {name:"T-Bar Row",sets:"3",reps:"10/10/10",weight:"90/100/100lb",note:"Chest-supported if available"},
-      {name:"Incline DB Curl",sets:"3",reps:"12/12/12",weight:"25/27.5/27.5lb",note:"Full stretch at bottom"},
-      {name:"Cable Face Pull",sets:"2",reps:"15/15",weight:"40/40lb",note:""}
+      {name:"T-Bar Row",sets:"3",reps:"10/10/10",weight:"—",note:"Chest-supported if available"},
+      {name:"Incline DB Curl",sets:"3",reps:"12/12/12",weight:"—",note:"Full stretch at bottom"},
+      {name:"Cable Face Pull",sets:"2",reps:"15/15",weight:"—",note:""}
     ]},
     Saturday:{label:"LEGS B — Posterior Chain",muscleGroups:["hamstrings","glutes","quads","calves"],exercises:[
-      {name:"Romanian Deadlift",sets:"4",reps:"10/10/10/10",weight:"135/155/165/165lb",note:"Feel the hamstring stretch"},
-      {name:"Hack Squat",sets:"3",reps:"10/10/10",weight:"180/200/200lb",note:""},
-      {name:"Lying Leg Curl",sets:"4",reps:"12/12/12/12",weight:"70/80/80/80lb",note:""},
-      {name:"Walking Lunges",sets:"3",reps:"12/12/12",weight:"45/45/45lb",note:""},
-      {name:"Seated Calf Raise",sets:"4",reps:"15/15/15/15",weight:"90/100/100/100lb",note:""}
+      {name:"Romanian Deadlift",sets:"4",reps:"10/10/10/10",weight:"—",note:"Feel the hamstring stretch"},
+      {name:"Hack Squat",sets:"3",reps:"10/10/10",weight:"—",note:""},
+      {name:"Lying Leg Curl",sets:"4",reps:"12/12/12/12",weight:"—",note:""},
+      {name:"Walking Lunges",sets:"3",reps:"12/12/12",weight:"—",note:""},
+      {name:"Seated Calf Raise",sets:"4",reps:"15/15/15/15",weight:"—",note:""}
     ]}
   },
   hybrid: {
     Monday:{label:"UPPER A — Strength",muscleGroups:["chest","back","shoulders","core"],exercises:[
-      {name:"Barbell Bench Press",sets:"5",reps:"5/5/5/5/5",weight:"135/155/165/175/175lb",note:"Rest 3 min between sets"},
-      {name:"Barbell Row",sets:"5",reps:"5/5/5/5/5",weight:"115/135/145/155/155lb",note:"Chest to bar"},
-      {name:"Overhead Press",sets:"4",reps:"6/6/6/6",weight:"85/95/100/100lb",note:""},
+      {name:"Barbell Bench Press",sets:"5",reps:"5/5/5/5/5",weight:"—",note:"Rest 3 min between sets"},
+      {name:"Barbell Row",sets:"5",reps:"5/5/5/5/5",weight:"—",note:"Chest to bar"},
+      {name:"Overhead Press",sets:"4",reps:"6/6/6/6",weight:"—",note:""},
       {name:"Pull-ups",sets:"3",reps:"6/6/6",weight:"BW/BW/BW",note:"Add weight if easy"},
       {name:"Plank",sets:"3",reps:"45s/45s/45s",weight:"BW",note:"Core braced throughout"}
     ]},
     Tuesday:{label:"LOWER A — Squat Focus",muscleGroups:["quads","hamstrings","glutes","core"],exercises:[
-      {name:"Back Squat",sets:"5",reps:"5/5/5/5/5",weight:"155/175/195/205/205lb",note:"Rest 3 min"},
-      {name:"Romanian Deadlift",sets:"4",reps:"6/6/6/6",weight:"135/155/165/165lb",note:"Hip hinge, slow eccentric"},
-      {name:"Leg Press",sets:"3",reps:"10/10/10",weight:"270/300/300lb",note:""},
-      {name:"Walking Lunges",sets:"3",reps:"10/10/10",weight:"40/40/40lb",note:"DB each hand"},
+      {name:"Back Squat",sets:"5",reps:"5/5/5/5/5",weight:"—",note:"Rest 3 min"},
+      {name:"Romanian Deadlift",sets:"4",reps:"6/6/6/6",weight:"—",note:"Hip hinge, slow eccentric"},
+      {name:"Leg Press",sets:"3",reps:"10/10/10",weight:"—",note:""},
+      {name:"Walking Lunges",sets:"3",reps:"10/10/10",weight:"—",note:"DB each hand"},
       {name:"Calf Raise",sets:"3",reps:"15/15/15",weight:"BW/BW/BW",note:""}
     ]},
     Wednesday:{label:"UPPER B — Hypertrophy",muscleGroups:["chest","shoulders","back","arms"],exercises:[
-      {name:"Incline DB Press",sets:"4",reps:"10/10/10/10",weight:"65/70/75/75lb",note:""},
-      {name:"Lat Pulldown",sets:"4",reps:"10/10/10/10",weight:"120/130/140/140lb",note:""},
-      {name:"DB Lateral Raise",sets:"4",reps:"15/15/15/15",weight:"20/20/20/20lb",note:""},
-      {name:"Seated Cable Row",sets:"3",reps:"12/12/12",weight:"130/140/140lb",note:""},
-      {name:"Tricep Pushdown",sets:"3",reps:"12/12/12",weight:"50/55/55lb",note:""},
-      {name:"Barbell Curl",sets:"3",reps:"12/12/12",weight:"65/70/70lb",note:""}
+      {name:"Incline DB Press",sets:"4",reps:"10/10/10/10",weight:"—",note:""},
+      {name:"Lat Pulldown",sets:"4",reps:"10/10/10/10",weight:"—",note:""},
+      {name:"DB Lateral Raise",sets:"4",reps:"15/15/15/15",weight:"—",note:""},
+      {name:"Seated Cable Row",sets:"3",reps:"12/12/12",weight:"—",note:""},
+      {name:"Tricep Pushdown",sets:"3",reps:"12/12/12",weight:"—",note:""},
+      {name:"Barbell Curl",sets:"3",reps:"12/12/12",weight:"—",note:""}
     ]},
     Thursday:{label:"LOWER B — Deadlift Focus",muscleGroups:["hamstrings","glutes","back","calves"],exercises:[
-      {name:"Trap Bar Deadlift",sets:"5",reps:"5/5/5/5/5",weight:"185/205/225/245/245lb",note:"Drive through heels"},
-      {name:"Bulgarian Split Squat",sets:"4",reps:"8/8/8/8",weight:"50/55/55/55lb",note:"DB each hand"},
-      {name:"Lying Leg Curl",sets:"4",reps:"12/12/12/12",weight:"70/80/80/80lb",note:""},
-      {name:"Glute Bridge",sets:"3",reps:"15/15/15",weight:"135/145/145lb",note:"Barbell, pause at top"},
-      {name:"Seated Calf Raise",sets:"3",reps:"15/15/15",weight:"90/100/100lb",note:""}
+      {name:"Trap Bar Deadlift",sets:"5",reps:"5/5/5/5/5",weight:"—",note:"Drive through heels"},
+      {name:"Bulgarian Split Squat",sets:"4",reps:"8/8/8/8",weight:"—",note:"DB each hand"},
+      {name:"Lying Leg Curl",sets:"4",reps:"12/12/12/12",weight:"—",note:""},
+      {name:"Glute Bridge",sets:"3",reps:"15/15/15",weight:"—",note:"Barbell, pause at top"},
+      {name:"Seated Calf Raise",sets:"3",reps:"15/15/15",weight:"—",note:""}
     ]}
   },
   empty: {
@@ -6502,7 +6503,7 @@ const PROGRAM_TEMPLATES = {
 };
 
 function restoreDefaultProgram(){
-  if(!confirm("Replace current program with default El Camino program? Your logged sets won't be deleted, but the weights won't match anymore."))return;
+  if(!confirm("Replace current program with the default program? Your logged sets won't be deleted, but the weights won't match anymore."))return;
   Object.keys(WORKOUTS).forEach(k => delete WORKOUTS[k]);
   Object.assign(WORKOUTS, JSON.parse(JSON.stringify(DEFAULT_WORKOUTS)));
   state.customProgram = null;
@@ -6529,6 +6530,7 @@ function deleteBagItem(i){state.bag.items.splice(i,1);persist();renderBag()}
 function renderBag(){const c=document.getElementById("bagList");c.innerHTML=state.bag.items.map((item,i)=>`<div class="bag-item ${item.packed?'packed':''}"><button class="bag-item-check ${item.packed?'done':''}" onclick="toggleBagItem(${i})"><svg><use href="#i-check"/></svg></button><span class="bag-item-text">${item.name}</span><button class="bag-item-delete" onclick="deleteBagItem(${i})"><svg><use href="#i-trash"/></svg></button></div>`).join("")}
 
 function setFatigue(muscle,level){state.fatigue[muscle]=level;persist();renderMuscleFatigue()}
+function resetAllFatigue(){state.fatigue={};persist();renderMuscleFatigue()}
 function renderMuscleFatigue(){
   const c=document.getElementById("muscleList");
   const levels=[["fresh","Fresh","active-fresh"],["light","Light","active-light"],["mod","Moderate","active-mod"],["heavy","Heavy","active-heavy"]];
@@ -6546,7 +6548,7 @@ function renderMoreModal(){
   const hasWellness=modules.includes('wellness');
   const items=[
     {tab:'tools',icon:'i-tools',label:'TOOLS',show:true},
-    {tab:'wellness',icon:'i-wellness',label:'WELLNESS',show:!basics&&hasWellness},
+    {tab:'wellness',icon:'i-wellness',label:'WELLNESS',show:hasWellness},
     {tab:'stats',icon:'i-stats',label:'STATS',show:!basics},
     {tab:'chart',icon:'i-chart',label:'STRENGTH',show:!basics},
     {tab:'running',icon:'i-run',label:'RUN PLAN',show:hasRun},
