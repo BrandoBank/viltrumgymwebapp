@@ -1133,11 +1133,15 @@
 
   <!-- STRENGTH TAB -->
   <section id="tab-chart" class="tab-content" style="display:none">
+    <div id="chartEmptyBanner" style="display:none;margin:0 0 16px;background:var(--bg-raised);border:1px solid var(--border);border-left:3px solid var(--lime);border-radius:10px;padding:16px 18px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">Your strength chart starts here</div>
+      <div style="font-size:12px;color:var(--text-faint);line-height:1.5">Log sets in Gym Mode and your squat, bench, and deadlift peaks will plot automatically. The preview below is a sample progression.</div>
+    </div>
     <div class="grid-4">
-      <div class="stat-card"><div class="stat-card-label mono">SQUAT PEAK</div><div class="stat-card-value" style="color:var(--lime)">245 lb</div><div class="stat-card-sub">1.01× bodyweight</div></div>
-      <div class="stat-card"><div class="stat-card-label mono">BENCH PEAK</div><div class="stat-card-value" style="color:var(--lime)">215 lb</div><div class="stat-card-sub">0.88× bodyweight</div></div>
-      <div class="stat-card"><div class="stat-card-label mono">DEADLIFT PEAK</div><div class="stat-card-value" style="color:var(--lime)">305 lb</div><div class="stat-card-sub">1.26× bodyweight</div></div>
-      <div class="stat-card"><div class="stat-card-label mono">BIG 3 TOTAL</div><div class="stat-card-value" style="color:var(--lime)">765 lb</div><div class="stat-card-sub">3.15× BW</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">SQUAT PEAK</div><div class="stat-card-value" style="color:var(--lime)" id="chartSquatPeak">—</div><div class="stat-card-sub" id="chartSquatSub">No data yet</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">BENCH PEAK</div><div class="stat-card-value" style="color:var(--lime)" id="chartBenchPeak">—</div><div class="stat-card-sub" id="chartBenchSub">No data yet</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">DEADLIFT PEAK</div><div class="stat-card-value" style="color:var(--lime)" id="chartDeadliftPeak">—</div><div class="stat-card-sub" id="chartDeadliftSub">No data yet</div></div>
+      <div class="stat-card"><div class="stat-card-label mono">BIG 3 TOTAL</div><div class="stat-card-value" style="color:var(--lime)" id="chartBig3Total">—</div><div class="stat-card-sub" id="chartBig3Sub">—</div></div>
     </div>
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-chart"/></svg>TOP WORKING WEIGHT — 16 MONTHS</div></div>
@@ -4040,6 +4044,28 @@ function renderHome(){
 
 /* ═════════════════ CHARTS ═════════════════ */
 function drawStrengthChart(){
+  // Empty state banner
+  const hasData = (state.sessionHistory||[]).length > 0;
+  const banner = document.getElementById('chartEmptyBanner');
+  if (banner) banner.style.display = hasData ? 'none' : 'block';
+
+  // Stat cards from personalBests
+  const pbs = state.personalBests || {};
+  const squat = pbs['Squat']?.weight || pbs['Back Squat']?.weight || null;
+  const bench = pbs['Bench Press']?.weight || pbs['Bench']?.weight || null;
+  const deadlift = pbs['Deadlift']?.weight || null;
+  const bw = state.weights?.length ? state.weights[state.weights.length-1].weight : null;
+  const setCard = (valId, subId, val, sub) => {
+    const ve = document.getElementById(valId); const se = document.getElementById(subId);
+    if (ve) ve.textContent = val || '—';
+    if (se) se.textContent = sub || 'No data yet';
+  };
+  setCard('chartSquatPeak', 'chartSquatSub', squat ? squat+' lb' : null, squat && bw ? (squat/bw).toFixed(2)+'× bodyweight' : null);
+  setCard('chartBenchPeak', 'chartBenchSub', bench ? bench+' lb' : null, bench && bw ? (bench/bw).toFixed(2)+'× bodyweight' : null);
+  setCard('chartDeadliftPeak', 'chartDeadliftSub', deadlift ? deadlift+' lb' : null, deadlift && bw ? (deadlift/bw).toFixed(2)+'× bodyweight' : null);
+  const big3 = (squat||0)+(bench||0)+(deadlift||0);
+  setCard('chartBig3Total', 'chartBig3Sub', big3 ? big3+' lb' : null, big3 && bw ? (big3/bw).toFixed(2)+'× BW' : null);
+
   const svg=document.getElementById("strengthChart");
   const W=svg.parentElement.clientWidth-32||600,H=260;
   const pad={top:12,right:16,bottom:32,left:44},cW=W-pad.left-pad.right,cH=H-pad.top-pad.bottom;
