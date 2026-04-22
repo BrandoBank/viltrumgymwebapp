@@ -2428,7 +2428,7 @@ async function wizardFinish(skip=false) {
   const startingWeight = parseFloat(document.getElementById('profileStart').value);
   const goalWeight = parseFloat(document.getElementById('profileGoal').value);
   const height = parseInt(document.getElementById('profileHeight').value);
-  wizardState.uiMode = 'basics';
+  wizardState.uiMode = 'advanced';
   try {
     const { error } = await supa.from('bb_profiles').upsert({
       id: currentUser.id, display_name: name,
@@ -2436,11 +2436,11 @@ async function wizardFinish(skip=false) {
       goal_weight: isNaN(goalWeight) ? null : goalWeight,
       height_inches: isNaN(height) ? null : height,
       enabled_modules: wizardState.modules,
-      ui_mode: 'basics'
+      ui_mode: 'advanced'
     });
     if (error) throw error;
     save(SK.enabledModules, wizardState.modules);
-    currentProfile = { display_name: name, starting_weight: startingWeight, goal_weight: goalWeight, height_inches: height, enabled_modules: wizardState.modules, ui_mode: 'basics' };
+    currentProfile = { display_name: name, starting_weight: startingWeight, goal_weight: goalWeight, height_inches: height, enabled_modules: wizardState.modules, ui_mode: 'advanced' };
     logEvent('onboarding_completed', {modules: wizardState.modules, program: wizardState.program});
     // Wipe all local state from any previous user on this device
     Object.keys(SK).forEach(k => localStorage.removeItem(SK[k]));
@@ -2507,7 +2507,7 @@ async function loadProfileAndData() {
     // Keep local cache in sync with what Supabase returned
     save(SK.enabledModules, currentProfile.enabled_modules);
   }
-  if (!currentProfile.ui_mode) currentProfile.ui_mode = 'advanced'; // existing users get all features
+  if (!currentProfile.ui_mode || currentProfile.ui_mode === 'basics') currentProfile.ui_mode = 'advanced'; // all users get full features
   // Fetch user data blob
   const { data: udata } = await supa.from('bb_user_data').select('data').eq('user_id', currentUser.id).maybeSingle();
   if (udata && udata.data) {
