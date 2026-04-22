@@ -53,11 +53,6 @@
   .header-stat-val strong{color:var(--lime)}
 
   /* iOS ADD-TO-HOMESCREEN BANNER */
-  .ios-hs-banner{display:flex;align-items:center;gap:12px;margin:12px 16px 0;background:var(--bg-card);border:1px solid var(--lime-dim);border-radius:10px;padding:12px 14px;position:relative}
-  .ios-hs-banner svg{flex-shrink:0;width:20px;height:20px;color:var(--lime)}
-  .ios-hs-banner-text{font-size:13px;line-height:1.45;color:var(--text)}
-  .ios-hs-banner-text b{color:var(--lime)}
-  .ios-hs-dismiss{position:absolute;top:8px;right:8px;padding:4px 8px;font-size:11px;color:var(--text-dim);border:1px solid var(--border);border-radius:6px;background:var(--bg-raised)}
 
   /* READINESS */
   .readiness{margin:16px 24px;background:linear-gradient(135deg,var(--bg-raised) 0%,var(--bg-card) 100%);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden}
@@ -1021,11 +1016,25 @@
 
 <div id="appShell" style="display:none">
 
-<!-- iOS ADD-TO-HOMESCREEN BANNER (shown once on iOS Safari if not already installed) -->
-<div id="iosHsBanner" style="display:none" class="ios-hs-banner">
-  <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0-4 4 4M12 4 8 8M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-  <div class="ios-hs-banner-text">Tap <b>Share ↑</b> then <b>Add to Home Screen</b> for the full app experience.</div>
-  <button class="ios-hs-dismiss" onclick="dismissIosBanner()">✕ GOT IT</button>
+<!-- iOS ADD-TO-HOMESCREEN BOTTOM SHEET (shown once on iOS Safari if not already installed) -->
+<div id="iosHsBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;padding:0 0 max(16px,env(safe-area-inset-bottom)) 0">
+  <div style="margin:0 12px;background:#161616;border:1px solid #2a2a2a;border-radius:14px;padding:18px 18px 14px;box-shadow:0 -8px 32px rgba(0,0,0,0.6)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <svg width="32" height="32" viewBox="0 0 40 40" fill="none"><polygon points="20,2 26,14 38,14 28,22 32,34 20,26 8,34 12,22 2,14 14,14" fill="#b6ff3c" opacity="0.9"/></svg>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#ededed">Add to Home Screen</div>
+          <div style="font-size:11px;color:#666;margin-top:2px">Get the full app experience</div>
+        </div>
+      </div>
+      <button onclick="dismissIosBanner()" style="background:none;border:none;color:#555;font-size:20px;cursor:pointer;padding:0;line-height:1;min-width:28px;min-height:28px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;background:#0e0e0e;border:1px solid #222;border-radius:8px;padding:10px 12px;margin-bottom:12px">
+      <svg fill="none" stroke="#b6ff3c" stroke-width="1.8" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+      <div style="font-size:12px;color:#8a8a8a;line-height:1.4">Tap <strong style="color:#ededed">Share</strong> <span style="color:#b6ff3c">↑</span> at the bottom of Safari, then <strong style="color:#ededed">Add to Home Screen</strong></div>
+    </div>
+    <button onclick="acknowledgeIosBanner()" style="width:100%;padding:12px;background:var(--lime);color:#000;border:none;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:0.04em;cursor:pointer;font-family:inherit">Got it</button>
+  </div>
 </div>
 
 <!-- READINESS -->
@@ -2473,14 +2482,25 @@ function maybeShowIosBanner() {
   const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isSafari = /safari/i.test(navigator.userAgent) && !/crios|fxios|opios|mercury/i.test(navigator.userAgent);
   const isStandalone = ('standalone' in navigator) && navigator.standalone;
-  const dismissed = localStorage.getItem('bb_hs_tip_dismissed');
-  if (isIos && isSafari && !isStandalone && !dismissed) {
-    document.getElementById('iosHsBanner').style.display = 'flex';
+  const seen = load(SK.nudgesSeen, []);
+  if (isIos && isSafari && !isStandalone && !seen.includes('ios_add_to_home')) {
+    setTimeout(() => {
+      document.getElementById('iosHsBanner').style.display = 'block';
+      logEvent('install_prompt_shown');
+    }, 2000);
   }
 }
 function dismissIosBanner() {
-  localStorage.setItem('bb_hs_tip_dismissed', '1');
   document.getElementById('iosHsBanner').style.display = 'none';
+  const seen = load(SK.nudgesSeen, []);
+  if (!seen.includes('ios_add_to_home')) { seen.push('ios_add_to_home'); save(SK.nudgesSeen, seen); }
+  logEvent('install_prompt_dismissed');
+}
+function acknowledgeIosBanner() {
+  document.getElementById('iosHsBanner').style.display = 'none';
+  const seen = load(SK.nudgesSeen, []);
+  if (!seen.includes('ios_add_to_home')) { seen.push('ios_add_to_home'); save(SK.nudgesSeen, seen); }
+  logEvent('install_prompt_accepted');
 }
 
 function showAppShell() {
