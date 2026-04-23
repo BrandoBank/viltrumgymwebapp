@@ -1,0 +1,26 @@
+/*
+  # Content Security Policy
+  # The app uses large inline <script> blocks and inline event handlers (onclick=),
+  # so 'unsafe-inline' is required for script-src until a nonce-based refactor is done.
+  # The high-value restrictions here are connect-src (stops data exfil),
+  # frame-ancestors (stops clickjacking), object-src (stops plugin injection),
+  # and base-uri (stops base tag hijacking).
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.anthropic.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; worker-src 'self' blob:
+
+  # Strict Transport Security — force HTTPS for 1 year, include subdomains
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+  # Prevent MIME-type sniffing attacks
+  X-Content-Type-Options: nosniff
+
+  # Block clickjacking (belt-and-suspenders alongside CSP frame-ancestors)
+  X-Frame-Options: DENY
+
+  # Disable browser features not used by this app
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), serial=()
+
+  # Control referrer information
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Cross-origin isolation headers
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
