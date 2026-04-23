@@ -3479,9 +3479,52 @@ let state={
 function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);save(SK.showCycleOverlay,state.showCycleOverlay);save(SK.blockAdvanceWeeks,state.blockAdvanceWeeks);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
+/**
+ * sanitizeEventData — PII firewall for analytics payloads
+ * ─────────────────────────────────────────────────────────────────────────────
+ * THREAT MITIGATED: Accidental PII or health data leaking into the bb_events
+ * analytics table in Supabase. Even though RLS prevents cross-user reads,
+ * minimising what is stored reduces the blast radius of any future breach and
+ * demonstrates Privacy-by-Design to auditors and users.
+ *
+ * POLICY (per event type):
+ *   weight_logged       — strip actual body weight value; log occurrence only
+ *   set_logged          — strip weight/reps/rpe; keep only exercise name
+ *   run_logged          — strip miles + date; keep only training phase label
+ *   ai_workout_generated — strip free-text prompt (may contain any PII the
+ *                          user typed); replace with character count only
+ *   energy_logged       — keep level (1–5 integer; aggregate, not identifying)
+ *   all other events    — pass through (module IDs, tab names, step numbers,
+ *                          UI mode strings are not personal data)
+ *
+ * When adding new logEvent() calls: if the payload contains user-generated
+ * text, exact numeric health metrics, or dates tied to real-world activity,
+ * add a sanitization rule here before shipping.
+ */
+function sanitizeEventData(name, data = {}) {
+  const d = { ...data };
+  switch (name) {
+    case 'weight_logged':
+      // Body weight is health data — record that logging happened, not the value
+      return { logged: true };
+    case 'set_logged':
+      // Weight lifted and rep counts are training metrics — keep exercise name only
+      return { exercise: d.exercise || null, logged: true };
+    case 'run_logged':
+      // Distance and date are behavioral health data — keep phase label only
+      return { phase: d.phase || null, logged: true };
+    case 'ai_workout_generated':
+      // Free-text prompt may contain name, age, medical info, etc. — strip it
+      return { prompt_length: typeof d.prompt === 'string' ? d.prompt.length : null };
+    default:
+      return d;
+  }
+}
+
 async function logEvent(name, data={}) {
   if (!supa || !currentUser) return;
-  supa.from('bb_events').insert({user_id:currentUser.id,event_name:name,event_data:data}).then(()=>{}).catch(()=>{});
+  const safeData = sanitizeEventData(name, data);
+  supa.from('bb_events').insert({user_id:currentUser.id,event_name:name,event_data:safeData}).then(()=>{}).catch(()=>{});
 }
 
 /* ═════════════════ UI MODE ═════════════════ */
