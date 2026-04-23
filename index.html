@@ -147,6 +147,7 @@
   .btn.primary{background:var(--lime);color:#000;border-color:var(--lime);font-weight:600}
   .btn.primary:hover{background:var(--lime-dim);border-color:var(--lime-dim);color:#000}
   .btn.danger:hover{border-color:var(--red);color:var(--red)}
+  @media(hover:none){.btn:hover{border-color:var(--border-lit);color:var(--text-dim)}.btn.primary:hover{background:var(--lime);border-color:var(--lime);color:#000}.btn.danger:hover{border-color:var(--border-lit);color:var(--text-dim)}}
 
   /* PROGRESS BAR */
   .prog-bar-track{background:var(--border);border-radius:10px;height:3px;margin-bottom:18px;overflow:hidden}
@@ -1221,6 +1222,7 @@
     </div>
 
     <!-- WELLNESS: Train Light banner (rendered by checkTrainLightBanner) -->
+    <div id="blockAdvanceBanner" style="display:none"></div>
     <div id="trainLightBanner" style="display:none"></div>
 
     <!-- CYCLE: Phase note (dismissible per-day) -->
@@ -1596,6 +1598,14 @@
           <div class="settings-group-title">FOCUS MODE DEFAULT</div>
           <div class="settings-group-desc">Start Gym Mode in focus mode automatically — hides nav and all non-workout UI.</div>
           <button class="btn" onclick="toggleFocusModeDefault()" id="focusModeDefaultBtn">—</button>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">BLOCK ADVANCE ALERT</div>
+          <div class="settings-group-desc">Get a reminder to advance to the next training block after this many weeks.</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+            <input type="number" id="blockAdvanceWeeksInput" min="1" max="12" style="width:64px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px;text-align:center;font-family:'JetBrains Mono'" oninput="saveBlockAdvanceWeeks(this.value)"/>
+            <span style="font-size:12px;color:var(--text-faint)">weeks per block (default: 4)</span>
+          </div>
         </div>
         <div class="settings-group" id="trainLightSettingsGroup" style="display:none;margin-bottom:0">
           <div class="settings-group-title">TRAIN LIGHT MODE</div>
@@ -2012,6 +2022,16 @@
       <label for="pdfActivateNow">Activate immediately (replaces current program)</label>
     </div>
     <button class="auth-btn" onclick="confirmSavePdfProgram()">SAVE PROGRAM</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-editProgram">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header"><div class="modal-title">EDIT PROGRAM</div><button class="modal-close" onclick="closeModal('editProgram')"><svg><use href="#i-x"/></svg></button></div>
+    <div style="font-size:11px;color:var(--text-faint);margin-bottom:10px;line-height:1.5">Edit the JSON below. Each day needs <code style="background:var(--bg);padding:1px 4px;border-radius:3px">label</code>, <code style="background:var(--bg);padding:1px 4px;border-radius:3px">muscleGroups</code>, and <code style="background:var(--bg);padding:1px 4px;border-radius:3px">exercises</code> (name, sets, reps, weight, note).</div>
+    <textarea id="editProgramJson" style="width:100%;min-height:320px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:11px;font-family:'JetBrains Mono';line-height:1.5;resize:vertical;box-sizing:border-box"></textarea>
+    <div id="editProgramStatus" style="font-size:11px;color:var(--red);margin-top:8px;min-height:16px"></div>
+    <button class="auth-btn" onclick="applyEditedProgram()" style="margin-top:10px">APPLY CHANGES</button>
   </div>
 </div>
 
@@ -2848,6 +2868,38 @@ async function deleteProgram(id) {
   } catch (err) { alert('Error: ' + err.message); }
 }
 
+function openEditProgram() {
+  const ta = document.getElementById('editProgramJson');
+  const st = document.getElementById('editProgramStatus');
+  if (!ta) return;
+  ta.value = JSON.stringify(state.customProgram || WORKOUTS, null, 2);
+  if (st) st.textContent = '';
+  openModal('editProgram');
+}
+async function applyEditedProgram() {
+  const ta = document.getElementById('editProgramJson');
+  const st = document.getElementById('editProgramStatus');
+  try {
+    const parsed = JSON.parse(ta.value);
+    const requiredDays = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+    for (const d of requiredDays) {
+      if (!parsed[d]) throw new Error(`Missing day: ${d}`);
+      if (!Array.isArray(parsed[d].exercises)) throw new Error(`${d} has no exercises array`);
+    }
+    Object.keys(WORKOUTS).forEach(k => delete WORKOUTS[k]);
+    Object.assign(WORKOUTS, parsed);
+    state.customProgram = parsed;
+    persist();
+    closeModal('editProgram');
+    renderProgramTab?.();
+    renderChecklist?.();
+    if (st) st.textContent = '';
+    haptic([60,40,60]);
+  } catch(err) {
+    if (st) st.textContent = 'Error: ' + err.message;
+  }
+}
+
 let programDayExpanded = {};
 
 function renderProgramTab() {
@@ -2913,7 +2965,10 @@ function renderProgramTab() {
     <div class="panel" style="margin-bottom:16px">
       <div class="panel-header" style="margin-bottom:4px">
         <div class="panel-title"><svg style="width:16px;height:16px"><use href="#i-stats"/></svg>ACTIVE PROGRAM</div>
-        ${activeProgram ? `<button class="btn" style="font-size:10px;padding:5px 10px;min-height:36px" onclick="renameProgram('${activeProgram.id}')">RENAME</button>` : ''}
+        <div style="display:flex;gap:6px">
+          ${state.customProgram ? `<button class="btn" style="font-size:10px;padding:5px 10px;min-height:36px" onclick="openEditProgram()">EDIT</button>` : ''}
+          ${activeProgram ? `<button class="btn" style="font-size:10px;padding:5px 10px;min-height:36px" onclick="renameProgram('${activeProgram.id}')">RENAME</button>` : ''}
+        </div>
       </div>
       <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${programName}</div>
       <div style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:16px">${programDesc}</div>
@@ -3278,7 +3333,7 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay",blockAdvanceWeeks:"bb_block_adv_wks"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -3316,9 +3371,10 @@ let state={
   conservativeMode:load(SK.conservativeMode,false),
   showProjections:load(SK.showProjections,true),
   projNudgesSeen:load(SK.projNudgesSeen,[]),
+  blockAdvanceWeeks:load(SK.blockAdvanceWeeks,4),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);save(SK.showCycleOverlay,state.showCycleOverlay);}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);save(SK.showCycleOverlay,state.showCycleOverlay);save(SK.blockAdvanceWeeks,state.blockAdvanceWeeks);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
 async function logEvent(name, data={}) {
@@ -3365,7 +3421,7 @@ function showTab(id){
   if(id==="home")renderHome();
   if(id==="chart")drawStrengthChart();
   if(id==="workouts"){renderProgramTab();logEvent('program_tab_viewed');applyUiMode();}
-  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();applyUiMode();checkGymNudge();checkTrainLightBanner();renderGymCycleNote();} else {stopSessionClock();releaseWakeLock();}
+  if(id==="checklist"){renderChecklist();renderMuscleMapToday();enableWakeLock();if(pct(state.activeDay)<100)startSessionClock();applyUiMode();checkGymNudge();checkTrainLightBanner();checkBlockAdvanceBanner();renderGymCycleNote();} else {stopSessionClock();releaseWakeLock();}
   if(id==="weight"){loadCutWeights();drawWeightChart();renderWeightHistory();updateWeightStats();renderMeasurementHistory();updateCycleOverlayToggle();}
   if(id==="running"){renderRunCards();renderIncline();drawRunChart();}
   if(id==="stats"){renderStats();renderAchievements();}
@@ -3376,6 +3432,7 @@ function showTab(id){
   if(id==="cycle")renderCycleTab();
   updateReadinessDisplay();
   updateStreakDisplay();
+  updateHeaderWeight();
   // Scroll to top of content when changing tabs on mobile
   window.scrollTo({top:0,behavior:'instant'});
 }
@@ -3423,6 +3480,10 @@ function renderSettings() {
       </div>`;
     }).join('');
   }
+
+  // Block advance alert input
+  const bawInput = document.getElementById('blockAdvanceWeeksInput');
+  if (bawInput) bawInput.value = state.blockAdvanceWeeks || 4;
 
   // Train Light toggle (wellness only)
   const tlGroup = document.getElementById('trainLightSettingsGroup');
@@ -3707,6 +3768,21 @@ function checkHomeEnergyCard() {
   }
 }
 
+function saveBlockAdvanceWeeks(val){
+  const n = parseInt(val);
+  if(n >= 1 && n <= 12){ state.blockAdvanceWeeks = n; persist(); }
+}
+function checkBlockAdvanceBanner(){
+  const banner = document.getElementById('blockAdvanceBanner');
+  if(!banner) return;
+  const alertWeeks = state.blockAdvanceWeeks || 4;
+  if(state.block && state.block.week > alertWeeks){
+    banner.style.display = '';
+    banner.innerHTML = `<div style="background:rgba(182,255,60,0.07);border:1px solid rgba(182,255,60,0.25);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div style="font-size:12px;color:var(--lime);font-family:'JetBrains Mono'">BLOCK ADVANCE REMINDER</div><div style="font-size:11px;color:var(--text-dim)">You're on week ${state.block.week} — time to advance your block?</div><button onclick="openModal('blockInfo')" style="background:none;border:1px solid var(--border);border-radius:12px;padding:4px 10px;color:var(--text-faint);font-size:10px;font-family:'JetBrains Mono';cursor:pointer;white-space:nowrap">LEARN MORE</button></div>`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
 function toggleTrainLight() {
   state.trainLightMode = !state.trainLightMode;
   persist();
@@ -4693,6 +4769,7 @@ function markAllSetsDone(exIdx, nSets){
   // Check PR against the heaviest set in this bulk-complete
   if(bestData) detectPR(exIdx, bestData);
   state.checklist[key(state.activeDay, exIdx)] = true;
+  delete state.expanded[key(state.activeDay, exIdx)]; // auto-collapse finished exercise
   const _csExName=(WORKOUTS[state.activeDay]?.exercises[exIdx]||{}).name||'';
   if(_csExName.includes('Treadmill'))logRunSession();
   haptic([60, 40, 60]);
@@ -4719,12 +4796,19 @@ function toggleSet(exIdx,s){
     startTimer(exIdx);
     const exName=(WORKOUTS[state.activeDay]?.exercises[exIdx]||{}).name||'';
     logEvent('set_logged',{exercise:exName,weight:d.weight||null,reps:d.reps||null,rpe:d.rpe||null});
+    // Assign to state BEFORE the all-check so the current set counts as done
+    state.setLog[k]=d;
     const nS=numSets(WORKOUTS[state.activeDay].exercises[exIdx].sets);
     let all=true;
     for(let i=1;i<=nS;i++) if(!(state.setLog[setKey(state.activeDay,exIdx,i)]||{}).done) all=false;
-    if(all){state.checklist[key(state.activeDay,exIdx)]=true;if(exName.includes('Treadmill'))logRunSession();}
+    if(all){
+      state.checklist[key(state.activeDay,exIdx)]=true;
+      if(exName.includes('Treadmill'))logRunSession();
+      delete state.expanded[key(state.activeDay,exIdx)]; // auto-collapse finished exercise
+    }
+  } else {
+    state.setLog[k]=d;
   }
-  state.setLog[k]=d;
   persist();
   renderChecklist();
 }
@@ -5985,6 +6069,14 @@ function calculateReadiness(){
   else if (energyLevel === 'high') score += 8;
 
   return Math.max(40, Math.min(100, score));
+}
+function updateHeaderWeight(){
+  const weights = allWeights();
+  const el = document.getElementById('currentWeight');
+  if(!el) return;
+  if(weights.length===0){ el.textContent='—'; return; }
+  const latest = weights.slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+  el.textContent = latest.weight;
 }
 function updateReadinessDisplay(){
   const score = calculateReadiness();
