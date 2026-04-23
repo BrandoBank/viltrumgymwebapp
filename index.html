@@ -3436,8 +3436,29 @@ function showTab(id){
   // Scroll to top of content when changing tabs on mobile
   window.scrollTo({top:0,behavior:'instant'});
 }
-document.getElementById("tabbar").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)showTab(b.dataset.tab)});
-document.getElementById("bottomNav")?.addEventListener("click",e=>{const b=e.target.closest(".bottom-nav-tab");if(b)showTab(b.dataset.tab)});
+// Scroll-aware tab click handlers — suppress click if the nav bar was dragged
+// horizontally (>6px) so scrolling doesn't accidentally switch tabs.
+(function(){
+  function scrollGuard(nav, selector, handler) {
+    if (!nav) return;
+    let startX = 0, startScroll = 0, dragged = false;
+    nav.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startScroll = nav.scrollLeft;
+      dragged = false;
+    }, { passive: true });
+    nav.addEventListener('touchmove', e => {
+      if (Math.abs(e.touches[0].clientX - startX) > 6) dragged = true;
+    }, { passive: true });
+    nav.addEventListener('click', e => {
+      if (dragged || Math.abs(nav.scrollLeft - startScroll) > 6) return;
+      const b = e.target.closest(selector);
+      if (b) handler(b);
+    });
+  }
+  scrollGuard(document.getElementById('tabbar'), '.tab', b => showTab(b.dataset.tab));
+  scrollGuard(document.getElementById('bottomNav'), '.bottom-nav-tab', b => { if(b.dataset.tab) showTab(b.dataset.tab); });
+})();
 
 /* ═════════════════ SETTINGS ═════════════════ */
 function renderSettings() {
