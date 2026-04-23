@@ -3337,6 +3337,36 @@ function generateWeightHistory(){
 }
 
 /* ═════════════════ STATE ═════════════════ */
+/**
+ * ── localStorage Threat Model ────────────────────────────────────────────────
+ *
+ * All keys are prefixed "bb_" to namespace away from other scripts that may
+ * share the same origin (none currently, but defensive practice).
+ *
+ * THREAT: XSS token theft
+ *   The Supabase session JWT is stored in localStorage by the Supabase SDK.
+ *   If an XSS vulnerability is exploited, the JWT could be exfiltrated.
+ *   Mitigations in place: sanitizeHTML() on all user-controlled innerHTML;
+ *   SRI hashes on CDN scripts; CSP connect-src restricts exfil destinations.
+ *   Residual risk: unsafe-inline in CSP; future nonce refactor will close this.
+ *
+ * THREAT: Shared device / physical access
+ *   localStorage persists across sessions. On a shared device, another person
+ *   could open DevTools and read stored data including cycle tracking history.
+ *   Mitigation: Settings → Privacy → DELETE ALL CYCLE DATA wipes sensitive data.
+ *   Users are shown a privacy notice in Settings describing what is stored locally.
+ *
+ * THREAT: Same-origin script injection
+ *   Any script running on the same origin can read all bb_* keys.
+ *   This app has no third-party scripts beyond pinned CDN deps (SRI-verified).
+ *   The Netlify proxy is the only server-side code and never reads localStorage.
+ *
+ * SENSITIVE KEYS:
+ *   bb_cycle      — menstrual cycle history, config, last period date
+ *   bb_weights    — body weight log
+ *   bb_setLog     — training weights and rep counts
+ *   These are excluded from exportData() and noted in SECURITY.md.
+ */
 const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay",blockAdvanceWeeks:"bb_block_adv_wks"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
