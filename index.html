@@ -5850,8 +5850,8 @@ function fireConfetti(){
 }
 
 /* ═════════════════ DATA EXPORT/IMPORT ═════════════════ */
-function exportData(){
-  const data = {
+async function exportData(){
+  const payload = {
     version: 3,
     exportedAt: new Date().toISOString(),
     checklist: state.checklist,
@@ -5864,7 +5864,17 @@ function exportData(){
     goalWeight: state.goalWeight,
     collapsed: state.collapsed,
     customProgram: state.customProgram
+    // NOTE: cycleData intentionally excluded — see SECURITY.md §Privacy
   };
+  // Compute SHA-256 integrity hash of the payload so the user (or a script)
+  // can verify the file has not been tampered with after export.
+  const payloadJson = JSON.stringify(payload, null, 2);
+  let checksum = '';
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payloadJson));
+    checksum = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  } catch(_) { /* crypto.subtle unavailable in very old browsers — degrade gracefully */ }
+  const data = { ...payload, ...(checksum ? { integrity: { algorithm: 'sha256', hash: checksum } } : {}) };
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -5881,11 +5891,26 @@ function importData(event){
   const file = event.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
-      const data = JSON.parse(e.target.result);
+      const raw = e.target.result;
+      const data = JSON.parse(raw);
       if(!data.version || !data.checklist){
         throw new Error("Not a valid BeeBuildz backup file");
+      }
+      // Verify integrity checksum if present
+      if(data.integrity && data.integrity.algorithm === 'sha256' && data.integrity.hash){
+        try {
+          const { integrity: _omit, ...payload } = data;
+          const payloadJson = JSON.stringify(payload, null, 2);
+          const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payloadJson));
+          const computed = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+          if(computed !== data.integrity.hash){
+            throw new Error("Integrity check failed — file may have been tampered with");
+          }
+        } catch(intErr){
+          if(!confirm(`⚠ ${intErr.message}. Import anyway?`)){ event.target.value=""; return; }
+        }
       }
       if(!confirm("Replace all current data with this backup? Your current data will be lost.")){
         event.target.value = "";
