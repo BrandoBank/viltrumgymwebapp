@@ -2689,6 +2689,61 @@ function showAppShell() {
   updateStreakDisplay();
   showTab('home');
   logEvent('default_tab_home');
+  // Arm idle-session-timeout watcher after successful auth
+  startIdleWatcher();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Idle Session Timeout
+ * ───────────────────────────────────────────────────────────────────────────
+ * THREAT MITIGATED: Abandoned authenticated sessions on shared or unattended
+ * devices. An attacker with brief physical access (or who inherits an open
+ * browser tab) would otherwise have full access to the authenticated user's
+ * data without needing to know the password.
+ *
+ * HOW IT WORKS:
+ *   - A 30-minute countdown timer starts when the authenticated app shell loads.
+ *   - Any user interaction (mouse move, click, keydown, touchstart, scroll)
+ *     resets the timer to zero.
+ *   - On expiry the Supabase session is silently signed out and the auth
+ *     screen is shown. The user's local state is preserved — they only need
+ *     to re-authenticate, not re-configure the app.
+ *   - Not active in localOnlyMode (no server-side session to expire).
+ *
+ * CONFIGURATION: Change IDLE_TIMEOUT_MS to adjust the threshold.
+ *   30 min is a reasonable default for a health/fitness app.
+ *
+ * FUTURE WORK:
+ *   - Show a "Session expiring in 2 minutes" warning toast so the user can
+ *     dismiss it and stay logged in rather than being surprised.
+ *   - Persist a last-active timestamp to localStorage so a page reload after
+ *     an idle period also triggers re-auth.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+let _idleTimer = null;
+
+function _resetIdleTimer() {
+  clearTimeout(_idleTimer);
+  _idleTimer = setTimeout(_handleIdleTimeout, IDLE_TIMEOUT_MS);
+}
+
+async function _handleIdleTimeout() {
+  if (!supa || localOnlyMode) return;
+  try { await supa.auth.signOut(); } catch (_) {}
+  // Auth state change listener will redirect to login screen automatically
+}
+
+function startIdleWatcher() {
+  if (localOnlyMode) return; // no-op for local-only users
+  const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
+  events.forEach(ev => window.addEventListener(ev, _resetIdleTimer, { passive: true }));
+  _resetIdleTimer(); // arm the timer immediately
+}
+
+function stopIdleWatcher() {
+  clearTimeout(_idleTimer);
+  const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
+  events.forEach(ev => window.removeEventListener(ev, _resetIdleTimer));
 }
 
 function toggleUserMenu() {
@@ -2704,6 +2759,7 @@ document.addEventListener('click', e => {
 async function signOut() {
   if (!supa || localOnlyMode) { alert('Local-only mode — nothing to sign out of.'); return; }
   if (!confirm('Sign out? Your data is safely synced to the cloud and will be there when you sign back in.')) return;
+  stopIdleWatcher(); // disarm idle timer before signing out
   await supa.auth.signOut();
 }
 
