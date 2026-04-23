@@ -2795,7 +2795,7 @@ function renderProgramsList() {
   container.innerHTML = savedPrograms.map(p => `
     <div class="program-card ${p.is_active ? 'active' : ''}">
       <div class="program-card-head">
-        <div class="program-card-name">${p.name}</div>
+        <div class="program-card-name">${sanitizeHTML(p.name)}</div>
         ${p.is_active ? '<span class="program-badge">ACTIVE</span>' : ''}
       </div>
       <div class="program-card-meta">Created ${new Date(p.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
@@ -2948,7 +2948,7 @@ function renderProgramTab() {
         : savedPrograms.map(p => `
           <div class="program-card ${p.is_active ? 'active' : ''}">
             <div class="program-card-head">
-              <div class="program-card-name">${p.name}</div>
+              <div class="program-card-name">${sanitizeHTML(p.name)}</div>
               ${p.is_active ? '<span class="program-badge">ACTIVE</span>' : ''}
             </div>
             <div class="program-card-meta">Created ${new Date(p.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
@@ -3336,6 +3336,18 @@ function generateWeightHistory(){
 const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay",blockAdvanceWeeks:"bb_block_adv_wks"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+
+/**
+ * sanitizeHTML — escapes user-controlled strings before insertion into innerHTML.
+ * Prevents stored/reflected XSS from profile names, bag items, coach notes, etc.
+ * Uses the browser's built-in TextNode encoding — no regex heuristics needed.
+ */
+function sanitizeHTML(str){
+  if(str===null||str===undefined) return '';
+  const d=document.createElement('div');
+  d.appendChild(document.createTextNode(String(str)));
+  return d.innerHTML;
+}
 
 let state={
   activeDay:"Monday",activeTab:"home",
@@ -4061,7 +4073,7 @@ function renderHome(){
   const isNewUser = (state.sessionHistory || []).length === 0;
   const name = currentProfile?.display_name || (localOnlyMode ? 'there' : '');
   const timeOfDay = hour < 5 ? 'Late night' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : hour < 22 ? 'Good evening' : 'Late night';
-  greeting.innerHTML = `${timeOfDay}${name ? ', <span>' + name.split(' ')[0] + '</span>' : ''}.`;
+  greeting.innerHTML = `${timeOfDay}${name ? ', <span>' + sanitizeHTML(name.split(' ')[0]) + '</span>' : ''}.`;
 
   if (isNewUser) {
     const now = new Date();
@@ -6697,7 +6709,7 @@ applyCustomProgram();
 function addBagItem(){const inp=document.getElementById("bagAdd");const v=inp.value.trim();if(!v)return;state.bag.items.push({name:v,packed:false});persist();renderBag();inp.value=""}
 function toggleBagItem(i){state.bag.items[i].packed=!state.bag.items[i].packed;persist();renderBag()}
 function deleteBagItem(i){state.bag.items.splice(i,1);persist();renderBag()}
-function renderBag(){const c=document.getElementById("bagList");c.innerHTML=state.bag.items.map((item,i)=>`<div class="bag-item ${item.packed?'packed':''}"><button class="bag-item-check ${item.packed?'done':''}" onclick="toggleBagItem(${i})"><svg><use href="#i-check"/></svg></button><span class="bag-item-text">${item.name}</span><button class="bag-item-delete" onclick="deleteBagItem(${i})"><svg><use href="#i-trash"/></svg></button></div>`).join("")}
+function renderBag(){const c=document.getElementById("bagList");c.innerHTML=state.bag.items.map((item,i)=>`<div class="bag-item ${item.packed?'packed':''}"><button class="bag-item-check ${item.packed?'done':''}" onclick="toggleBagItem(${i})"><svg><use href="#i-check"/></svg></button><span class="bag-item-text">${sanitizeHTML(item.name)}</span><button class="bag-item-delete" onclick="deleteBagItem(${i})"><svg><use href="#i-trash"/></svg></button></div>`).join("")}
 
 function setFatigue(muscle,level){state.fatigue[muscle]=level;persist();renderMuscleFatigue()}
 function resetAllFatigue(){state.fatigue={};persist();renderMuscleFatigue()}
