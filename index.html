@@ -6774,6 +6774,35 @@ function setFatigue(muscle,level){state.fatigue[muscle]=level;persist();renderMu
 function resetAllFatigue(){state.fatigue={};persist();renderMuscleFatigue()}
 
 /* ═════════════════ CYCLE TRACKING ═════════════════ */
+/**
+ * Privacy-by-Design: Cycle Tracking Data
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Cycle data (last period date, cycle length, history) is health information
+ * and treated with heightened care:
+ *
+ * STORAGE (Privacy Posture B):
+ *   - Stored in localStorage under key "bb_cycle"
+ *   - Automatically synced to Supabase bb_user_data via syncToCloud()
+ *   - Protected by RLS: only the owning user can read/write their row
+ *   - EXCLUDED from exportData() — does not appear in downloaded JSON backups
+ *   - Explicitly cleared by deleteCycleData() which also overwrites Supabase
+ *
+ * ANALYTICS:
+ *   - Zero logEvent() calls carry cycle payload data (phase, dates, history)
+ *   - The only cycle-related analytics event is module_enabled/disabled —
+ *     which records only that the feature was toggled, not any health data
+ *
+ * RESIDUAL RISKS:
+ *   - localStorage is readable by anyone with physical device access;
+ *     users are directed to Settings → Privacy → DELETE ALL CYCLE DATA
+ *   - Supabase stores the data server-side; it is covered by their DPA/GDPR
+ *     compliance; the RLS policy prevents any other user from reading it
+ *   - Phase predictions are estimates only; not medical advice
+ *
+ * FUTURE WORK:
+ *   - Client-side encryption of bb_cycle key before writing to localStorage
+ *     and before syncing to Supabase (zero-knowledge storage)
+ */
 const CYCLE_PHASES = {
   menstrual:  { label:'Menstrual',  color:'#EF4444', bg:'rgba(239,68,68,0.07)',  gymNote:"Your body is working hard already. Consider a lighter session or Train Light mode today.", intensityLabel:'Rest or train light' },
   follicular: { label:'Follicular', color:'#B6FF3C', bg:'rgba(182,255,60,0.07)', gymNote:"Recovery capacity may be peaking. This may be a good time for pushing heavier compounds.", intensityLabel:'Push volume' },
