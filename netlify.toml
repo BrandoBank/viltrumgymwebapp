@@ -3,3 +3,15 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# Force browsers (including iOS PWA) to always revalidate the HTML document.
+# Prevents stale cached versions of the app from being served after a deploy.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
