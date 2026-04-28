@@ -33,9 +33,10 @@ function isRateLimited(ip) {
 
 // ── Origin allowlist ──────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
-  'https://beebuildz.netlify.app',
+  'https://viltrumgymtrainer.netlify.app',
+  'https://www.viltrumgymtrainer.netlify.app',
+  'https://beebuildz.netlify.app',       // alias / future custom domain
   'https://www.beebuildz.netlify.app',
-  // Add custom domain when live, e.g. 'https://beebuildz.app'
 ];
 
 function isAllowedOrigin(origin) {
