@@ -93,8 +93,8 @@ exports.handler = async (event) => {
     return { statusCode: 413, headers: corsHeaders, body: JSON.stringify({ error: { message: 'Payload too large' } }) };
   }
 
-  // API key check
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  // API key check — supports both env var names
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.Claude_KEY;
   if (!apiKey) {
     return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: { message: 'API not configured' } }) };
   }
