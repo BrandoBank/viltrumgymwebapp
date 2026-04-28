@@ -1027,6 +1027,7 @@
     <div class="user-menu-dropdown" id="userMenuDropdown">
       <button class="user-menu-item" onclick="openModal('profileEdit');closeUserMenu()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>Edit Profile</button>
       <button class="user-menu-item" data-advanced onclick="showTab('workouts');closeUserMenu()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 8v8m3-10v12m12-12v12m3-10v8M6 12h12"/></svg>My Programs</button>
+      <button class="user-menu-item" id="focusModeMenuBtn" style="display:none" onclick="toggleFocusMode();closeUserMenu()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>Exit Focus Mode</button>
       <div class="user-menu-divider"></div>
       <button class="user-menu-item" onclick="signOut()"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</button>
     </div>
@@ -2680,6 +2681,9 @@ function showAppShell() {
   // Defensive rAF backup: re-apply on next paint in case iOS Safari defers
   // the layout update when the parent transitions from display:none.
   if(!state.focusMode) requestAnimationFrame(()=>{ if(bn) bn.style.display='flex'; });
+  // Sync the header escape-hatch button for focus mode
+  const fmMenuBtn = document.getElementById('focusModeMenuBtn');
+  if(fmMenuBtn) fmMenuBtn.style.display = state.focusMode ? '' : 'none';
   maybeShowIosBanner();
   applyModuleVisibility();
   applyUiMode();
@@ -3725,8 +3729,10 @@ async function toggleUiMode() {
 }
 
 function toggleFocusModeDefault() {
-  state.focusMode = !state.focusMode;
-  persist();
+  // Apply the toggle fully (DOM + state) so the setting takes effect immediately.
+  // Previously this only saved to state without updating the DOM, which left the
+  // nav hidden on next load with no way for the user to escape.
+  toggleFocusMode();
   renderSettings();
 }
 
@@ -6153,6 +6159,9 @@ function toggleFocusMode(){
   // Mirror nav visibility in JS so it stays in sync regardless of CSS specificity
   const bn = document.getElementById('bottomNav');
   if(bn) bn.style.display = isOn ? 'none' : 'flex';
+  // Show/hide the escape-hatch menu button
+  const fmMenuBtn = document.getElementById('focusModeMenuBtn');
+  if(fmMenuBtn) fmMenuBtn.style.display = isOn ? '' : 'none';
   state.focusMode = isOn;
   persist();
   haptic(30);
