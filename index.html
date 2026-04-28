@@ -2670,7 +2670,11 @@ function showAppShell() {
   document.getElementById('mainHeader').style.display = 'grid';
   document.getElementById('appShell').style.display = 'block';
   const bn = document.getElementById('bottomNav');
-  if(bn) bn.style.display = ''; // remove inline style, let CSS media query control it
+  // Explicitly show/hide nav via JS rather than relying on the CSS media query
+  // re-applying after clearing an inline style. On some iOS Safari PWA installs
+  // the media query doesn't fire reliably, leaving the nav invisible. Respect
+  // focus mode state which is restored before showAppShell() is called.
+  if(bn) bn.style.display = state.focusMode ? 'none' : 'flex';
   maybeShowIosBanner();
   applyModuleVisibility();
   applyUiMode();
@@ -6141,6 +6145,9 @@ function toggleFocusMode(){
   const isOn = document.body.classList.contains("focus-mode");
   const label = document.getElementById("focusBtnLabel");
   if(label) label.textContent = isOn ? "Exit Focus" : "Focus Mode";
+  // Mirror nav visibility in JS so it stays in sync regardless of CSS specificity
+  const bn = document.getElementById('bottomNav');
+  if(bn) bn.style.display = isOn ? 'none' : 'flex';
   state.focusMode = isOn;
   persist();
   haptic(30);
