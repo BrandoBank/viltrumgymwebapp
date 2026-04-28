@@ -1792,10 +1792,10 @@
 
 <!-- MOBILE BOTTOM NAV — mirrors top tabbar, fixed to bottom -->
 <nav class="bottom-nav" id="bottomNav">
-  <button class="bottom-nav-tab active" data-tab="home"><svg><use href="#i-home"/></svg>HOME</button>
-  <button class="bottom-nav-tab" data-tab="checklist"><svg><use href="#i-check-list"/></svg>GYM</button>
-  <button class="bottom-nav-tab" data-tab="workouts"><svg><use href="#i-dumbbell"/></svg>PROGRAM</button>
-  <button class="bottom-nav-tab" data-tab="weight"><svg><use href="#i-scale"/></svg>WEIGHT</button>
+  <button class="bottom-nav-tab active" data-tab="home" onclick="showTab('home')"><svg><use href="#i-home"/></svg>HOME</button>
+  <button class="bottom-nav-tab" data-tab="checklist" onclick="showTab('checklist')"><svg><use href="#i-check-list"/></svg>GYM</button>
+  <button class="bottom-nav-tab" data-tab="workouts" onclick="showTab('workouts')"><svg><use href="#i-dumbbell"/></svg>PROGRAM</button>
+  <button class="bottom-nav-tab" data-tab="weight" onclick="showTab('weight')"><svg><use href="#i-scale"/></svg>WEIGHT</button>
   <button class="bottom-nav-tab" data-tab="more" onclick="openModal('moreTabs');return false"><svg><use href="#i-grid"/></svg>MORE</button>
 </nav>
 
@@ -3581,8 +3581,11 @@ function showTab(id){
   // Scroll to top of content when changing tabs on mobile
   window.scrollTo({top:0,behavior:'instant'});
 }
-// Scroll-aware tab click handlers — suppress click if the nav bar was dragged
+// Scroll-aware tab click handlers — suppress click if the top tabbar was dragged
 // horizontally (>6px) so scrolling doesn't accidentally switch tabs.
+// Note: bottom nav buttons use direct onclick attributes instead (the bottom nav
+// never scrolls horizontally on mobile, so the drag-guard caused false positives
+// on iOS Safari where touchmove fires on gentle taps, swallowing the click).
 (function(){
   function scrollGuard(nav, selector, handler) {
     if (!nav) return;
@@ -3601,8 +3604,9 @@ function showTab(id){
       if (b) handler(b);
     });
   }
+  // Top tabbar (desktop/tablet) — scrolls horizontally, drag-guard needed
   scrollGuard(document.getElementById('tabbar'), '.tab', b => showTab(b.dataset.tab));
-  scrollGuard(document.getElementById('bottomNav'), '.bottom-nav-tab', b => { if(b.dataset.tab) showTab(b.dataset.tab); });
+  // Bottom nav — no horizontal scroll, onclick handlers on each button handle navigation
 })();
 
 /* ═════════════════ SETTINGS ═════════════════ */
