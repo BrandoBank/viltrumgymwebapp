@@ -1861,6 +1861,11 @@
 <!-- PR toast -->
 <div class="pr-toast" id="prToast">NEW PR!</div>
 
+<!-- Focus mode escape pill — floats top-right, visible ONLY when focus mode is active.
+     z-index 9998 ensures it's above all other content (below splash at 9999).
+     Gives users a guaranteed way out even if the header and nav are both hidden. -->
+<button id="focusEscapePill" onclick="toggleFocusMode()" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;z-index:9998;background:rgba(182,255,60,0.18);border:1px solid rgba(182,255,60,0.5);border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;color:var(--lime);letter-spacing:0.06em;font-family:inherit;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">EXIT FOCUS</button>
+
 <!-- Confetti container -->
 <div class="confetti-container" id="confettiContainer"></div>
 
@@ -2681,9 +2686,11 @@ function showAppShell() {
   // Defensive rAF backup: re-apply on next paint in case iOS Safari defers
   // the layout update when the parent transitions from display:none.
   if(!state.focusMode) requestAnimationFrame(()=>{ if(bn) bn.style.display='flex'; });
-  // Sync the header escape-hatch button for focus mode
+  // Sync the header escape-hatch button and floating pill for focus mode
   const fmMenuBtn = document.getElementById('focusModeMenuBtn');
   if(fmMenuBtn) fmMenuBtn.style.display = state.focusMode ? '' : 'none';
+  const fmPill = document.getElementById('focusEscapePill');
+  if(fmPill) fmPill.style.display = state.focusMode ? '' : 'none';
   maybeShowIosBanner();
   applyModuleVisibility();
   applyUiMode();
@@ -6159,9 +6166,11 @@ function toggleFocusMode(){
   // Mirror nav visibility in JS so it stays in sync regardless of CSS specificity
   const bn = document.getElementById('bottomNav');
   if(bn) bn.style.display = isOn ? 'none' : 'flex';
-  // Show/hide the escape-hatch menu button
+  // Show/hide the escape-hatch menu button and floating pill
   const fmMenuBtn = document.getElementById('focusModeMenuBtn');
   if(fmMenuBtn) fmMenuBtn.style.display = isOn ? '' : 'none';
+  const fmPill = document.getElementById('focusEscapePill');
+  if(fmPill) fmPill.style.display = isOn ? '' : 'none';
   state.focusMode = isOn;
   persist();
   haptic(30);
