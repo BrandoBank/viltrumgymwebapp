@@ -1600,11 +1600,6 @@
           </div>
         </div>
         <div class="settings-group">
-          <div class="settings-group-title">FOCUS MODE DEFAULT</div>
-          <div class="settings-group-desc">Start Gym Mode in focus mode automatically — hides nav and all non-workout UI.</div>
-          <button class="btn" onclick="toggleFocusModeDefault()" id="focusModeDefaultBtn">—</button>
-        </div>
-        <div class="settings-group">
           <div class="settings-group-title">BLOCK ADVANCE ALERT</div>
           <div class="settings-group-desc">Get a reminder to advance to the next training block after this many weeks.</div>
           <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
@@ -1864,7 +1859,7 @@
 <!-- Focus mode escape pill — floats top-right, visible ONLY when focus mode is active.
      z-index 9998 ensures it's above all other content (below splash at 9999).
      Gives users a guaranteed way out even if the header and nav are both hidden. -->
-<button id="focusEscapePill" onclick="toggleFocusMode()" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;z-index:9998;background:rgba(182,255,60,0.18);border:1px solid rgba(182,255,60,0.5);border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;color:var(--lime);letter-spacing:0.06em;font-family:inherit;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">EXIT FOCUS</button>
+<button id="focusEscapePill" onclick="toggleFocusMode()" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;z-index:9998;background:var(--lime);border:none;border-radius:22px;padding:10px 18px;font-size:13px;font-weight:800;color:#000;letter-spacing:0.06em;font-family:inherit;cursor:pointer;box-shadow:0 4px 16px rgba(182,255,60,0.45)">✕ EXIT FOCUS</button>
 
 <!-- Confetti container -->
 <div class="confetti-container" id="confettiContainer"></div>
@@ -3641,9 +3636,6 @@ function renderSettings() {
   const amoledSt = document.getElementById('amoledStatusSettings');
   if (amoledSt) amoledSt.textContent = state.amoled ? 'ON — Pure black background' : 'OFF — Dark gray background';
 
-  // Focus mode default
-  const fmBtn = document.getElementById('focusModeDefaultBtn');
-  if (fmBtn) fmBtn.textContent = state.focusMode ? '✓ Focus Mode ON by default' : 'Focus Mode OFF by default';
 
   // UI mode toggle
   const uiBtn = document.getElementById('uiModeToggle');
@@ -3735,13 +3727,6 @@ async function toggleUiMode() {
   renderSettings();
 }
 
-function toggleFocusModeDefault() {
-  // Apply the toggle fully (DOM + state) so the setting takes effect immediately.
-  // Previously this only saved to state without updating the DOM, which left the
-  // nav hidden on next load with no way for the user to escape.
-  toggleFocusMode();
-  renderSettings();
-}
 
 function confirmClearData() {
   if (!confirm('Delete ALL your BeeBuildz data? This cannot be undone.\n\nYour account and login will still exist.')) return;
@@ -6174,6 +6159,14 @@ function toggleFocusMode(){
   state.focusMode = isOn;
   persist();
   haptic(30);
+  // When turning focus mode ON, show a brief hint so the user always knows how to exit
+  if (isOn) {
+    const hint = document.createElement('div');
+    hint.textContent = 'Tap ✕ EXIT FOCUS (top right) to return to full view';
+    hint.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(30,30,30,0.95);color:#ccc;font-size:12px;padding:10px 18px;border-radius:12px;z-index:9997;white-space:nowrap;pointer-events:none;font-family:inherit;border:1px solid rgba(255,255,255,0.08)';
+    document.body.appendChild(hint);
+    setTimeout(() => hint.remove(), 3500);
+  }
 }
 function applyAccentColor(hex) {
   document.documentElement.style.setProperty('--lime', hex);
