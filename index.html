@@ -4764,12 +4764,39 @@ function renderProgram(){
 
 function applyProgressiveOverload(weightStr){
   if(!weightStr||weightStr==="—"||weightStr==="BW"||weightStr==="Light"||weightStr==="Moderate"||weightStr.includes("Progressive")||weightStr.includes("Ascending")||weightStr.includes("See"))return weightStr;
-  const week=state.block.week;
-  const bump=week===1?0:week===2?5:week===3?10:-15; // deload week is −15 from week 3
-  // Try to bump the LAST number in the string
   const match=weightStr.match(/(\d+(?:\.\d+)?)(?=[^\d]*$)/);
-  if(match){const orig=parseFloat(match[1]);const newVal=Math.max(orig+bump,orig*0.7);return weightStr.replace(match[1],Math.round(newVal))}
-  return weightStr;
+  if(!match) return weightStr;
+  const base=parseFloat(match[1]);
+  if(!base) return weightStr;
+
+  const week=state.block.week;
+  const totalWeeks=state.blockAdvanceWeeks||4;
+  const isDeload=week>=totalWeeks;
+
+  // Train light override: 70% of base regardless of week
+  if(state.trainLightMode){
+    const tl=Math.max(Math.round((base*0.70)/2.5)*2.5,2.5);
+    return weightStr.replace(match[1],tl%1===0?tl.toString():tl.toFixed(1));
+  }
+
+  let pct;
+  if(isDeload){
+    // Deload: 85% of base weight — genuine tissue recovery without losing feel
+    pct=0.85;
+  } else {
+    // Percentage-based overload: +2.5% per working week
+    // (flat-lb bumps break down at both ends — too little for heavy lifts, too much for light ones)
+    pct=1+(week-1)*0.025;
+    // Fatigue adjustment: low daily energy (1–2 out of 5) → back off 7%
+    // This integrates the energy-log data instead of ignoring it
+    const energy=todayEnergyLevel();
+    if(energy!==null&&energy<=2) pct*=0.93;
+  }
+
+  // Round to nearest 2.5 lb — the smallest practical plate increment
+  const raw=base*pct;
+  const rounded=Math.max(Math.round(raw/2.5)*2.5,2.5);
+  return weightStr.replace(match[1],rounded%1===0?rounded.toString():rounded.toFixed(1));
 }
 
 /* ═════════════════ CHECKLIST ═════════════════ */
