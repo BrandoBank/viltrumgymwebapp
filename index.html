@@ -3551,7 +3551,7 @@ function generateWeightHistory(){
  *   bb_setLog     — training weights and rep counts
  *   These are excluded from exportData() and noted in SECURITY.md.
  */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay",blockAdvanceWeeks:"bb_block_adv_wks"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay",blockAdvanceWeeks:"bb_block_adv_wks",weekArchive:"bb_week_archive"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
@@ -3602,9 +3602,10 @@ let state={
   showProjections:load(SK.showProjections,true),
   projNudgesSeen:load(SK.projNudgesSeen,[]),
   blockAdvanceWeeks:load(SK.blockAdvanceWeeks,4),
+  weekArchive:load(SK.weekArchive,{}),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);save(SK.showCycleOverlay,state.showCycleOverlay);save(SK.blockAdvanceWeeks,state.blockAdvanceWeeks);}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);save(SK.showCycleOverlay,state.showCycleOverlay);save(SK.blockAdvanceWeeks,state.blockAdvanceWeeks);save(SK.weekArchive,state.weekArchive);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
 /**
@@ -4075,6 +4076,21 @@ function checkBlockAdvanceBanner(){
 }
 function advanceWeek(){
   const total = state.blockAdvanceWeeks || 4;
+
+  // Archive current week's set log + completed marks before clearing
+  const archiveKey = `b${state.block.num}w${state.block.week}`;
+  state.weekArchive = state.weekArchive || {};
+  state.weekArchive[archiveKey] = {
+    setLog: Object.assign({}, state.setLog),
+    checklist: Object.assign({}, state.checklist),
+    savedAt: new Date().toISOString().slice(0, 10)
+  };
+
+  // Clear completed marks and set logs — fresh start for new week
+  state.checklist = {};
+  state.setLog = {};
+
+  // Advance block/week counter
   if(state.block.week < total){
     state.block.week++;
   } else {
@@ -4082,9 +4098,12 @@ function advanceWeek(){
     state.block.week = 1;
     state.block.startDate = new Date().toISOString().slice(0,10);
   }
+
   persist();
   renderBlockDots();
   checkBlockAdvanceBanner();
+  // Re-render gym tab if it's open so checkmarks clear immediately
+  if(state.activeTab === 'checklist') renderChecklist();
   haptic(30);
 }
 function decrementWeek(){
@@ -7625,14 +7644,43 @@ function renderWarmup(){
 
 function renderHistory(){
   const d=state.activeDay,w=WORKOUTS[d];
-  let html=`<div style="font-size:11px;color:var(--text-faint);margin-bottom:14px;font-family:'JetBrains Mono'">PREVIOUS ${d.toUpperCase()} SESSION</div>`;
+
+  // Find most recent archived week that has data for this day
+  const archive=state.weekArchive||{};
+  const sortedKeys=Object.keys(archive).sort((a,b)=>{
+    const [,ab,aw]=a.match(/b(\d+)w(\d+)/)||[0,0,0];
+    const [,bb,bw]=b.match(/b(\d+)w(\d+)/)||[0,0,0];
+    return (parseInt(bb)*100+parseInt(bw))-(parseInt(ab)*100+parseInt(aw));
+  }); // descending: most recent first
+
+  let logSource=null; let sourceLabel='';
+  for(const k of sortedKeys){
+    const entry=archive[k];
+    if(!entry||!entry.setLog) continue;
+    const hasData=w.exercises.some((_,i)=>Object.keys(entry.setLog).some(sk=>sk.startsWith(`${d}_${i}_`)));
+    if(hasData){
+      logSource=entry.setLog;
+      const m=k.match(/b(\d+)w(\d+)/);
+      sourceLabel=m?`Block ${m[1]} · Week ${m[2]}`:'previous week';
+      break;
+    }
+  }
+
+  // Fall back to current setLog if no archive has data
+  if(!logSource && Object.keys(state.setLog).some(k=>k.startsWith(d+'_'))){ logSource=state.setLog; sourceLabel='this week'; }
+
+  let html=`<div style="font-size:11px;color:var(--text-faint);margin-bottom:14px;font-family:'JetBrains Mono'">${sourceLabel?sourceLabel.toUpperCase()+' · ':''} ${d.toUpperCase()}</div>`;
   let hasLogs=false;
-  w.exercises.forEach((ex,i)=>{
-    const nS=numSets(ex.sets);const logs=[];
-    for(let s=1;s<=nS;s++){const data=state.setLog[setKey(d,i,s)];if(data&&data.weight){logs.push(`${data.weight}×${data.reps||'?'}${data.rpe?` @${data.rpe}`:''}`);hasLogs=true}}
-    if(logs.length)html+=`<div style="padding:8px 0;border-bottom:1px solid var(--border)"><div style="color:var(--text);font-size:13px;margin-bottom:3px">${ex.name.replace("🏃 ","")}</div><div class="mono" style="color:var(--lime);font-size:11px">${logs.join(" · ")}</div></div>`;
-  });
-  if(!hasLogs)html+=`<div style="color:var(--text-faint);font-style:italic;font-size:12px">No logged sets yet. Start logging in Gym Mode and your history will appear here next week.</div>`;
+
+  if(logSource){
+    w.exercises.forEach((ex,i)=>{
+      const nS=numSets(ex.sets);const logs=[];
+      for(let s=1;s<=nS;s++){const data=logSource[setKey(d,i,s)];if(data&&data.weight){logs.push(`${data.weight}×${data.reps||'?'}${data.rpe?` @${data.rpe}`:''}`);hasLogs=true}}
+      if(logs.length)html+=`<div style="padding:8px 0;border-bottom:1px solid var(--border)"><div style="color:var(--text);font-size:13px;margin-bottom:3px">${ex.name.replace("🏃 ","")}</div><div class="mono" style="color:var(--lime);font-size:11px">${logs.join(" · ")}</div></div>`;
+    });
+  }
+
+  if(!hasLogs)html+=`<div style="color:var(--text-faint);font-style:italic;font-size:12px">No logged sets yet. Log your sets this week and they'll appear here next week.</div>`;
   document.getElementById("historyContent").innerHTML=html;
 }
 
