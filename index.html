@@ -3553,7 +3553,7 @@ function generateWeightHistory(){
  */
 const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay",blockAdvanceWeeks:"bb_block_adv_wks",weekArchive:"bb_week_archive"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
-const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){if(e.name==='QuotaExceededError'||e.code===22){console.warn('BeeBuildz: localStorage quota exceeded');if(!window._bbQuotaWarned){window._bbQuotaWarned=true;alert('Storage almost full — consider clearing old data in Settings to keep the app working correctly.')}}}};
 
 /**
  * sanitizeHTML — escapes user-controlled strings before insertion into innerHTML.
@@ -4004,7 +4004,10 @@ function logEnergyLevel(level) {
   const arr = [...(state.dailyEnergy || [])];
   const idx = arr.findIndex(e => e.date === today);
   if (idx >= 0) arr[idx].level = level; else arr.push({date:today, level});
-  state.dailyEnergy = arr;
+  // Keep only last 90 days
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-90);
+  const cutoffStr = cutoff.toISOString().slice(0,10);
+  state.dailyEnergy = arr.filter(e => e.date >= cutoffStr);
   persist();
   logEvent('energy_logged', {level});
   haptic(30);
@@ -4085,6 +4088,13 @@ function advanceWeek(){
     checklist: Object.assign({}, state.checklist),
     savedAt: new Date().toISOString().slice(0, 10)
   };
+  // Cap archive to last 12 weeks to prevent localStorage bloat
+  const archiveKeys = Object.keys(state.weekArchive).sort((a,b)=>{
+    const [,an,aw]=a.match(/b(\d+)w(\d+)/)||[0,0,0];
+    const [,bn,bw]=b.match(/b(\d+)w(\d+)/)||[0,0,0];
+    return (parseInt(an)*100+parseInt(aw))-(parseInt(bn)*100+parseInt(bw));
+  });
+  if(archiveKeys.length > 12){ archiveKeys.slice(0, archiveKeys.length - 12).forEach(k => delete state.weekArchive[k]); }
 
   // Clear completed marks and set logs — fresh start for new week
   state.checklist = {};
@@ -4824,6 +4834,7 @@ function logRunSession(dateStr) {
   const phase = RUN_PLAN[Math.max(0, idx)];
   const miles = phase.miles || 0;
   state.runLog.push({date: target, miles, phase: phase.phase});
+  if(state.runLog.length > 200) state.runLog = state.runLog.slice(-200);
   persist();
   haptic([30]);
   logEvent('run_logged', {date: target, miles, phase: phase.phase});
@@ -6596,6 +6607,7 @@ function logSessionComplete(day, durationLabel){
   const existing = state.sessionHistory.find(s => s.date === today && s.day === day);
   if(!existing){
     state.sessionHistory.push({date: today, day, duration: durationLabel||null});
+    if(state.sessionHistory.length > 300) state.sessionHistory = state.sessionHistory.slice(-300);
     persist();
     const mins = durationLabel ? parseInt(durationLabel) : null;
     logEvent('session_completed',{day, duration_minutes: mins});
