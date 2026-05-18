@@ -1085,7 +1085,8 @@
   </div>
   <div class="block-action" style="display:flex;gap:6px;align-items:center">
     <button class="btn" onclick="decrementWeek()" style="padding:6px 12px;font-size:16px;line-height:1" title="Previous week">‹</button>
-    <button class="btn" onclick="advanceWeek()" style="padding:6px 12px;font-size:16px;line-height:1" title="Next week">›</button>
+    <button class="btn" onclick="advanceViewWeek()" style="padding:6px 12px;font-size:16px;line-height:1" title="Next week">›</button>
+    <button class="btn" id="viewTodayBtn" onclick="snapToCurrentWeek()" style="display:none;padding:6px 10px;font-size:9px;letter-spacing:0.08em;font-family:'JetBrains Mono'" title="Back to current week">TODAY</button>
     <button class="btn" onclick="openModal('blockInfo')">INFO</button>
   </div>
 </div>
@@ -3551,7 +3552,7 @@ function generateWeightHistory(){
  *   bb_setLog     — training weights and rep counts
  *   These are excluded from exportData() and noted in SECURITY.md.
  */
-const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay",blockAdvanceWeeks:"bb_block_adv_wks",weekArchive:"bb_week_archive"};
+const SK={checklist:"bb_checklist",setLog:"bb_setLog",expanded:"bb_expanded",bag:"bb_bag",fatigue:"bb_fatigue",weights:"bb_weights",block:"bb_block",goalWeight:"bb_goalWt",startingWeight:"bb_startWt",collapsed:"bb_collapsed",customProgram:"bb_customProg",measurements:"bb_measurements",sessionHistory:"bb_sessionHistory",amoled:"bb_amoled",focusMode:"bb_focusMode",coachNotes:"bb_coachNotes",personalBests:"bb_pbs",nudgesSeen:"bb_nudges_seen",dailyEnergy:"bb_daily_energy",trainLightMode:"bb_train_light",trainLightDismissed:"bb_train_light_dismissed",runStartDate:"bb_run_start",runLog:"bb_run_log",enabledModules:"bb_enabled_mods",accentColor:"bb_accent_color",projSnapshot:"bb_proj_snap",goalJournal:"bb_goal_journal",postGoalPlan:"bb_post_goal",conservativeMode:"bb_cons_mode",showProjections:"bb_show_proj",projNudgesSeen:"bb_proj_nudges",cycleData:"bb_cycle",showCycleOverlay:"bb_cycle_overlay",blockAdvanceWeeks:"bb_block_adv_wks",weekArchive:"bb_week_archive",viewWeek:"bb_view_week"};
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){if(e.name==='QuotaExceededError'||e.code===22){console.warn('BeeBuildz: localStorage quota exceeded');if(!window._bbQuotaWarned){window._bbQuotaWarned=true;alert('Storage almost full — consider clearing old data in Settings to keep the app working correctly.')}}}};
 
@@ -3603,9 +3604,10 @@ let state={
   projNudgesSeen:load(SK.projNudgesSeen,[]),
   blockAdvanceWeeks:load(SK.blockAdvanceWeeks,4),
   weekArchive:load(SK.weekArchive,{}),
+  viewWeek:load(SK.viewWeek,null),
   timer:{running:false,seconds:0,interval:null}
 };
-function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);save(SK.showCycleOverlay,state.showCycleOverlay);save(SK.blockAdvanceWeeks,state.blockAdvanceWeeks);save(SK.weekArchive,state.weekArchive);}
+function persist(){save(SK.checklist,state.checklist);save(SK.setLog,state.setLog);save(SK.expanded,state.expanded);save(SK.bag,state.bag);save(SK.fatigue,state.fatigue);save(SK.weights,state.weights);save(SK.block,state.block);save(SK.goalWeight,state.goalWeight);save(SK.startingWeight,state.startingWeight);save(SK.collapsed,state.collapsed);save(SK.customProgram,state.customProgram);save(SK.measurements,state.measurements);save(SK.sessionHistory,state.sessionHistory);save(SK.amoled,state.amoled);save(SK.focusMode,state.focusMode);save(SK.coachNotes,state.coachNotes);save(SK.nudgesSeen,state.nudgesSeen);save(SK.dailyEnergy,state.dailyEnergy);save(SK.trainLightMode,state.trainLightMode);save(SK.trainLightDismissed,state.trainLightDismissed);save(SK.runStartDate,state.runStartDate);save(SK.runLog,state.runLog);save(SK.accentColor,state.accentColor);save(SK.projSnapshot,state.projSnapshot);save(SK.goalJournal,state.goalJournal);save(SK.postGoalPlan,state.postGoalPlan);save(SK.conservativeMode,state.conservativeMode);save(SK.showProjections,state.showProjections);save(SK.projNudgesSeen,state.projNudgesSeen);save(SK.cycleData,state.cycleData);save(SK.showCycleOverlay,state.showCycleOverlay);save(SK.blockAdvanceWeeks,state.blockAdvanceWeeks);save(SK.weekArchive,state.weekArchive);save(SK.viewWeek,state.viewWeek);}
 
 /* ═════════════════ ANALYTICS ═════════════════ */
 /**
@@ -3673,7 +3675,15 @@ function applyUiMode(){
 /* ═════════════════ HELPERS ═════════════════ */
 const key=(d,i)=>`${d}_${i}`;
 const setKey=(d,i,s)=>`${d}_${i}_${s}`;
-const isDone=(d,i)=>!!state.checklist[key(d,i)];
+function getViewWeek(){return state.viewWeek||{num:state.block.num,week:state.block.week};}
+function isViewingCurrentWeek(){const v=getViewWeek();return v.num===state.block.num&&v.week===state.block.week;}
+function getViewChecklist(){
+  if(isViewingCurrentWeek())return state.checklist;
+  const v=getViewWeek();
+  const entry=(state.weekArchive||{})[`b${v.num}w${v.week}`];
+  return(entry&&entry.checklist)||{};
+}
+const isDone=(d,i)=>!!getViewChecklist()[key(d,i)];
 const doneCount=(d)=>WORKOUTS[d].exercises.filter((_,i)=>isDone(d,i)).length;
 const totalCount=(d)=>WORKOUTS[d].exercises.length;
 const pct=(d)=>Math.round(doneCount(d)/totalCount(d)*100);
@@ -4099,6 +4109,8 @@ function advanceWeek(){
   // Clear completed marks and set logs — fresh start for new week
   state.checklist = {};
   state.setLog = {};
+  // Always snap view back to current week when advancing
+  state.viewWeek = null;
 
   // Advance block/week counter
   if(state.block.week < total){
@@ -4116,18 +4128,46 @@ function advanceWeek(){
   if(state.activeTab === 'checklist') renderChecklist();
   haptic(30);
 }
+// Navigate view backward — never changes the live week
 function decrementWeek(){
   const total = state.blockAdvanceWeeks || 4;
-  if(state.block.week > 1){
-    state.block.week--;
-  } else if(state.block.num > 1){
-    state.block.num--;
-    state.block.week = total;
+  const cur = getViewWeek();
+  if(cur.week > 1){
+    state.viewWeek = {num:cur.num, week:cur.week-1};
+  } else if(cur.num > 1){
+    state.viewWeek = {num:cur.num-1, week:total};
+  } else {
+    return; // already at the beginning
   }
   persist();
   renderBlockDots();
-  checkBlockAdvanceBanner();
-  haptic(30);
+  if(state.activeTab === 'checklist') renderChecklist();
+  haptic(20);
+}
+// Navigate view forward — if already on current week, advance the live week
+function advanceViewWeek(){
+  if(isViewingCurrentWeek()){
+    advanceWeek();
+    return;
+  }
+  const total = state.blockAdvanceWeeks || 4;
+  const cur = getViewWeek();
+  let next;
+  if(cur.week < total){
+    next = {num:cur.num, week:cur.week+1};
+  } else {
+    next = {num:cur.num+1, week:1};
+  }
+  // If next is current or beyond, snap to current
+  if(next.num > state.block.num || (next.num === state.block.num && next.week >= state.block.week)){
+    state.viewWeek = null;
+  } else {
+    state.viewWeek = next;
+  }
+  persist();
+  renderBlockDots();
+  if(state.activeTab === 'checklist') renderChecklist();
+  haptic(20);
 }
 function toggleTrainLight() {
   state.trainLightMode = !state.trainLightMode;
@@ -5151,7 +5191,7 @@ function markAllSetsDone(exIdx, nSets){
   renderChecklist();
 }
 
-function toggleExercise(i){const k=key(state.activeDay,i);if(state.checklist[k])delete state.checklist[k];else{state.checklist[k]=true;haptic(40);const exName=(WORKOUTS[state.activeDay]?.exercises[i]||{}).name||'';if(exName.includes('Treadmill'))logRunSession();}persist();renderChecklist()}
+function toggleExercise(i){if(!isViewingCurrentWeek())return;const k=key(state.activeDay,i);if(state.checklist[k])delete state.checklist[k];else{state.checklist[k]=true;haptic(40);const exName=(WORKOUTS[state.activeDay]?.exercises[i]||{}).name||'';if(exName.includes('Treadmill'))logRunSession();}persist();renderChecklist()}
 function toggleExpand(i){const k=key(state.activeDay,i);if(state.expanded[k])delete state.expanded[k];else state.expanded[k]=true;persist();renderChecklist()}
 function toggleSet(exIdx,s){
   const k=setKey(state.activeDay,exIdx,s);
@@ -7727,14 +7767,39 @@ function renderHistory(){
 function renderBlockDots(){
   const dots=document.getElementById("blockDots");dots.innerHTML="";
   const total=state.blockAdvanceWeeks||4;
+  const v=getViewWeek();
+  const viewing=!isViewingCurrentWeek();
   for(let i=1;i<=total;i++){
     const d=document.createElement("div");
-    d.className="wk-dot"+(i<state.block.week?" complete":"")+(i===state.block.week?" current":"")+(i===total?" deload":"");
+    // When viewing a past week: all past dots green, current view dot highlighted, rest grey
+    if(viewing){
+      d.className="wk-dot"+(i<v.week?" complete":"")+(i===v.week?" current":"")+(i===total?" deload":"");
+    } else {
+      d.className="wk-dot"+(i<state.block.week?" complete":"")+(i===state.block.week?" current":"")+(i===total?" deload":"");
+    }
     dots.appendChild(d);
   }
-  document.getElementById("blockNum").textContent=state.block.num;
-  document.getElementById("blockWeek").textContent=state.block.week;
+  document.getElementById("blockNum").textContent=v.num;
+  document.getElementById("blockWeek").textContent=v.week;
   const tw=document.getElementById("blockTotalWeeks");if(tw)tw.textContent=total;
+  // Show/hide TODAY button and viewing label
+  const todayBtn=document.getElementById("viewTodayBtn");
+  if(todayBtn) todayBtn.style.display=viewing?"inline-flex":"none";
+  const blockNameEl=document.querySelector(".block-name");
+  if(blockNameEl){
+    if(viewing){
+      blockNameEl.innerHTML=`<span style="color:var(--text-faint);font-size:10px">VIEWING </span>B<span id="blockNum">${v.num}</span> · WK<span id="blockWeek">${v.week}</span> OF <span id="blockTotalWeeks">${total}</span>`;
+    } else {
+      blockNameEl.innerHTML=`BLOCK <span id="blockNum">${v.num}</span> · WEEK <span id="blockWeek">${v.week}</span> OF <span id="blockTotalWeeks">${total}</span>`;
+    }
+  }
+}
+function snapToCurrentWeek(){
+  state.viewWeek=null;
+  persist();
+  renderBlockDots();
+  if(state.activeTab==='checklist') renderChecklist();
+  haptic(20);
 }
 
 /* ═════════════════ INIT ═════════════════ */
