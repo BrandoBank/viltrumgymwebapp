@@ -74,7 +74,7 @@
   /* BLOCK TRACKER */
   .block-tracker{margin:0 24px 16px;background:var(--bg-raised);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
   .block-info{display:flex;align-items:center;gap:14px}
-  .block-name{font-size:12px;font-weight:600}
+  .block-name{font-size:12px;font-weight:600;white-space:nowrap}
   .block-name span{color:var(--lime)}
   .block-week-dots{display:flex;gap:5px}
   .wk-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:all 0.2s}
@@ -625,6 +625,9 @@
   .war-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
   .war-preset{display:inline-block;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-dim);margin-right:6px;margin-bottom:6px;cursor:pointer;transition:all 0.15s;font-family:inherit}
   .war-preset:hover{border-color:var(--lime);color:var(--lime)}
+  .war-days-btn{flex:1;padding:10px 6px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:15px;font-weight:700;color:var(--text-dim);cursor:pointer;transition:all 0.15s;font-family:'JetBrains Mono';text-align:center}
+  .war-days-btn:hover{border-color:var(--lime);color:var(--lime)}
+  .war-days-btn-active{background:rgba(182,255,60,0.1);border-color:var(--lime);color:var(--lime)}
   .vol-row{margin-bottom:12px}
   .vol-row-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
   .vol-name{font-size:12px;color:var(--text);font-weight:500}
@@ -1077,10 +1080,12 @@
 <!-- BLOCK TRACKER -->
 <div class="block-tracker">
   <div class="block-info">
-    <div class="block-name">BLOCK <span id="blockNum">1</span> · WEEK <span id="blockWeek">1</span> OF 4</div>
+    <div class="block-name">BLOCK <span id="blockNum">1</span> · WEEK <span id="blockWeek">1</span> OF <span id="blockTotalWeeks">4</span></div>
     <div class="block-week-dots" id="blockDots"></div>
   </div>
-  <div class="block-action">
+  <div class="block-action" style="display:flex;gap:6px;align-items:center">
+    <button class="btn" onclick="decrementWeek()" style="padding:6px 12px;font-size:16px;line-height:1" title="Previous week">‹</button>
+    <button class="btn" onclick="advanceWeek()" style="padding:6px 12px;font-size:16px;line-height:1" title="Next week">›</button>
     <button class="btn" onclick="openModal('blockInfo')">INFO</button>
   </div>
 </div>
@@ -1218,6 +1223,7 @@
   <section id="tab-checklist" class="tab-content" style="display:none">
     <div class="tools-bar">
       <button class="tool-btn" onclick="openModal('restTimer')"><svg><use href="#i-clock"/></svg>Rest Timer</button>
+      <button class="tool-btn" onclick="openModal('intervalTimer')"><svg><use href="#i-activity"/></svg>Intervals</button>
       <button class="tool-btn" onclick="openModal('plates')"><svg><use href="#i-plates"/></svg>Plate Calc</button>
       <button class="tool-btn" data-advanced onclick="openModal('onerm')"><svg><use href="#i-calc"/></svg>1RM Calc</button>
       <button class="tool-btn" onclick="openModal('warmup')"><svg><use href="#i-warmup"/></svg>Warm-up</button>
@@ -1439,6 +1445,26 @@
 
     <div class="panel">
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-dumbbell"/></svg>PROGRAM CRITERIA</div></div>
+
+      <!-- DAYS PER WEEK -->
+      <div style="font-size:11px;color:var(--text-faint);margin-bottom:8px;letter-spacing:0.08em;font-family:'JetBrains Mono'">DAYS PER WEEK</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px" id="warDaysRow">
+        <button class="war-days-btn" data-days="3" onclick="setWarDays(3)">3</button>
+        <button class="war-days-btn" data-days="4" onclick="setWarDays(4)">4</button>
+        <button class="war-days-btn war-days-btn-active" data-days="5" onclick="setWarDays(5)">5</button>
+        <button class="war-days-btn" data-days="6" onclick="setWarDays(6)">6</button>
+      </div>
+
+      <!-- WEEKS PER BLOCK -->
+      <div style="font-size:11px;color:var(--text-faint);margin-bottom:8px;letter-spacing:0.08em;font-family:'JetBrains Mono'">WEEKS PER BLOCK</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px" id="warWeeksRow">
+        <button class="war-days-btn" data-weeks="2" onclick="setWarWeeks(2)">2</button>
+        <button class="war-days-btn" data-weeks="3" onclick="setWarWeeks(3)">3</button>
+        <button class="war-days-btn war-days-btn-active" data-weeks="4" onclick="setWarWeeks(4)">4</button>
+        <button class="war-days-btn" data-weeks="6" onclick="setWarWeeks(6)">6</button>
+        <button class="war-days-btn" data-weeks="8" onclick="setWarWeeks(8)">8</button>
+      </div>
+
       <div style="font-size:11px;color:var(--text-faint);margin-bottom:8px;letter-spacing:0.08em;font-family:'JetBrains Mono'">QUICK PRESETS</div>
       <div style="margin-bottom:14px">
         <button class="war-preset" onclick="usePreset('strength')">5-Day Powerbuilding</button>
@@ -1447,7 +1473,7 @@
         <button class="war-preset" onclick="usePreset('cut')">Cutting Phase</button>
         <button class="war-preset" onclick="usePreset('athletic')">Athletic Performance</button>
       </div>
-      <textarea class="war-textarea" id="warPrompt" placeholder="Example: Build me a 5-day hypertrophy-focused block. I'm cutting from 243→210 at 5'9&quot;. Monday lower/hamstring, Tuesday push+back, Wednesday pull+arms, Thursday hinge+trap deadlift, Friday shoulders+arms. Include a 20-min treadmill run every day. Keep compounds heavy (bench 205, trap deadlift 305, pulse squats 185). My current PRs: Bench 215, Trap deadlift 305, Squat 245. No shoulder injuries."></textarea>
+      <textarea class="war-textarea" id="warPrompt" placeholder="Example: Build me a hypertrophy-focused block. I'm cutting from 243→210 at 5'9&quot;. Monday lower/hamstring, Tuesday push+back, Wednesday pull+arms, Thursday hinge+trap deadlift, Friday shoulders+arms. Include a 20-min treadmill run every day. Keep compounds heavy (bench 205, trap deadlift 305, pulse squats 185). My current PRs: Bench 215, Trap deadlift 305, Squat 245. No shoulder injuries."></textarea>
       <div class="war-actions">
         <button class="btn primary" onclick="generateWorkout()" id="genBtn"><svg><use href="#i-sparkle"/></svg>GENERATE WORKOUT</button>
         <button class="btn" onclick="restoreDefaultProgram()"><svg><use href="#i-reset"/></svg>RESTORE DEFAULT</button>
@@ -1464,6 +1490,26 @@
 
   <!-- TOOLS TAB -->
   <section id="tab-tools" class="tab-content" style="display:none">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><svg><use href="#i-activity"/></svg>INTERVAL TIMER</div></div>
+      <div style="font-size:12px;color:var(--text-faint);margin-bottom:14px;line-height:1.5">Set work/rest intervals and rounds. Tap Start to begin. Great for HIIT, circuits, and timed sets.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;margin-bottom:6px">WORK (s)</div>
+          <input id="itWorkTab" type="number" min="5" max="300" value="40" oninput="syncItInputs(this,'work')" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--lime);font-family:'JetBrains Mono';font-size:18px;font-weight:700;text-align:center;padding:8px 4px"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;margin-bottom:6px">REST (s)</div>
+          <input id="itRestTab" type="number" min="5" max="300" value="20" oninput="syncItInputs(this,'rest')" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono';font-size:18px;font-weight:700;text-align:center;padding:8px 4px"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;margin-bottom:6px">ROUNDS</div>
+          <input id="itRoundsTab" type="number" min="1" max="99" value="5" oninput="syncItInputs(this,'rounds')" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono';font-size:18px;font-weight:700;text-align:center;padding:8px 4px"/>
+        </div>
+      </div>
+      <button class="btn primary" onclick="openModal('intervalTimer')" style="width:100%"><svg><use href="#i-play"/></svg>OPEN TIMER</button>
+    </div>
+
     <div class="panel" data-advanced>
       <div class="panel-header"><div class="panel-title"><svg><use href="#i-warroom"/></svg>ASK COACH</div></div>
       <div style="font-size:12px;color:var(--text-faint);margin-bottom:12px;line-height:1.5">Got a question? Form, programming, recovery, pain, nutrition — ask anything.</div>
@@ -1949,6 +1995,43 @@
   </div>
 </div>
 
+<!-- INTERVAL TIMER MODAL -->
+<div class="modal-backdrop" id="modal-intervalTimer">
+  <div class="modal" style="max-width:380px;text-align:center">
+    <div class="modal-header"><div class="modal-title">INTERVAL TIMER</div><button class="modal-close" onclick="closeModal('intervalTimer');stopIntervalTimer()"><svg><use href="#i-x"/></svg></button></div>
+    <!-- Settings row (hidden while running) -->
+    <div id="itSettings" style="margin-bottom:18px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
+        <div>
+          <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;margin-bottom:6px">WORK (s)</div>
+          <input id="itWork" type="number" min="5" max="300" value="40" oninput="syncItInputs(this,'work')" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--lime);font-family:'JetBrains Mono';font-size:18px;font-weight:700;text-align:center;padding:8px 4px"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;margin-bottom:6px">REST (s)</div>
+          <input id="itRest" type="number" min="5" max="300" value="20" oninput="syncItInputs(this,'rest')" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono';font-size:18px;font-weight:700;text-align:center;padding:8px 4px"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.08em;margin-bottom:6px">ROUNDS</div>
+          <input id="itRounds" type="number" min="1" max="99" value="5" oninput="syncItInputs(this,'rounds')" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono';font-size:18px;font-weight:700;text-align:center;padding:8px 4px"/>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text-faint);margin-top:6px" id="itTotalLabel"></div>
+    </div>
+    <!-- Phase label -->
+    <div id="itPhaseLabel" style="font-size:11px;font-weight:700;letter-spacing:.15em;font-family:'JetBrains Mono';color:var(--text-faint);margin-bottom:6px">READY</div>
+    <!-- Big timer display -->
+    <div style="font-size:72px;font-weight:700;font-family:'JetBrains Mono';line-height:1;margin-bottom:8px" id="itDisplay">0:40</div>
+    <!-- Round counter -->
+    <div id="itRoundLabel" style="font-size:13px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:20px"> </div>
+    <!-- Controls -->
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn primary" onclick="startIntervalTimer()" id="itStartBtn"><svg><use href="#i-play"/></svg>START</button>
+      <button class="btn" onclick="pauseIntervalTimer()" id="itPauseBtn"><svg><use href="#i-pause"/></svg>PAUSE</button>
+      <button class="btn" onclick="resetIntervalTimer()"><svg><use href="#i-reset"/></svg>RESET</button>
+    </div>
+  </div>
+</div>
+
 <!-- BREATHING TIMER MODAL -->
 <div class="modal-backdrop" id="modal-breathing">
   <div class="modal" style="max-width:380px;text-align:center">
@@ -2046,6 +2129,36 @@
   <div class="modal" style="max-width:580px">
     <div class="modal-header"><div class="modal-title">TRAINING BLOCKS & VOLUME</div><button class="modal-close" onclick="closeModal('blockInfo')"><svg><use href="#i-x"/></svg></button></div>
     <div style="font-size:13px;color:var(--text-dim);line-height:1.7">
+      <!-- MANAGE BLOCK CONTROLS -->
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:18px">
+        <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';letter-spacing:.1em;margin-bottom:14px">MANAGE CURRENT POSITION</div>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;text-align:center">
+            <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:8px">BLOCK #</div>
+            <div style="display:flex;gap:6px;align-items:center;justify-content:center">
+              <button class="btn" onclick="if(state.block.num>1){state.block.num--;persist();renderBlockDots();document.getElementById('blockInfoNum').textContent=state.block.num}" style="padding:5px 10px">−</button>
+              <span id="blockInfoNum" style="font-size:22px;font-weight:700;color:var(--lime);min-width:28px;text-align:center;font-family:'JetBrains Mono'">1</span>
+              <button class="btn" onclick="state.block.num++;persist();renderBlockDots();document.getElementById('blockInfoNum').textContent=state.block.num" style="padding:5px 10px">+</button>
+            </div>
+          </div>
+          <div style="flex:1;text-align:center">
+            <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:8px">WEEK</div>
+            <div style="display:flex;gap:6px;align-items:center;justify-content:center">
+              <button class="btn" onclick="if(state.block.week>1){state.block.week--;persist();renderBlockDots();document.getElementById('blockInfoWeek').textContent=state.block.week}" style="padding:5px 10px">−</button>
+              <span id="blockInfoWeek" style="font-size:22px;font-weight:700;color:var(--lime);min-width:28px;text-align:center;font-family:'JetBrains Mono'">1</span>
+              <button class="btn" onclick="const tw=state.blockAdvanceWeeks||4;if(state.block.week<tw){state.block.week++;persist();renderBlockDots();document.getElementById('blockInfoWeek').textContent=state.block.week}" style="padding:5px 10px">+</button>
+            </div>
+          </div>
+          <div style="flex:1;text-align:center">
+            <div style="font-size:10px;color:var(--text-faint);font-family:'JetBrains Mono';margin-bottom:8px">WKS/BLOCK</div>
+            <div style="display:flex;gap:6px;align-items:center;justify-content:center">
+              <button class="btn" onclick="const tw=state.blockAdvanceWeeks||4;if(tw>2){state.blockAdvanceWeeks=tw-1;persist();renderBlockDots();document.getElementById('blockInfoTotal').textContent=state.blockAdvanceWeeks}" style="padding:5px 10px">−</button>
+              <span id="blockInfoTotal" style="font-size:22px;font-weight:700;color:var(--lime);min-width:28px;text-align:center;font-family:'JetBrains Mono'">4</span>
+              <button class="btn" onclick="state.blockAdvanceWeeks=(state.blockAdvanceWeeks||4)+1;persist();renderBlockDots();document.getElementById('blockInfoTotal').textContent=state.blockAdvanceWeeks" style="padding:5px 10px">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <p style="margin-bottom:14px">A <strong style="color:var(--lime)">block</strong> is 4 weeks of the same exercises with progressive overload week-over-week. This is how your body actually adapts and builds strength.</p>
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:18px">
         <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><strong style="color:var(--lime)">Week 1</strong><span>Baseline — learn the pattern</span></div>
@@ -3960,6 +4073,33 @@ function checkBlockAdvanceBanner(){
     banner.style.display = 'none';
   }
 }
+function advanceWeek(){
+  const total = state.blockAdvanceWeeks || 4;
+  if(state.block.week < total){
+    state.block.week++;
+  } else {
+    state.block.num++;
+    state.block.week = 1;
+    state.block.startDate = new Date().toISOString().slice(0,10);
+  }
+  persist();
+  renderBlockDots();
+  checkBlockAdvanceBanner();
+  haptic(30);
+}
+function decrementWeek(){
+  const total = state.blockAdvanceWeeks || 4;
+  if(state.block.week > 1){
+    state.block.week--;
+  } else if(state.block.num > 1){
+    state.block.num--;
+    state.block.week = total;
+  }
+  persist();
+  renderBlockDots();
+  checkBlockAdvanceBanner();
+  haptic(30);
+}
 function toggleTrainLight() {
   state.trainLightMode = !state.trainLightMode;
   persist();
@@ -4799,7 +4939,7 @@ function renderCheckItems(){
   w.exercises.forEach((ex,i)=>{
     const done=isDone(state.activeDay,i),expKey=key(state.activeDay,i),expanded=!!state.expanded[expKey];
     const nameCleaned=ex.name.replace("🏃 ","");
-    const lib=EXERCISE_LIBRARY[nameCleaned]||GENERIC_EX;
+    const lib=lookupExerciseLib(nameCleaned).lib;
     const nSets=numSets(ex.sets);
     const isTreadmill = ex.name.includes("Treadmill");
     const wrap=document.createElement("div");
@@ -6102,6 +6242,99 @@ function updateModalTimerDisplay(){
   }
 }
 
+/* ═════════════════ INTERVAL TIMER ═════════════════ */
+let itState = {interval:null, running:false, phase:'work', seconds:40, round:1, totalRounds:5, workSecs:40, restSecs:20};
+function itBeep(freq, dur){
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=freq;g.gain.setValueAtTime(0.25,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+dur);o.start();o.stop(ctx.currentTime+dur);}catch{}
+}
+function itFmt(s){const m=Math.floor(s/60),r=s%60;return`${m}:${r.toString().padStart(2,'0')}`;}
+function updateItDisplay(){
+  const disp=document.getElementById('itDisplay');
+  const phase=document.getElementById('itPhaseLabel');
+  const round=document.getElementById('itRoundLabel');
+  if(!disp)return;
+  disp.textContent=itFmt(Math.max(0,itState.seconds));
+  const isWork=itState.phase==='work';
+  disp.style.color=itState.seconds<=3&&itState.running?'var(--red)':isWork?'var(--lime)':'var(--blue)';
+  if(phase)phase.textContent=itState.running||itState.seconds<(isWork?itState.workSecs:itState.restSecs)?itState.phase.toUpperCase():'READY';
+  if(round)round.textContent=itState.running||itState.round>1?`ROUND ${itState.round} OF ${itState.totalRounds}`:'';
+}
+function itUpdateTotal(){
+  const w=parseInt(document.getElementById('itWork')?.value)||40;
+  const r=parseInt(document.getElementById('itRest')?.value)||20;
+  const rds=parseInt(document.getElementById('itRounds')?.value)||5;
+  const total=((w+r)*rds);
+  const el=document.getElementById('itTotalLabel');
+  if(el)el.textContent=`Total: ${itFmt(total)} · ${rds} rounds of ${w}s work / ${r}s rest`;
+}
+function startIntervalTimer(){
+  if(itState.running)return;
+  if(itState.seconds===(itState.phase==='work'?itState.workSecs:itState.restSecs)&&itState.round===1){
+    // Fresh start — read settings
+    itState.workSecs=Math.max(5,parseInt(document.getElementById('itWork')?.value)||40);
+    itState.restSecs=Math.max(5,parseInt(document.getElementById('itRest')?.value)||20);
+    itState.totalRounds=Math.max(1,parseInt(document.getElementById('itRounds')?.value)||5);
+    itState.phase='work';itState.round=1;itState.seconds=itState.workSecs;
+    const s=document.getElementById('itSettings');if(s)s.style.display='none';
+  }
+  itState.running=true;
+  haptic(30);
+  itState.interval=setInterval(()=>{
+    itState.seconds--;
+    updateItDisplay();
+    if(itState.seconds<=0){
+      itBeep(itState.phase==='work'?880:660,0.15);
+      haptic([100,50,100]);
+      if(itState.phase==='work'){
+        itState.phase='rest';itState.seconds=itState.restSecs;
+      } else {
+        itState.round++;
+        if(itState.round>itState.totalRounds){
+          // Done
+          clearInterval(itState.interval);itState.running=false;itState.round=1;itState.phase='work';itState.seconds=itState.workSecs;
+          const ph=document.getElementById('itPhaseLabel');if(ph)ph.textContent='DONE ✓';
+          const di=document.getElementById('itDisplay');if(di){di.textContent='0:00';di.style.color='var(--lime)';}
+          const rl=document.getElementById('itRoundLabel');if(rl)rl.textContent='All rounds complete!';
+          const s=document.getElementById('itSettings');if(s)s.style.display='';
+          haptic([200,100,200,100,400]);
+          itBeep(1046,0.4);
+          return;
+        }
+        itState.phase='work';itState.seconds=itState.workSecs;
+      }
+      updateItDisplay();
+    }
+  },1000);
+}
+function pauseIntervalTimer(){
+  if(itState.interval)clearInterval(itState.interval);
+  itState.running=false;
+}
+function stopIntervalTimer(){
+  pauseIntervalTimer();
+}
+function resetIntervalTimer(){
+  pauseIntervalTimer();
+  itState.phase='work';itState.round=1;
+  itState.workSecs=Math.max(5,parseInt(document.getElementById('itWork')?.value)||40);
+  itState.restSecs=Math.max(5,parseInt(document.getElementById('itRest')?.value)||20);
+  itState.totalRounds=Math.max(1,parseInt(document.getElementById('itRounds')?.value)||5);
+  itState.seconds=itState.workSecs;
+  const s=document.getElementById('itSettings');if(s)s.style.display='';
+  const ph=document.getElementById('itPhaseLabel');if(ph)ph.textContent='READY';
+  const rl=document.getElementById('itRoundLabel');if(rl)rl.textContent='';
+  updateItDisplay();
+}
+function syncItInputs(src, field){
+  // Keep modal and tab inputs in sync
+  const val=src.value;
+  const modalId=field==='work'?'itWork':field==='rest'?'itRest':'itRounds';
+  const tabId=field==='work'?'itWorkTab':field==='rest'?'itRestTab':'itRoundsTab';
+  const other=src.id===modalId?document.getElementById(tabId):document.getElementById(modalId);
+  if(other)other.value=val;
+  itUpdateTotal();
+}
+
 /* ═════════════════ BREATHING TIMER ═════════════════ */
 let breathInterval = null;
 function startBreathing(){
@@ -6681,6 +6914,26 @@ function renderWarRoom(){
   document.getElementById("currentProgSummary").innerHTML = `<div style="font-size:10px;color:var(--text-faint);margin-bottom:8px;letter-spacing:0.08em;font-family:'JetBrains Mono'">PROGRAM STATUS:${custom}</div>${summary}`;
 }
 
+let warDays = 5, warWeeks = 4;
+function setWarDays(n){
+  warDays = n;
+  document.querySelectorAll('#warDaysRow .war-days-btn').forEach(b=>{
+    b.classList.toggle('war-days-btn-active', parseInt(b.dataset.days)===n);
+  });
+  // Also update blockAdvanceWeeks to match
+  state.blockAdvanceWeeks = warWeeks;
+  persist();
+  renderBlockDots();
+}
+function setWarWeeks(n){
+  warWeeks = n;
+  document.querySelectorAll('#warWeeksRow .war-days-btn').forEach(b=>{
+    b.classList.toggle('war-days-btn-active', parseInt(b.dataset.weeks)===n);
+  });
+  state.blockAdvanceWeeks = n;
+  persist();
+  renderBlockDots();
+}
 function usePreset(id){
   const textarea = document.getElementById("warPrompt");
   textarea.value = PRESETS[id] || "";
@@ -6693,28 +6946,36 @@ function setWarStatus(msg, type){
 }
 
 async function generateWorkout(){
-  const prompt = document.getElementById("warPrompt").value.trim();
-  if(!prompt){
+  const rawPrompt = document.getElementById("warPrompt").value.trim();
+  if(!rawPrompt){
     setWarStatus("Describe what you want your workout to look like", "error");
     return;
   }
 
-  logEvent('ai_workout_generated',{prompt: prompt.slice(0,80)});
+  // Build the day list based on warDays selection
+  const ALL_DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const activeDays = ALL_DAYS.slice(0, warDays);
+  const daysJson = activeDays.map(d=>`"${d}": { "label": "${d.slice(0,3).toUpperCase()} — [focus area]", "muscleGroups": [...], "exercises": [...] }`).join(',\n  ');
+
+  // Prepend structured context to the user prompt
+  const prompt = `[${warDays}-day split, ${warWeeks}-week block] ${rawPrompt}`;
+
+  logEvent('ai_workout_generated',{prompt: prompt.slice(0,80), days: warDays, weeks: warWeeks});
   const btn = document.getElementById("genBtn");
   btn.disabled = true;
   setWarStatus("Generating workout with Claude...", "loading");
   document.getElementById("genResult").style.display = "none";
 
-  const systemPrompt = `You are an expert strength and conditioning coach. When the user describes a workout program, generate a structured 5-day training block as JSON.
+  const systemPrompt = `You are an expert strength and conditioning coach. When the user describes a workout program, generate a structured ${warDays}-day training block as JSON.
+
+The user has selected ${warDays} training days per week and a ${warWeeks}-week block structure. Design the split accordingly (e.g. ${warDays===3?'full-body or upper/lower/full':warDays===4?'upper/lower or push/pull':warDays===6?'push/pull/legs twice':'5-day powerbuilding'} is common for ${warDays} days).
 
 Return ONLY valid JSON matching this exact schema (no markdown, no commentary):
 {
-  "Monday": { "label": "MON — [focus area]", "muscleGroups": ["quads","glutes",...], "exercises": [ { "name": "Exercise Name", "sets": "4", "reps": "10", "weight": "50-60lb", "note": "brief form cue" }, ... ] },
-  "Tuesday": { same structure },
-  "Wednesday": { same structure },
-  "Thursday": { same structure },
-  "Friday": { same structure }
+  ${daysJson}
 }
+
+Include ONLY these ${warDays} days: ${activeDays.join(', ')}. Do NOT include other days of the week.
 
 Rules:
 - muscleGroups must use these exact lowercase values: quads, hamstrings, glutes, calves, chest, back, shoulders, biceps, triceps, core, traps
@@ -6754,17 +7015,26 @@ Rules:
     const workoutData = JSON.parse(jsonStr);
 
     // Validate structure
-    const requiredDays = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
+    const ALL_DAYS_V = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+    const requiredDays = ALL_DAYS_V.slice(0, warDays);
     for(const d of requiredDays){
       if(!workoutData[d] || !Array.isArray(workoutData[d].exercises)){
         throw new Error(`Missing or invalid ${d} in response`);
       }
     }
+    // Set blockAdvanceWeeks to match selected weeks
+    state.blockAdvanceWeeks = warWeeks;
+    state.block.week = 1;
+    state.block.startDate = new Date().toISOString().slice(0,10);
 
     // Apply to state
     state.customProgram = workoutData;
+    // Remove old days not in new program before assigning
+    Object.keys(WORKOUTS).forEach(k=>{ if(!workoutData[k]) delete WORKOUTS[k]; });
     Object.assign(WORKOUTS, workoutData);
+    refreshDays();
     persist();
+    renderBlockDots();
 
     setWarStatus("Workout generated & applied — check Program tab", "success");
     const resultEl = document.getElementById("genResult");
@@ -7256,7 +7526,7 @@ function renderMoreModal(){
   if(!grid)return;
   grid.innerHTML=items.filter(i=>i.show).map(i=>`<button class="more-btn${activeTab===i.tab?' active':''}" onclick="showTab('${i.tab}');closeModal('moreTabs')"><svg><use href="#${i.icon}"/></svg>${i.label}</button>`).join('');
 }
-function openModal(id){const el=document.getElementById("modal-"+id);if(!el)return;el.classList.add("open");if(id==="plates")calcPlates();if(id==="onerm")calcOneRM();if(id==="warmup")renderWarmup();if(id==="history")renderHistory();if(id==="moreTabs")renderMoreModal();}
+function openModal(id){const el=document.getElementById("modal-"+id);if(!el)return;el.classList.add("open");if(id==="plates")calcPlates();if(id==="onerm")calcOneRM();if(id==="warmup")renderWarmup();if(id==="history")renderHistory();if(id==="moreTabs")renderMoreModal();if(id==="blockInfo"){const n=document.getElementById("blockInfoNum");const w=document.getElementById("blockInfoWeek");const t=document.getElementById("blockInfoTotal");if(n)n.textContent=state.block.num;if(w)w.textContent=state.block.week;if(t)t.textContent=state.blockAdvanceWeeks||4;}if(id==="intervalTimer"){itUpdateTotal();updateItDisplay();}}
 function closeModal(id){document.getElementById("modal-"+id).classList.remove("open")}
 document.querySelectorAll(".modal-backdrop").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open")}));
 
@@ -7282,11 +7552,48 @@ function calcOneRM(){
   document.getElementById("rmPercents").innerHTML=[95,90,85,80,70].map(p=>`<div class="percent-card"><div class="percent-label mono">${p}%</div><div class="percent-val">${Math.round(rm*p/100)}</div></div>`).join("");
 }
 
+/* ── Keyword-based exercise lookup (handles AI-generated name variants) ── */
+const EXERCISE_KEYWORDS = [
+  {keys:['squat','front squat','box squat','goblet squat','hack squat','pulse squat'],lib:'Squat'},
+  {keys:['deadlift','rdl','romanian','trap bar','hex bar','sumo dead','conventional dead'],lib:'Deadlift'},
+  {keys:['bench press','chest press','db press','dumbbell press','barbell press','incline press','decline press','push press'],lib:'Bench Press'},
+  {keys:['overhead press','ohp','military press','shoulder press','arnold press','standing press'],lib:'Overhead Press'},
+  {keys:['barbell row','bent over row','pendlay','chest supported row','t-bar row','db row','dumbbell row','cable row','seated row'],lib:'Barbell Row'},
+  {keys:['pull-up','pullup','chin-up','chinup','lat pull','pulldown'],lib:'Pull-ups'},
+  {keys:['incline','incline bench','incline db','incline dumbbell'],lib:'Incline Bench'},
+  {keys:['dumbbell chest','db chest','db flat','dumbbell flat'],lib:'Dumbbell Chest Press'},
+  {keys:['lateral raise','side raise','side lateral'],lib:'Lateral Raises'},
+  {keys:['leg press'],lib:'Leg Press'},
+  {keys:['leg curl','hamstring curl','lying curl','seated curl'],lib:'Leg Curl'},
+  {keys:['calf raise','calf press'],lib:'Calf Raise'},
+];
+function lookupExerciseLib(name){
+  const n=name.toLowerCase().replace(/🏃 /,'');
+  if(EXERCISE_LIBRARY[name]) return {key:name,lib:EXERCISE_LIBRARY[name]};
+  // Try cleaned name
+  const cleaned=name.replace('🏃 ','');
+  if(EXERCISE_LIBRARY[cleaned]) return {key:cleaned,lib:EXERCISE_LIBRARY[cleaned]};
+  // Keyword fallback
+  for(const {keys,lib} of EXERCISE_KEYWORDS){
+    if(keys.some(k=>n.includes(k))) return {key:lib,lib:EXERCISE_LIBRARY[lib]||GENERIC_EX};
+  }
+  return {key:cleaned,lib:GENERIC_EX};
+}
+
 function renderWarmup(){
   const day=state.activeDay,w=WORKOUTS[day];
-  const mainLift=w.exercises.find(ex=>EXERCISE_LIBRARY[ex.name]?.mainLift);
+  // Try exact mainLift match first, then keyword fallback
+  let mainLift=w.exercises.find(ex=>EXERCISE_LIBRARY[ex.name]?.mainLift);
+  let warmupName=mainLift?.name;
+  if(!mainLift){
+    // Keyword fallback — find first exercise matching a known compound
+    for(const ex of w.exercises){
+      const {key,lib}=lookupExerciseLib(ex.name);
+      if(WARMUP_LIBRARY[key]){mainLift=ex;warmupName=key;break;}
+    }
+  }
   if(!mainLift){document.getElementById("warmupContent").innerHTML=`<div style="color:var(--text-dim);font-size:13px">No main lift scheduled for ${day}. Do 5 min of easy cardio + dynamic stretches.</div>`;return}
-  const wu=WARMUP_LIBRARY[mainLift.name]||WARMUP_FALLBACK;
+  const wu=WARMUP_LIBRARY[warmupName||mainLift.name]||WARMUP_FALLBACK;
   const workingWeight=parseInt(mainLift.weight.match(/\d+/g)?.slice(-1)[0]||135);
 
   const barItems=(wu.bar||[]).map(item=>{
@@ -7299,7 +7606,7 @@ function renderWarmup(){
   }).join("");
 
   document.getElementById("warmupContent").innerHTML=`
-    <div style="font-size:11px;color:var(--text-faint);margin-bottom:14px;font-family:'JetBrains Mono'">FOR ${day.toUpperCase()} · ${mainLift.name.toUpperCase()}</div>
+    <div style="font-size:11px;color:var(--text-faint);margin-bottom:14px;font-family:'JetBrains Mono'">FOR ${day.toUpperCase()} · ${mainLift.name.replace('🏃 ','').toUpperCase()}</div>
 
     <div class="warmup-section">
       <div class="warmup-section-title"><svg><use href="#i-warmup"/></svg>MOBILITY & STRETCHING</div>
@@ -7332,13 +7639,15 @@ function renderHistory(){
 /* ═════════════════ BLOCK DOTS ═════════════════ */
 function renderBlockDots(){
   const dots=document.getElementById("blockDots");dots.innerHTML="";
-  for(let i=1;i<=4;i++){
+  const total=state.blockAdvanceWeeks||4;
+  for(let i=1;i<=total;i++){
     const d=document.createElement("div");
-    d.className="wk-dot"+(i<state.block.week?" complete":"")+(i===state.block.week?" current":"")+(i===4?" deload":"");
+    d.className="wk-dot"+(i<state.block.week?" complete":"")+(i===state.block.week?" current":"")+(i===total?" deload":"");
     dots.appendChild(d);
   }
   document.getElementById("blockNum").textContent=state.block.num;
   document.getElementById("blockWeek").textContent=state.block.week;
+  const tw=document.getElementById("blockTotalWeeks");if(tw)tw.textContent=total;
 }
 
 /* ═════════════════ INIT ═════════════════ */
