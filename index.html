@@ -6767,6 +6767,8 @@ async function handlePdfUpload(event){
     if(fullText.trim().length < 50){
       throw new Error("Could not extract text from PDF (might be scanned/image-only). OCR is not supported yet.");
     }
+    // Truncate very long PDFs — 60k chars covers any realistic program PDF without exceeding payload limits
+    if(fullText.length > 60000) fullText = fullText.slice(0, 60000) + "\n\n[truncated for length]";
 
     btn.textContent = "PARSING WITH AI…";
     statusEl.innerHTML = '<div style="color:var(--text-faint);font-style:italic">AI is analyzing the workout structure (~10-30 seconds)…</div>';

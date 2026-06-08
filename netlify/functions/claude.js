@@ -49,8 +49,8 @@ function isAllowedOrigin(origin) {
 // ── Allowlisted request fields forwarded to Anthropic ────────────────────────
 const ALLOWED_FIELDS = new Set(['model', 'max_tokens', 'system', 'messages', 'temperature', 'stream']);
 
-// ── Max payload size (32 KB) ──────────────────────────────────────────────────
-const MAX_BODY_BYTES = 32_768;
+// ── Max payload size (200 KB) — raised from 32 KB to support PDF upload payloads ──
+const MAX_BODY_BYTES = 204_800;
 
 // ── Handler ───────────────────────────────────────────────────────────────────
 exports.handler = async (event) => {
